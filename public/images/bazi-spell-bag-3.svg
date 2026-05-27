@@ -1,0 +1,7 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#F6F4EF"/>
+  <rect x="230" y="130" width="340" height="340" rx="10" fill="#FFFFFF" stroke="#18181B"/>
+  <path d="M310 250H490M310 310H490M310 370H430" stroke="#18181B" stroke-width="8" stroke-linecap="round"/>
+  <path d="M375 175L400 220L425 175" stroke="#751C1C" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="400" y="535" text-anchor="middle" fill="#18181B" font-family="Arial" font-size="24">Rune Paper Contents</text>
+</svg>

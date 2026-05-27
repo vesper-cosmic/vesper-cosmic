@@ -1,0 +1,11 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#F6F4EF"/>
+  <rect x="180" y="70" width="440" height="460" rx="12" fill="#FFFFFF" stroke="#D4D4D8"/>
+  <rect x="230" y="130" width="340" height="16" rx="8" fill="#18181B"/>
+  <rect x="230" y="178" width="260" height="10" rx="5" fill="#A1A1AA"/>
+  <rect x="230" y="210" width="300" height="10" rx="5" fill="#A1A1AA"/>
+  <rect x="230" y="242" width="220" height="10" rx="5" fill="#A1A1AA"/>
+  <circle cx="400" cy="365" r="72" stroke="#18181B" stroke-width="2"/>
+  <path d="M400 293V437M328 365H472M350 315L450 415M450 315L350 415" stroke="#18181B" stroke-width="2"/>
+  <text x="400" y="495" text-anchor="middle" fill="#18181B" font-family="Arial" font-size="24">Digital PDF Layout</text>
+</svg>

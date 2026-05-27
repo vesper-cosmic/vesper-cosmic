@@ -1,0 +1,9 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#ECE7DE"/>
+  <path d="M280 180H520L570 460H230L280 180Z" fill="#3D1F2F"/>
+  <path d="M310 180C315 120 485 120 490 180" stroke="#E7D8A6" stroke-width="10"/>
+  <circle cx="330" cy="360" r="18" fill="#E7D8A6"/>
+  <circle cx="400" cy="330" r="22" fill="#A7F3D0"/>
+  <circle cx="470" cy="365" r="16" fill="#DDD6FE"/>
+  <text x="400" y="535" text-anchor="middle" fill="#18181B" font-family="Arial" font-size="24">Custom Bazi Spell Bag</text>
+</svg>

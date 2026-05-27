@@ -1,0 +1,9 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#F6F4EF"/>
+  <rect x="210" y="90" width="380" height="420" rx="12" fill="#111827"/>
+  <rect x="255" y="140" width="290" height="320" rx="8" fill="#FFFFFF"/>
+  <path d="M350 250H450L430 400H370L350 250Z" fill="#C7B081" stroke="#18181B" stroke-width="3"/>
+  <rect x="365" y="215" width="70" height="35" rx="8" fill="#18181B"/>
+  <circle cx="400" cy="330" r="34" fill="#E7D8A6"/>
+  <text x="400" y="548" text-anchor="middle" fill="#18181B" font-family="Arial" font-size="24">Shadow Box Edition</text>
+</svg>

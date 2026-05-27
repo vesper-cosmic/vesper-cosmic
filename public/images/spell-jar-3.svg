@@ -1,0 +1,8 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#F6F4EF"/>
+  <circle cx="400" cy="275" r="110" fill="#751C1C"/>
+  <circle cx="400" cy="275" r="74" fill="#9F2E2E"/>
+  <path d="M340 275H460M400 215V335" stroke="#E7D8A6" stroke-width="6"/>
+  <rect x="250" y="430" width="300" height="14" rx="7" fill="#18181B"/>
+  <text x="400" y="500" text-anchor="middle" fill="#18181B" font-family="Arial" font-size="24">Wax Seal Close-up</text>
+</svg>

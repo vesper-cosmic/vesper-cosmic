@@ -1,0 +1,9 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#151515"/>
+  <circle cx="400" cy="250" r="125" stroke="#E7D8A6" stroke-width="3"/>
+  <circle cx="400" cy="250" r="72" stroke="#E7D8A6" stroke-width="2"/>
+  <path d="M280 250H520M400 130V370M315 165L485 335M485 165L315 335" stroke="#E7D8A6" stroke-width="2"/>
+  <rect x="210" y="415" width="380" height="18" rx="9" fill="#E7D8A6"/>
+  <rect x="250" y="455" width="300" height="12" rx="6" fill="#EFE7D2"/>
+  <text x="400" y="505" text-anchor="middle" fill="#EFE7D2" font-family="Arial" font-size="26">Report Preview</text>
+</svg>

@@ -1,0 +1,8 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#18181B"/>
+  <path d="M300 140H500L470 470H330L300 140Z" fill="#EFE7D2" stroke="#E7D8A6" stroke-width="4"/>
+  <circle cx="400" cy="285" r="80" fill="#C7B081"/>
+  <circle cx="365" cy="330" r="18" fill="#FFFFFF"/>
+  <circle cx="435" cy="250" r="14" fill="#FFFFFF"/>
+  <text x="400" y="535" text-anchor="middle" fill="#EFE7D2" font-family="Arial" font-size="24">Energy Jar Detail</text>
+</svg>

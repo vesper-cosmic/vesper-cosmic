@@ -1,0 +1,9 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#151515"/>
+  <circle cx="300" cy="270" r="48" fill="#A7F3D0"/>
+  <circle cx="405" cy="310" r="62" fill="#DDD6FE"/>
+  <circle cx="505" cy="250" r="42" fill="#E7D8A6"/>
+  <circle cx="355" cy="390" r="34" fill="#FCA5A5"/>
+  <circle cx="485" cy="395" r="28" fill="#BAE6FD"/>
+  <text x="400" y="535" text-anchor="middle" fill="#EFE7D2" font-family="Arial" font-size="24">Crystal Chips</text>
+</svg>

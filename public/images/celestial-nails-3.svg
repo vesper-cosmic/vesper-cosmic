@@ -1,0 +1,8 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#151515"/>
+  <rect x="240" y="150" width="320" height="300" rx="150" fill="#EADBC8"/>
+  <path d="M300 235C300 200 345 200 345 235V350C345 375 300 375 300 350V235Z" fill="#FAFAFA"/>
+  <path d="M382 205C382 170 427 170 427 205V375C427 400 382 400 382 375V205Z" fill="#FAFAFA"/>
+  <path d="M462 235C462 200 507 200 507 235V350C507 375 462 375 462 350V235Z" fill="#FAFAFA"/>
+  <text x="400" y="515" text-anchor="middle" fill="#EFE7D2" font-family="Arial" font-size="24">Worn Styling Shot</text>
+</svg>

@@ -1,0 +1,11 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#231F20"/>
+  <rect x="130" y="120" width="540" height="360" rx="16" fill="#F6F4EF"/>
+  <circle cx="290" cy="300" r="82" fill="#18181B"/>
+  <circle cx="290" cy="300" r="55" stroke="#E7D8A6" stroke-width="2"/>
+  <rect x="420" y="220" width="150" height="14" rx="7" fill="#18181B"/>
+  <rect x="420" y="264" width="220" height="10" rx="5" fill="#71717A"/>
+  <rect x="420" y="296" width="190" height="10" rx="5" fill="#71717A"/>
+  <rect x="420" y="328" width="210" height="10" rx="5" fill="#71717A"/>
+  <text x="400" y="520" text-anchor="middle" fill="#E7D8A6" font-family="Arial" font-size="24">English Bazi Report</text>
+</svg>

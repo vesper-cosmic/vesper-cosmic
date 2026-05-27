@@ -1,0 +1,9 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#F6F4EF"/>
+  <circle cx="400" cy="300" r="180" fill="#18181B"/>
+  <path d="M310 220C310 170 370 170 370 220V390C370 425 310 425 310 390V220Z" fill="#EFE7D2"/>
+  <path d="M430 210C430 160 490 160 490 210V400C490 435 430 435 430 400V210Z" fill="#EFE7D2"/>
+  <path d="M335 260L345 282L369 286L352 303L356 327L335 316L314 327L318 303L301 286L325 282L335 260Z" fill="#18181B"/>
+  <circle cx="460" cy="280" r="16" fill="#18181B"/>
+  <text x="400" y="535" text-anchor="middle" fill="#18181B" font-family="Arial" font-size="24">Macro Detail</text>
+</svg>
