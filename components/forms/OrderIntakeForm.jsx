@@ -182,20 +182,20 @@ export default function OrderIntakeForm({ product }) {
     <form onSubmit={handleSubmit} className="space-y-8">
       {errors.submit ? <ErrorBox>{errors.submit}</ErrorBox> : null}
 
-      <section className="rounded-lg border border-[#7fa9b5]/35 bg-[#10232d] p-5">
-        <p className="text-sm uppercase tracking-[0.24em] text-[#9bc4cf]">
+      <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5">
+        <p className="text-sm uppercase tracking-[0.24em] text-[#8EB1D1]">
           Step 1 of 2 — Your Details
         </p>
-        <div className="mt-4 h-2 rounded-full bg-[#1f3944]">
-          <div className="h-2 w-1/2 rounded-full bg-[#b8d7df]" />
+        <div className="mt-4 h-2 rounded-full bg-[#C4D8E5]">
+          <div className="h-2 w-1/2 rounded-full bg-[#8EB1D1]" />
         </div>
-        <h1 className="mt-6 text-4xl font-semibold text-[#edf7f8]">
+        <h1 className="mt-6 text-4xl font-semibold text-[#1C2B48]">
           {product.name}
         </h1>
-        <p className="mt-2 text-2xl font-semibold text-[#d8eef3]">
+        <p className="mt-2 text-2xl font-semibold text-[#1C2B48]">
           ${product.price} {product.currency}
         </p>
-        <p className="mt-3 text-sm leading-6 text-[#c7d9dd]">
+        <p className="mt-3 text-sm leading-6 text-[#35506B]">
           {product.fulfillmentTime}
         </p>
       </section>
@@ -234,7 +234,7 @@ export default function OrderIntakeForm({ product }) {
         <ShippingFields form={form} errors={errors} updateAddress={updateAddress} />
       ) : null}
 
-      <p className="rounded-lg border border-[#7fa9b5]/25 bg-[#0d1d26] p-4 text-sm leading-6 text-[#c7d9dd]">
+      <p className="rounded-lg border border-[#8EB1D1]/25 bg-[#C4D8E5] p-4 text-sm leading-6 text-[#35506B]">
         Your information is kept strictly confidential and used only for your
         order.
       </p>
@@ -242,7 +242,7 @@ export default function OrderIntakeForm({ product }) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mist-button w-full rounded border border-[#b8d7df] bg-[#b8d7df] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#08141b] transition hover:bg-[#d8eef3] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mist-button w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? "Preparing Checkout..." : "Continue to Review & Pay"}
       </button>
@@ -317,19 +317,19 @@ function NailDetailsFields({
 }) {
   return (
     <FormPanel title="Press-On Nail Details">
-      <p className="rounded border border-[#b8d7df]/35 bg-[#08141b] p-4 text-sm leading-6 text-[#d8eef3]">
+      <p className="rounded border border-[#8EB1D1]/35 bg-[#1C2B48] p-4 text-sm leading-6 text-[#E8ECEF]">
         {intro}
       </p>
-      <div className="rounded-lg border border-[#7fa9b5]/25 bg-[#0d1d26] p-4">
+      <div className="rounded-lg border border-[#8EB1D1]/25 bg-[#C4D8E5] p-4">
         <div className="grid gap-4 md:grid-cols-[1fr_180px] md:items-center">
-          <p className="text-sm leading-6 text-[#c7d9dd]">
+          <p className="text-sm leading-6 text-[#35506B]">
             Measure the widest part of each nail in millimeters using a ruler.
             If you're between sizes, size up. Tip: A credit card is 85mm wide —
             use it as a reference.
           </p>
-          <div className="rounded border border-[#b8d7df]/35 p-3 text-center">
-            <div className="mx-auto h-20 w-32 rounded-md border border-[#b8d7df] bg-[#10232d]" />
-            <p className="mt-2 text-xs text-[#9fb8bf]">85mm reference card</p>
+          <div className="rounded border border-[#8EB1D1]/35 p-3 text-center">
+            <div className="mx-auto h-20 w-32 rounded-md border border-[#8EB1D1] bg-[#E8ECEF]" />
+            <p className="mt-2 text-xs text-[#5B7893]">85mm reference card</p>
           </div>
         </div>
       </div>
@@ -350,11 +350,11 @@ function NailDetailsFields({
         disabled={form.mixedSet}
         onChange={updateNailMeasurement}
       />
-      <p className="text-xs leading-5 text-[#9fb8bf]">
+      <p className="text-xs leading-5 text-[#5B7893]">
         Not sure? Select 'Mixed Set' below and I'll include the most common
         sizes so you can find your best fit.
       </p>
-      <label className="flex items-start gap-3 rounded border border-[#7fa9b5]/25 p-3 text-sm text-[#c7d9dd]">
+      <label className="flex items-start gap-3 rounded border border-[#8EB1D1]/25 p-3 text-sm text-[#35506B]">
         <input
           type="checkbox"
           checked={form.mixedSet}
@@ -365,7 +365,7 @@ function NailDetailsFields({
         />
         <span>
           Send me a Mixed Set instead
-          <span className="block text-xs text-[#9fb8bf]">
+          <span className="block text-xs text-[#5B7893]">
             includes sizes 10–18mm, one of each
           </span>
         </span>
@@ -401,7 +401,7 @@ function NailDetailsFields({
         onChange={updateField}
         error={errors.stylePreference}
       />
-      <p className="text-sm leading-6 text-[#9fb8bf]">
+      <p className="text-sm leading-6 text-[#5B7893]">
         I'll use these as a reference — the final design will be guided by your
         BaZi element and intentions.
       </p>
@@ -410,7 +410,7 @@ function NailDetailsFields({
         error={errors.inspirationPhoto}
         hint="Upload a photo of a style you love. This helps me understand your aesthetic — your set will still be uniquely designed for your energy."
       >
-        <input type="file" accept="image/png,image/jpeg" onChange={updatePhoto} className="w-full text-sm text-[#c7d9dd] file:mr-4 file:rounded file:border-0 file:bg-[#b8d7df] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[#08141b]" />
+        <input type="file" accept="image/png,image/jpeg" onChange={updatePhoto} className="w-full text-sm text-[#35506B] file:mr-4 file:rounded file:border-0 file:bg-[#8EB1D1] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[#1C2B48]" />
       </Field>
       <Field label="Any other notes for your nails?">
         <textarea
@@ -428,7 +428,7 @@ function NailDetailsFields({
 function NailMeasurementRow({ title, keys, values, errors, disabled, onChange }) {
   return (
     <div>
-      <h3 className="mb-3 text-lg font-semibold text-[#edf7f8]">{title}</h3>
+      <h3 className="mb-3 text-lg font-semibold text-[#1C2B48]">{title}</h3>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {keys.map(([key, label]) => (
           <Field key={key} label={label} error={errors[key]}>
@@ -483,14 +483,14 @@ function ShippingFields({ form, errors, updateAddress }) {
 function RadioGroup({ label, name, value, options, onChange, error, renderOption }) {
   return (
     <fieldset>
-      <legend className="mb-3 text-sm font-semibold text-[#edf7f8]">{label}</legend>
+      <legend className="mb-3 text-sm font-semibold text-[#1C2B48]">{label}</legend>
       <div className="grid gap-3 sm:grid-cols-2">
         {options.map((option) => {
           const optionValue = typeof option === "string" ? option : option.id;
           const optionLabel = typeof option === "string" ? option : option.label;
 
           return (
-            <label key={optionValue} className="flex items-center gap-3 rounded border border-[#7fa9b5]/25 p-3 text-sm text-[#c7d9dd] transition hover:border-[#b8d7df]">
+            <label key={optionValue} className="flex items-center gap-3 rounded border border-[#8EB1D1]/25 p-3 text-sm text-[#35506B] transition hover:border-[#8EB1D1]">
               <input
                 type="radio"
                 name={name}
@@ -511,8 +511,8 @@ function RadioGroup({ label, name, value, options, onChange, error, renderOption
 
 function FormPanel({ title, children }) {
   return (
-    <section className="rounded-lg border border-[#7fa9b5]/35 bg-[#10232d] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.25)]">
-      <h2 className="mb-5 text-2xl font-semibold text-[#edf7f8]">{title}</h2>
+    <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.25)]">
+      <h2 className="mb-5 text-2xl font-semibold text-[#1C2B48]">{title}</h2>
       <div className="grid gap-5">{children}</div>
     </section>
   );
@@ -521,9 +521,9 @@ function FormPanel({ title, children }) {
 function Field({ label, hint, error, children }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-semibold text-[#edf7f8]">{label}</span>
+      <span className="mb-2 block text-sm font-semibold text-[#1C2B48]">{label}</span>
       {children}
-      {hint ? <span className="mt-2 block text-xs leading-5 text-[#9fb8bf]">{hint}</span> : null}
+      {hint ? <span className="mt-2 block text-xs leading-5 text-[#5B7893]">{hint}</span> : null}
       {error ? <ErrorText>{error}</ErrorText> : null}
     </label>
   );
@@ -542,4 +542,4 @@ function ErrorBox({ children }) {
 }
 
 const inputClass =
-  "w-full rounded border border-[#7fa9b5]/35 bg-[#08141b] px-3 py-2 text-[#edf7f8] outline-none transition placeholder:text-[#6f8991] focus:border-[#b8d7df] disabled:cursor-not-allowed disabled:opacity-45";
+  "w-full rounded border border-[#8EB1D1]/45 bg-white px-3 py-2 text-[#1C2B48] outline-none transition placeholder:text-[#5B7893] focus:border-[#8EB1D1] disabled:cursor-not-allowed disabled:opacity-45";
