@@ -11,7 +11,7 @@ export default function NailShapeIcon({ shape }) {
     <svg
       aria-hidden="true"
       viewBox="0 0 36 40"
-      className="h-9 w-9 shrink-0 text-[#d8b96f]"
+      className="h-9 w-9 shrink-0 text-[#b8d7df]"
       fill="none"
     >
       <path d={paths[shape]} stroke="currentColor" strokeWidth="2" />

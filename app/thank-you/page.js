@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function ThankYouPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#07090f] px-4 py-10 sm:px-6 lg:px-8">
+    <main className="flex min-h-screen items-center justify-center bg-transparent px-4 py-10 sm:px-6 lg:px-8">
       <div className="w-full max-w-2xl">
         <ThankYouMessage />
       </div>
