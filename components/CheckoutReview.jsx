@@ -6,6 +6,7 @@ import { getProductById } from "@/data/products";
 
 export default function CheckoutReview() {
   const [order, setOrder] = useState(null);
+  const [paymentStarted, setPaymentStarted] = useState(false);
 
   useEffect(() => {
     const storedOrder = sessionStorage.getItem("vesperCheckoutOrder");
@@ -42,7 +43,13 @@ export default function CheckoutReview() {
     const thankYouUrl = `${window.location.origin}/thank-you`;
     sessionStorage.setItem("vesperLastOrder", JSON.stringify(order));
     sessionStorage.setItem("vesperPaypalReturnHint", thankYouUrl);
-    window.location.href = order.paypalUrl;
+    setPaymentStarted(true);
+    window.open(order.paypalUrl, "_blank", "noopener,noreferrer");
+  }
+
+  function goToThankYou() {
+    sessionStorage.setItem("vesperLastOrder", JSON.stringify(order));
+    window.location.href = "/thank-you";
   }
 
   return (
@@ -109,6 +116,10 @@ export default function CheckoutReview() {
       </section>
 
       <section className="rounded-lg border border-[#8EB1D1]/45 bg-[#C4D8E5] p-5 text-center">
+        <p className="mb-4 rounded border border-[#8EB1D1]/35 bg-[#E8ECEF] p-3 text-sm leading-6 text-[#35506B]">
+          Your order will only be confirmed after PayPal payment is completed.
+          Unpaid submissions will not be processed.
+        </p>
         <button
           type="button"
           onClick={proceedToPayment}
@@ -117,8 +128,18 @@ export default function CheckoutReview() {
           Proceed to Payment
         </button>
         <p className="mt-3 text-xs leading-5 text-[#5B7893]">
-          You will be redirected to PayPal to complete your payment securely.
+          PayPal will open in a new tab. After payment, return here and continue
+          to the confirmation page.
         </p>
+        {paymentStarted ? (
+          <button
+            type="button"
+            onClick={goToThankYou}
+            className="mt-4 w-full rounded border border-[#1C2B48] bg-[#1C2B48] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#E8ECEF] transition hover:bg-[#35506B]"
+          >
+            I have completed PayPal payment
+          </button>
+        ) : null}
       </section>
     </div>
   );

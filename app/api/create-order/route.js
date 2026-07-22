@@ -3,7 +3,6 @@ import {
   createNotionOrder,
   createPaypalUrl,
   persistOrder,
-  sendOrderEmails,
   validateOrderPayload,
 } from "@/lib/orderServer";
 
@@ -35,15 +34,14 @@ export async function POST(request) {
     console.error("Notion order creation failed:", error);
   }
 
-  const emailResult = await sendOrderEmails(order, notionResult);
-
   return NextResponse.json(
     {
       success: true,
       orderId: order.orderId,
+      createdAt: order.createdAt,
       paypalUrl: createPaypalUrl(order.price),
       notion: notionResult?.error ? "failed" : "ok",
-      emails: emailResult,
+      emails: "will_send_after_payment_return",
     },
     { status: 201 }
   );

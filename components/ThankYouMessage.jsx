@@ -5,6 +5,7 @@ import Link from "next/link";
 
 export default function ThankYouMessage() {
   const [order, setOrder] = useState(null);
+  const [confirmationStatus, setConfirmationStatus] = useState("idle");
 
   useEffect(() => {
     const storedOrder =
@@ -12,7 +13,26 @@ export default function ThankYouMessage() {
       sessionStorage.getItem("vesperCheckoutOrder");
 
     if (storedOrder) {
-      setOrder(JSON.parse(storedOrder));
+      const parsedOrder = JSON.parse(storedOrder);
+      setOrder(parsedOrder);
+
+      const confirmationKey = `vesperPaymentConfirmed:${parsedOrder.orderId}`;
+      if (!sessionStorage.getItem(confirmationKey)) {
+        setConfirmationStatus("sending");
+        fetch("/api/confirm-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(parsedOrder),
+        })
+          .then(async (response) => {
+            if (!response.ok) throw new Error("Confirmation failed.");
+            sessionStorage.setItem(confirmationKey, "true");
+            setConfirmationStatus("sent");
+          })
+          .catch(() => setConfirmationStatus("failed"));
+      } else {
+        setConfirmationStatus("sent");
+      }
     }
   }, []);
 
@@ -41,8 +61,8 @@ export default function ThankYouMessage() {
         Your order has been received
       </h1>
       <p className="mt-4 text-base leading-7 text-[#35506B]">
-        Thank you, {order.fullName}. I'll be in touch within 24 hours to confirm
-        your order details.
+        Thank you, {order.fullName}. Your PayPal payment has been submitted. I'll
+        be in touch within 24 hours to confirm your order details.
       </p>
       {isDigitalOnly ? (
         <p className="mt-4 text-base leading-7 text-[#35506B]">
@@ -58,6 +78,17 @@ export default function ThankYouMessage() {
       <p className="mt-6 text-sm leading-6 text-[#1C2B48]">
         Questions? Email me at vesper.cosmic.blueprint@gmail.com
       </p>
+      {confirmationStatus === "sending" ? (
+        <p className="mt-4 rounded border border-[#8EB1D1]/35 bg-[#C4D8E5] p-3 text-sm text-[#35506B]">
+          Sending your confirmation email now...
+        </p>
+      ) : null}
+      {confirmationStatus === "failed" ? (
+        <p className="mt-4 rounded border border-[#ffb8b1]/50 bg-[#2d171d] p-3 text-sm text-[#ffe1dd]">
+          Your order page loaded, but the confirmation email could not be sent
+          automatically. Please email me with your order ID.
+        </p>
+      ) : null}
       <Link
         href="/shop"
         className="mist-button mt-7 inline-flex rounded border border-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] hover:bg-[#8EB1D1] hover:text-[#1C2B48]"

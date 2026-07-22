@@ -172,6 +172,7 @@ export default function OrderIntakeForm({ product }) {
     const checkoutOrder = {
       ...orderDraft,
       orderId: payload.orderId,
+      createdAt: payload.createdAt,
       paypalUrl: payload.paypalUrl,
     };
     sessionStorage.setItem("vesperCheckoutOrder", JSON.stringify(checkoutOrder));
@@ -236,7 +237,7 @@ export default function OrderIntakeForm({ product }) {
 
       <p className="rounded-lg border border-[#8EB1D1]/25 bg-[#C4D8E5] p-4 text-sm leading-6 text-[#35506B]">
         Your information is kept strictly confidential and used only for your
-        order.
+        order. Your order is not confirmed until PayPal payment is completed.
       </p>
 
       <button
