@@ -17,15 +17,30 @@ export default function ShopProductCard({ product }) {
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8EB1D1]">
-          Form Type {product.formType}
-        </p>
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#8EB1D1]">
+            {product.categoryLabel}
+          </span>
+          <span className="rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#35506B]">
+            {product.fulfillmentMode}
+          </span>
+          {product.intentionType === "single" ? (
+            <span className="rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#35506B]">
+              Single Intention
+            </span>
+          ) : null}
+        </div>
         <h3 className="mt-2 text-2xl font-semibold leading-tight text-[#1C2B48]">
           {product.name}
         </h3>
         <p className="mt-3 text-sm leading-6 text-[#35506B]">
           {product.description}
         </p>
+        {product.availableIntentions?.length ? (
+          <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#5B7893]">
+            Focus: {product.availableIntentions.join(" / ")}
+          </p>
+        ) : null}
         {product.includes ? (
           <p className="mt-3 text-sm leading-6 text-[#1C2B48]">
             Includes: {product.includes}

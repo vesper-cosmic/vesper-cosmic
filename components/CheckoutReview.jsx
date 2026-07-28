@@ -81,6 +81,9 @@ export default function CheckoutReview() {
         <dl className="mt-5 grid gap-4 text-sm">
           <SummaryRow label="Name" value={order.fullName} />
           <SummaryRow label="Email" value={order.email} />
+          {order.readyIntention ? (
+            <SummaryRow label="Single Intention" value={order.readyIntention} />
+          ) : null}
           {order.requiresBirthData ? (
             <>
               <SummaryRow label="Birth Date" value={order.birthDate} />

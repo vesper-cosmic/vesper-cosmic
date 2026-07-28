@@ -18,12 +18,57 @@ export const productSections = [
   },
 ];
 
+export const productCategories = [
+  {
+    id: "crystal-sachets",
+    title: "Crystal Sachets",
+    description:
+      "Ready-to-use sachets and DIY kits for focused daily energy support.",
+  },
+  {
+    id: "energy-bottles",
+    title: "Energy Bottles",
+    description:
+      "Crystal energy bottles for altars, desks, bedside rituals, and display.",
+  },
+  {
+    id: "press-on-nails",
+    title: "Press-On Nails",
+    description:
+      "Wearable crystal-inspired nail art, from ready-made sets to custom BaZi designs.",
+  },
+  {
+    id: "custom-bazi",
+    title: "Custom BaZi",
+    description:
+      "Personalized pieces guided by birth data, elemental balance, and intention.",
+  },
+  {
+    id: "reports-bundles",
+    title: "Reports & Bundles",
+    description:
+      "Digital astrology reports and complete sets for deeper energetic alignment.",
+  },
+];
+
+export const singleIntentionOptions = [
+  "Health & Energy",
+  "Career & Growth",
+  "Love & Relationships",
+  "Wealth & Abundance",
+];
+
 export const products = [
   {
     id: "crystal-energy-bottle-ready",
     slug: "crystal-energy-bottle-ready",
     name: "Crystal Energy Bottle — Ready to Ship",
     section: "ready-to-ship",
+    category: "energy-bottles",
+    categoryLabel: "Energy Bottle",
+    fulfillmentMode: "Ready to Ship",
+    intentionType: "single",
+    availableIntentions: singleIntentionOptions,
     formType: "A",
     productKind: "Physical",
     price: 45,
@@ -46,6 +91,11 @@ export const products = [
     slug: "press-on-nails-ready",
     name: "Crystal Press-On Nails — Ready to Ship",
     section: "ready-to-ship",
+    category: "press-on-nails",
+    categoryLabel: "Press-On Nails",
+    fulfillmentMode: "Ready to Ship",
+    intentionType: "single",
+    availableIntentions: singleIntentionOptions,
     formType: "A",
     productKind: "Physical",
     price: 38,
@@ -70,6 +120,11 @@ export const products = [
     slug: "crystal-sachet-ready",
     name: "Crystal Sachet — Ready to Use",
     section: "ready-to-ship",
+    category: "crystal-sachets",
+    categoryLabel: "Crystal Sachet",
+    fulfillmentMode: "Ready to Ship",
+    intentionType: "single",
+    availableIntentions: singleIntentionOptions,
     formType: "A",
     productKind: "Physical",
     price: 45,
@@ -92,6 +147,10 @@ export const products = [
     slug: "crystal-energy-bottle-custom",
     name: "BaZi Crystal Energy Bottle — Custom",
     section: "custom-bazi",
+    category: "custom-bazi",
+    categoryLabel: "Custom BaZi",
+    fulfillmentMode: "Custom BaZi",
+    intentionType: "custom",
     formType: "B",
     productKind: "Physical",
     price: 65,
@@ -114,6 +173,10 @@ export const products = [
     slug: "press-on-nails-custom",
     name: "Custom BaZi Crystal Press-On Nails",
     section: "custom-bazi",
+    category: "custom-bazi",
+    categoryLabel: "Custom BaZi",
+    fulfillmentMode: "Custom BaZi",
+    intentionType: "custom",
     formType: "B",
     productKind: "Physical",
     price: 58,
@@ -138,6 +201,10 @@ export const products = [
     slug: "astrology-report",
     name: "Eastern Astrology Report",
     section: "digital-bundles",
+    category: "reports-bundles",
+    categoryLabel: "Astrology Report",
+    fulfillmentMode: "Digital",
+    intentionType: "custom",
     formType: "C",
     productKind: "Digital",
     price: 55,
@@ -160,6 +227,10 @@ export const products = [
     slug: "crystal-sachet-kit",
     name: "DIY BaZi Crystal Sachet Kit",
     section: "digital-bundles",
+    category: "crystal-sachets",
+    categoryLabel: "Crystal Sachet",
+    fulfillmentMode: "Custom BaZi DIY",
+    intentionType: "custom",
     formType: "B",
     productKind: "Physical",
     price: 38,
@@ -182,6 +253,10 @@ export const products = [
     slug: "complete-bazi-set",
     name: "The Complete BaZi Energy Set",
     section: "digital-bundles",
+    category: "reports-bundles",
+    categoryLabel: "Bundle",
+    fulfillmentMode: "Bundle",
+    intentionType: "custom",
     formType: "B+C",
     productKind: "Bundle",
     price: 130,

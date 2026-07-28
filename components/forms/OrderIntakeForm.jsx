@@ -12,6 +12,7 @@ import {
   nailLengths,
   nailShapes,
   nailSizeKeys,
+  singleIntentionOptions,
   stylePreferences,
 } from "@/lib/formOptions";
 import NailShapeIcon from "@/components/forms/NailShapeIcon";
@@ -26,6 +27,7 @@ const baseForm = {
   birthLocation: "",
   baziIntention: "",
   digitalCuriosityArea: "",
+  readyIntention: "",
   specificIntentions: "",
   address: emptyAddress(),
   nailMeasurements: emptyNailMeasurements(),
@@ -90,6 +92,10 @@ export default function OrderIntakeForm({ product }) {
 
     if (!form.fullName.trim()) nextErrors.fullName = "Full name is required.";
     if (!emailPattern.test(form.email)) nextErrors.email = "Enter a valid email.";
+
+    if (product.intentionType === "single" && !form.readyIntention) {
+      nextErrors.readyIntention = "Select one intention for this piece.";
+    }
 
     if (product.requiresBirthData) {
       if (!form.birthDate) nextErrors.birthDate = "Date of birth is required.";
@@ -210,6 +216,15 @@ export default function OrderIntakeForm({ product }) {
         </Field>
       </FormPanel>
 
+      {product.intentionType === "single" ? (
+        <SingleIntentionFields
+          form={form}
+          product={product}
+          errors={errors}
+          updateField={updateField}
+        />
+      ) : null}
+
       {product.requiresBirthData ? (
         <BirthDataFields
           form={form}
@@ -248,6 +263,35 @@ export default function OrderIntakeForm({ product }) {
         {isSubmitting ? "Preparing Checkout..." : "Continue to Review & Pay"}
       </button>
     </form>
+  );
+}
+
+function SingleIntentionFields({ form, product, errors, updateField }) {
+  const options = product.availableIntentions || singleIntentionOptions;
+
+  return (
+    <FormPanel title="Single Intention">
+      <Field
+        label="Choose one focus for this piece"
+        error={errors.readyIntention}
+        hint="This ready-made piece will be selected or prepared around one main intention. Dual-focus combinations can be added later as separate products."
+      >
+        <select
+          name="readyIntention"
+          value={form.readyIntention}
+          onChange={updateField}
+          required
+          className={inputClass}
+        >
+          <option value="">Select one</option>
+          {options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </Field>
+    </FormPanel>
   );
 }
 
