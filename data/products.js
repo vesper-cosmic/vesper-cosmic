@@ -66,6 +66,28 @@ export const products = [
     badge: null,
   },
   {
+    id: "crystal-sachet-ready",
+    slug: "crystal-sachet-ready",
+    name: "Crystal Sachet — Ready to Use",
+    section: "ready-to-ship",
+    formType: "A",
+    productKind: "Physical",
+    price: 45,
+    currency: "USD",
+    description:
+      "A finished crystal energy sachet made with curated stones for everyday protection, clarity, and gentle energetic support. Ready to carry, gift, or place in your sacred space.",
+    fulfillmentTime: "Ships within 3–5 business days",
+    images: [
+      "/images/bazi-spell-bag-1.svg",
+      "/images/bazi-spell-bag-2.svg",
+      "/images/bazi-spell-bag-3.svg",
+    ],
+    requiresBirthData: false,
+    requiresShipping: true,
+    requiresNailDetails: false,
+    badge: null,
+  },
+  {
     id: "bazi-crystal-energy-bottle-custom",
     slug: "crystal-energy-bottle-custom",
     name: "BaZi Crystal Energy Bottle — Custom",
