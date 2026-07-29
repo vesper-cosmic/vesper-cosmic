@@ -1,8 +1,12 @@
-import Link from "next/link";
-
-export default function ShopProductCard({ product }) {
+export default function ShopProductCard({ product, onClick }) {
   return (
-    <article className="mist-card group flex h-full flex-col overflow-hidden rounded-lg border border-[#8EB1D1]/45 bg-[#E8ECEF]">
+    <article
+      className="mist-card group flex h-full flex-col overflow-hidden rounded-lg border border-[#8EB1D1]/45 bg-[#E8ECEF]"
+      onClick={onClick}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick?.(); } }}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+    >
       <div className="relative aspect-[4/3] overflow-hidden bg-[#E8ECEF]">
         <img
           src={product.images[0]}
@@ -59,12 +63,20 @@ export default function ShopProductCard({ product }) {
               ${product.price} {product.currency}
             </p>
           </div>
-          <Link
-            href={`/order/${product.slug}`}
-            className="mist-button rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
-          >
-            Order Now
-          </Link>
+          {onClick ? (
+            <span
+              className="mist-button inline-block cursor-pointer rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+            >
+              View Details
+            </span>
+          ) : (
+            <a
+              href={`/order/${product.slug}`}
+              className="mist-button inline-block rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+            >
+              Order Now
+            </a>
+          )}
         </div>
       </div>
     </article>

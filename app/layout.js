@@ -1,4 +1,5 @@
 import "./globals.css";
+import { CartProvider } from "@/lib/cartContext";
 
 export const metadata = {
   title: "Vesper Cosmic Blueprint",
@@ -9,7 +10,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <CartProvider>{children}</CartProvider>
+      </body>
     </html>
   );
 }

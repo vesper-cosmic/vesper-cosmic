@@ -1,54 +1,248 @@
-export const PAYPAL_ME_USERNAME = process.env.PAYPAL_ME || "VesperCosmic";
+export const products = [
+  // ── Crystal Press-On Nails — Ready to Ship ──
+  {
+    id: "crystal-press-on-nails-ready",
+    slug: "crystal-press-on-nails-ready",
+    name: "Crystal Press-On Nails",
+    category: "press-on-nails-ready",
+    categoryLabel: "Press-On Nails",
+    productKind: "Crystal Press-On Nails — Ready to Ship",
+    formType: "B",
+    price: 88,
+    originalPrice: null,
+    currency: "USD",
+    description:
+      "Ready-to-ship press-on nails infused with crystal energy. Each set is crafted around a single intention and comes in your selected size, shape, and length.",
+    fulfillmentTime: "Ships within 3–5 business days",
+    fulfillmentMode: "Ready to Ship",
+    intentionType: "single",
+    availableIntentions: ["Health & Energy", "Career & Growth", "Love & Relationships", "Wealth & Abundance"],
+    requiresBirthData: true,
+    requiresShipping: true,
+    requiresNailDetails: true,
+    nailIntro:
+      "These press-on nails are crafted around your BaZi element and intentions. Provide your nail measurements below and I will custom-fit them to your hands.",
+    includes: "10 press-on nails, nail glue, cuticle stick, mini file, energy cleansing card",
+    badge: "Ready to Ship",
+    images: [
+      "/images/celestial-nails-1.svg",
+      "/images/celestial-nails-2.svg",
+      "/images/celestial-nails-3.svg",
+    ],
+  },
 
-export const productSections = [
+  // ── Crystal Press-On Nails — Custom BaZi ──
   {
-    id: "ready-to-ship",
-    title: "Ready to Ship",
-    description: "Finished pieces that only need your shipping details.",
+    id: "crystal-press-on-nails-custom",
+    slug: "crystal-press-on-nails-custom",
+    name: "Custom BaZi Crystal Press-On Nails",
+    category: "press-on-nails-custom",
+    categoryLabel: "Press-On Nails",
+    productKind: "Custom BaZi Crystal Press-On Nails",
+    formType: "B",
+    price: 128,
+    originalPrice: null,
+    currency: "USD",
+    description:
+      "Fully custom press-on nails designed from your BaZi chart. Every color, crystal placement, and symbol is chosen to align with your natal elements.",
+    fulfillmentTime: "Made to order — ships within 7–10 business days",
+    fulfillmentMode: "Made to Order",
+    intentionType: "bazi",
+    requiresBirthData: true,
+    requiresShipping: true,
+    requiresNailDetails: true,
+    nailIntro:
+      "These custom nails are designed exclusively from your BaZi birth chart. Each nail is sized to your measurements for a perfect fit.",
+    badge: "Custom",
+    images: [
+      "/images/celestial-nails-1.svg",
+      "/images/celestial-nails-2.svg",
+      "/images/celestial-nails-3.svg",
+    ],
   },
+
+  // ── Crystal Energy Bottle — Ready to Ship ──
   {
-    id: "custom-bazi",
-    title: "Custom BaZi",
-    description: "Personalized pieces guided by birth data and intentions.",
+    id: "crystal-energy-bottle-ready",
+    slug: "crystal-energy-bottle-ready",
+    name: "Crystal Energy Bottle",
+    category: "crystal-energy-bottle-ready",
+    categoryLabel: "Energy Bottles",
+    productKind: "Crystal Energy Bottle — Ready to Ship",
+    formType: "A",
+    price: 48,
+    originalPrice: null,
+    currency: "USD",
+    description:
+      "A ready-to-ship crystal energy bottle charged with a single intention. Carried in your bag or placed on your altar for daily energetic support.",
+    fulfillmentTime: "Ships within 2–3 business days",
+    fulfillmentMode: "Ready to Ship",
+    intentionType: "single",
+    availableIntentions: ["Health & Energy", "Career & Growth", "Love & Relationships", "Wealth & Abundance"],
+    requiresBirthData: false,
+    requiresShipping: true,
+    requiresNailDetails: false,
+    badge: "Ready to Ship",
+    images: [
+      "/images/spell-jar-1.svg",
+      "/images/spell-jar-2.svg",
+      "/images/spell-jar-3.svg",
+    ],
   },
+
+  // ── Crystal Energy Bottle — Custom BaZi ──
   {
-    id: "digital-bundles",
-    title: "Digital & Bundles",
-    description: "Reports and complete energy sets for deeper guidance.",
+    id: "crystal-energy-bottle-custom",
+    slug: "crystal-energy-bottle-custom",
+    name: "BaZi Crystal Energy Bottle",
+    category: "crystal-energy-bottle-custom",
+    categoryLabel: "Energy Bottles",
+    productKind: "BaZi Crystal Energy Bottle — Custom",
+    formType: "B",
+    price: 78,
+    originalPrice: null,
+    currency: "USD",
+    description:
+      "A custom crystal energy bottle formulated from your BaZi chart. Each crystal is selected to balance your elemental makeup and support your intention.",
+    fulfillmentTime: "Made to order — ships within 5–7 business days",
+    fulfillmentMode: "Made to Order",
+    intentionType: "bazi",
+    requiresBirthData: true,
+    requiresShipping: true,
+    requiresNailDetails: false,
+    badge: "Custom",
+    images: [
+      "/images/spell-jar-1.svg",
+      "/images/spell-jar-2.svg",
+      "/images/spell-jar-3.svg",
+    ],
+  },
+
+  // ── Crystal Sachet — Ready to Use ──
+  {
+    id: "crystal-sachet-ready",
+    slug: "crystal-sachet-ready",
+    name: "Crystal Sachet",
+    category: "crystal-sachet-ready",
+    categoryLabel: "Sachets & Kits",
+    productKind: "Crystal Sachet — Ready to Use",
+    formType: "A",
+    price: 28,
+    originalPrice: null,
+    currency: "USD",
+    description:
+      "A ready-to-use crystal sachet charged with a single intention. Carry it in your pocket, purse, or place it under your pillow for gentle energetic alignment.",
+    fulfillmentTime: "Ships within 2–3 business days",
+    fulfillmentMode: "Ready to Ship",
+    intentionType: "single",
+    availableIntentions: ["Health & Energy", "Career & Growth", "Love & Relationships", "Wealth & Abundance"],
+    requiresBirthData: false,
+    requiresShipping: true,
+    requiresNailDetails: false,
+    badge: "Ready to Ship",
+    images: [
+      "/images/bazi-spell-bag-1.svg",
+      "/images/bazi-spell-bag-2.svg",
+      "/images/bazi-spell-bag-3.svg",
+    ],
+  },
+
+  // ── DIY BaZi Crystal Sachet Kit ──
+  {
+    id: "diy-bazi-crystal-sachet-kit",
+    slug: "diy-bazi-crystal-sachet-kit",
+    name: "DIY BaZi Crystal Sachet Kit",
+    category: "crystal-sachet-kit",
+    categoryLabel: "Sachets & Kits",
+    productKind: "DIY BaZi Crystal Sachet Kit",
+    formType: "B",
+    price: 58,
+    originalPrice: null,
+    currency: "USD",
+    description:
+      "A DIY kit with raw crystals selected from your BaZi chart, plus a pouch and instructions. You assemble and charge the sachet yourself for a hands-on energy practice.",
+    fulfillmentTime: "Ships within 3–5 business days",
+    fulfillmentMode: "Made to Order",
+    intentionType: "bazi",
+    requiresBirthData: true,
+    requiresShipping: true,
+    requiresNailDetails: false,
+    badge: "DIY Kit",
+    images: [
+      "/images/bazi-spell-bag-1.svg",
+      "/images/bazi-spell-bag-2.svg",
+      "/images/bazi-spell-bag-3.svg",
+    ],
+  },
+
+  // ── Eastern Astrology Report ──
+  {
+    id: "eastern-astrology-report",
+    slug: "eastern-astrology-report",
+    name: "Eastern Astrology Report",
+    category: "digital-reports",
+    categoryLabel: "Digital Reports",
+    productKind: "Eastern Astrology Report",
+    formType: "C",
+    price: 68,
+    originalPrice: null,
+    currency: "USD",
+    description:
+      "A detailed PDF report based on your BaZi (Four Pillars of Destiny) chart. Covers your life path, element composition, and key cycles with personalized guidance.",
+    fulfillmentTime: "Delivered via email within 3–5 business days",
+    fulfillmentMode: "Digital Delivery",
+    intentionType: "bazi",
+    requiresBirthData: true,
+    requiresShipping: false,
+    requiresNailDetails: false,
+    badge: "Digital",
+    images: [
+      "/images/cosmic-blueprint-1.svg",
+      "/images/cosmic-blueprint-2.svg",
+      "/images/cosmic-blueprint-3.svg",
+    ],
+  },
+
+  // ── The Complete BaZi Energy Set ──
+  {
+    id: "complete-bazi-energy-set",
+    slug: "complete-bazi-energy-set",
+    name: "The Complete BaZi Energy Set",
+    category: "bundles",
+    categoryLabel: "Bundles",
+    productKind: "The Complete BaZi Energy Set",
+    formType: "D",
+    price: 198,
+    originalPrice: 238,
+    currency: "USD",
+    description:
+      "The full Vesper Cosmic experience: a BaZi crystal energy bottle, a crystal sachet, a press-on nail set, and your Eastern Astrology Report — all aligned to your birth chart.",
+    fulfillmentTime: "Ships within 7–10 business days (report delivered via email)",
+    fulfillmentMode: "Bundle",
+    intentionType: "bazi",
+    requiresBirthData: true,
+    requiresShipping: true,
+    requiresNailDetails: true,
+    nailIntro:
+      "Your Complete BaZi Energy Set includes a custom press-on nail set. Please provide your nail measurements for a perfect fit.",
+    badge: "Best Value",
+    images: [
+      "/images/cosmic-blueprint-1.svg",
+      "/images/cosmic-blueprint-2.svg",
+      "/images/cosmic-blueprint-3.svg",
+    ],
   },
 ];
 
 export const productCategories = [
-  {
-    id: "crystal-sachets",
-    title: "Crystal Sachets",
-    description:
-      "Ready-to-use sachets and DIY kits for focused daily energy support.",
-  },
-  {
-    id: "energy-bottles",
-    title: "Energy Bottles",
-    description:
-      "Crystal energy bottles for altars, desks, bedside rituals, and display.",
-  },
-  {
-    id: "press-on-nails",
-    title: "Press-On Nails",
-    description:
-      "Wearable crystal-inspired nail art, from ready-made sets to custom BaZi designs.",
-  },
-  {
-    id: "custom-bazi",
-    title: "Custom BaZi",
-    description:
-      "Personalized pieces guided by birth data, elemental balance, and intention.",
-  },
-  {
-    id: "reports-bundles",
-    title: "Reports & Bundles",
-    description:
-      "Digital astrology reports and complete sets for deeper energetic alignment.",
-  },
+  { id: "press-on-nails-ready", title: "Ready-to-Ship Nails", description: "Crystal-infused press-on nails, ready to ship around a single intention." },
+  { id: "press-on-nails-custom", title: "Custom BaZi Nails", description: "Fully custom press-on nails designed from your BaZi chart." },
+  { id: "crystal-energy-bottle-ready", title: "Ready-to-Ship Energy Bottles", description: "Crystal energy bottles charged with a single intention." },
+  { id: "crystal-energy-bottle-custom", title: "Custom BaZi Energy Bottles", description: "Custom crystal energy bottles formulated from your BaZi chart." },
+  { id: "crystal-sachet-ready", title: "Ready-to-Use Sachets", description: "Crystal sachets charged with a single intention." },
+  { id: "crystal-sachet-kit", title: "DIY Sachet Kits", description: "DIY kits with BaZi-selected crystals for hands-on energy work." },
+  { id: "digital-reports", title: "Digital Reports", description: "Personalized Eastern Astrology (BaZi) reports delivered via email." },
+  { id: "bundles", title: "Bundles", description: "Complete BaZi energy sets at a bundle discount." },
 ];
 
 export const singleIntentionOptions = [
@@ -58,236 +252,10 @@ export const singleIntentionOptions = [
   "Wealth & Abundance",
 ];
 
-export const products = [
-  {
-    id: "crystal-energy-bottle-ready",
-    slug: "crystal-energy-bottle-ready",
-    name: "Crystal Energy Bottle — Ready to Ship",
-    section: "ready-to-ship",
-    category: "energy-bottles",
-    categoryLabel: "Energy Bottle",
-    fulfillmentMode: "Ready to Ship",
-    intentionType: "single",
-    availableIntentions: singleIntentionOptions,
-    formType: "A",
-    productKind: "Physical",
-    price: 45,
-    currency: "USD",
-    description:
-      "A handcrafted crystal energy bottle with curated stones for general protection, clarity, and abundance. Sealed with wax and presented in a black floating display box.",
-    fulfillmentTime: "Ships within 3–5 business days",
-    images: [
-      "/images/spell-jar-1.svg",
-      "/images/spell-jar-2.svg",
-      "/images/spell-jar-3.svg",
-    ],
-    requiresBirthData: false,
-    requiresShipping: true,
-    requiresNailDetails: false,
-    badge: null,
-  },
-  {
-    id: "crystal-press-on-nails-ready",
-    slug: "press-on-nails-ready",
-    name: "Crystal Press-On Nails — Ready to Ship",
-    section: "ready-to-ship",
-    category: "press-on-nails",
-    categoryLabel: "Press-On Nails",
-    fulfillmentMode: "Ready to Ship",
-    intentionType: "single",
-    availableIntentions: singleIntentionOptions,
-    formType: "A",
-    productKind: "Physical",
-    price: 38,
-    currency: "USD",
-    description:
-      "Handmade press-on nails with crystal and mystic design. One size fits most, includes nail glue and prep pad.",
-    fulfillmentTime: "Ships within 3–5 business days",
-    images: [
-      "/images/celestial-nails-1.svg",
-      "/images/celestial-nails-2.svg",
-      "/images/celestial-nails-3.svg",
-    ],
-    requiresBirthData: false,
-    requiresShipping: true,
-    requiresNailDetails: true,
-    nailIntro:
-      "This is a ready-made design. Share your size and style preferences and I'll match you with the best option from current stock.",
-    badge: null,
-  },
-  {
-    id: "crystal-sachet-ready",
-    slug: "crystal-sachet-ready",
-    name: "Crystal Sachet — Ready to Use",
-    section: "ready-to-ship",
-    category: "crystal-sachets",
-    categoryLabel: "Crystal Sachet",
-    fulfillmentMode: "Ready to Ship",
-    intentionType: "single",
-    availableIntentions: singleIntentionOptions,
-    formType: "A",
-    productKind: "Physical",
-    price: 45,
-    currency: "USD",
-    description:
-      "A finished crystal energy sachet made with curated stones for everyday protection, clarity, and gentle energetic support. Ready to carry, gift, or place in your sacred space.",
-    fulfillmentTime: "Ships within 3–5 business days",
-    images: [
-      "/images/bazi-spell-bag-1.svg",
-      "/images/bazi-spell-bag-2.svg",
-      "/images/bazi-spell-bag-3.svg",
-    ],
-    requiresBirthData: false,
-    requiresShipping: true,
-    requiresNailDetails: false,
-    badge: null,
-  },
-  {
-    id: "bazi-crystal-energy-bottle-custom",
-    slug: "crystal-energy-bottle-custom",
-    name: "BaZi Crystal Energy Bottle — Custom",
-    section: "custom-bazi",
-    category: "custom-bazi",
-    categoryLabel: "Custom BaZi",
-    fulfillmentMode: "Custom BaZi",
-    intentionType: "custom",
-    formType: "B",
-    productKind: "Physical",
-    price: 65,
-    currency: "USD",
-    description:
-      "A crystal energy bottle made specifically for your BaZi chart and personal intentions. Every stone, symbol, and seal is chosen based on your unique energy blueprint.",
-    fulfillmentTime: "Ships within 7–14 business days",
-    images: [
-      "/images/spell-jar-1.svg",
-      "/images/spell-jar-2.svg",
-      "/images/spell-jar-3.svg",
-    ],
-    requiresBirthData: true,
-    requiresShipping: true,
-    requiresNailDetails: false,
-    badge: "Most Popular",
-  },
-  {
-    id: "custom-bazi-crystal-press-on-nails",
-    slug: "press-on-nails-custom",
-    name: "Custom BaZi Crystal Press-On Nails",
-    section: "custom-bazi",
-    category: "custom-bazi",
-    categoryLabel: "Custom BaZi",
-    fulfillmentMode: "Custom BaZi",
-    intentionType: "custom",
-    formType: "B",
-    productKind: "Physical",
-    price: 58,
-    currency: "USD",
-    description:
-      "Handmade press-on nails designed around your BaZi element, dominant energy, and intentions. Each set is completely one-of-a-kind.",
-    fulfillmentTime: "Ships within 7–14 business days",
-    images: [
-      "/images/celestial-nails-1.svg",
-      "/images/celestial-nails-2.svg",
-      "/images/celestial-nails-3.svg",
-    ],
-    requiresBirthData: true,
-    requiresShipping: true,
-    requiresNailDetails: true,
-    nailIntro:
-      "Your nails will be designed specifically for your BaZi element and intentions. No two sets are ever the same.",
-    badge: "Most Popular",
-  },
-  {
-    id: "eastern-astrology-report",
-    slug: "astrology-report",
-    name: "Eastern Astrology Report",
-    section: "digital-bundles",
-    category: "reports-bundles",
-    categoryLabel: "Astrology Report",
-    fulfillmentMode: "Digital",
-    intentionType: "custom",
-    formType: "C",
-    productKind: "Digital",
-    price: 55,
-    currency: "USD",
-    description:
-      "A deeply personalized PDF report based on your BaZi and Zi Wei Dou Shu chart. Covers personality, wealth timing, career path, relationships, and 2026–2027 forecast.",
-    fulfillmentTime: "Delivered to your inbox within 3–5 business days",
-    images: [
-      "/images/cosmic-blueprint-1.svg",
-      "/images/cosmic-blueprint-2.svg",
-      "/images/cosmic-blueprint-3.svg",
-    ],
-    requiresBirthData: true,
-    requiresShipping: false,
-    requiresNailDetails: false,
-    badge: null,
-  },
-  {
-    id: "diy-bazi-crystal-sachet-kit",
-    slug: "crystal-sachet-kit",
-    name: "DIY BaZi Crystal Sachet Kit",
-    section: "digital-bundles",
-    category: "crystal-sachets",
-    categoryLabel: "Crystal Sachet",
-    fulfillmentMode: "Custom BaZi DIY",
-    intentionType: "custom",
-    formType: "B",
-    productKind: "Physical",
-    price: 38,
-    currency: "USD",
-    description:
-      "A curated set of crystal chips selected for your BaZi element, with a velvet pouch and handwritten intention card. Assemble your own energy talisman at home.",
-    fulfillmentTime: "Ships within 3–7 business days",
-    images: [
-      "/images/bazi-spell-bag-1.svg",
-      "/images/bazi-spell-bag-2.svg",
-      "/images/bazi-spell-bag-3.svg",
-    ],
-    requiresBirthData: true,
-    requiresShipping: true,
-    requiresNailDetails: false,
-    badge: null,
-  },
-  {
-    id: "complete-bazi-energy-set",
-    slug: "complete-bazi-set",
-    name: "The Complete BaZi Energy Set",
-    section: "digital-bundles",
-    category: "reports-bundles",
-    categoryLabel: "Bundle",
-    fulfillmentMode: "Bundle",
-    intentionType: "custom",
-    formType: "B+C",
-    productKind: "Bundle",
-    price: 130,
-    originalPrice: 158,
-    currency: "USD",
-    includes:
-      "Eastern Astrology Report + BaZi Crystal Energy Bottle + DIY Crystal Sachet Kit",
-    description:
-      "Everything you need to understand your energy blueprint and surround yourself with aligned crystals.",
-    fulfillmentTime:
-      "Report delivered within 3–5 business days. Physical items ship within 7–14 business days.",
-    images: [
-      "/images/cosmic-blueprint-1.svg",
-      "/images/spell-jar-1.svg",
-      "/images/bazi-spell-bag-1.svg",
-    ],
-    requiresBirthData: true,
-    requiresShipping: true,
-    requiresNailDetails: false,
-    badge: "Best Value",
-  },
-];
-
 export function getProductBySlug(slug) {
-  return products.find((product) => product.slug === slug);
+  return products.find((product) => product.slug === slug) || null;
 }
 
 export function getProductById(id) {
-  return products.find((product) => product.id === id);
-}
-
-export function getPaypalMeUrl(product) {
-  return `https://www.paypal.com/paypalme/${PAYPAL_ME_USERNAME}/${product.price}`;
+  return products.find((product) => product.id === id) || null;
 }
