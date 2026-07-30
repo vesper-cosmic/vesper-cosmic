@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import {
   productCategories,
   products,
@@ -15,21 +15,7 @@ export default function ShopPage() {
   const { totalItems } = useCart();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
-  const [expandedCategories, setExpandedCategories] = useState({});
-
-  // Expand first category by default, then load full expansion state
-  useEffect(() => {
-    setExpandedCategories(
-      Object.fromEntries(productCategories.map((cat) => [cat.id, true]))
-    );
-  }, []);
-
-  function toggleCategory(categoryId) {
-    setExpandedCategories((prev) => ({
-      ...prev,
-      [categoryId]: !prev[categoryId],
-    }));
-  }
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   function openProductDetail(product) {
     setSelectedProduct(product);
@@ -144,57 +130,29 @@ export default function ShopPage() {
               </p>
               <nav className="mt-4 space-y-1">
                 {activeCategories.map((category) => {
-                  const isExpanded = expandedCategories[category.id];
                   const count = categoryProductCounts[category.id] || 0;
+                  const isActive = selectedCategory === category.id;
 
                   return (
-                    <div key={category.id}>
-                      <button
-                        type="button"
-                        onClick={() => toggleCategory(category.id)}
-                        className="flex w-full items-center justify-between rounded border border-[#8EB1D1]/20 px-3 py-2 text-left text-sm font-semibold text-[#1C2B48] transition hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
-                      >
-                        <span>{category.title}</span>
-                        <span className="flex items-center gap-2">
-                          <span className="text-xs font-normal text-[#5B7893]">
-                            {count}
-                          </span>
-                          <svg
-                            aria-hidden="true"
-                            className={`h-3 w-3 transition-transform ${
-                              isExpanded ? "rotate-180" : ""
-                            }`}
-                            fill="none"
-                            viewBox="0 0 12 12"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M3 5l3 3 3-3"
-                            />
-                          </svg>
-                        </span>
-                      </button>
-                      {/* Expanded product list under the category */}
-                      {isExpanded ? (
-                        <div className="mt-1 space-y-1 pl-2">
-                          {products
-                            .filter((p) => p.category === category.id)
-                            .map((product) => (
-                              <button
-                                key={product.id}
-                                type="button"
-                                onClick={() => openProductDetail(product)}
-                                className="block w-full rounded px-3 py-1.5 text-left text-xs font-medium text-[#35506B] transition hover:bg-[#C4D8E5]/60"
-                              >
-                                {product.name}
-                              </button>
-                            ))}
-                        </div>
-                      ) : null}
-                    </div>
+                    <button
+                      key={category.id}
+                      type="button"
+                      onClick={() =>
+                        setSelectedCategory(
+                          isActive ? null : category.id
+                        )
+                      }
+                      className={`flex w-full items-center justify-between rounded border px-3 py-2 text-left text-sm font-semibold transition ${
+                        isActive
+                          ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
+                          : "border-[#8EB1D1]/20 text-[#1C2B48] hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
+                      }`}
+                    >
+                      <span>{category.title}</span>
+                      <span className="text-xs font-normal text-[#5B7893]">
+                        {count}
+                      </span>
+                    </button>
                   );
                 })}
               </nav>
@@ -202,39 +160,44 @@ export default function ShopPage() {
 
             {/* Product Grid — grouped by category */}
             <div className="space-y-14">
-              {activeCategories.map((category) => {
-                const sectionProducts = products.filter(
-                  (product) => product.category === category.id
-                );
+              {activeCategories
+                .filter(
+                  (cat) =>
+                    !selectedCategory || cat.id === selectedCategory
+                )
+                .map((category) => {
+                  const sectionProducts = products.filter(
+                    (product) => product.category === category.id
+                  );
 
-                if (sectionProducts.length === 0) return null;
+                  if (sectionProducts.length === 0) return null;
 
-                return (
-                  <section
-                    key={category.id}
-                    id={category.id}
-                    className="scroll-mt-24"
-                  >
-                    <div className="mb-5 border-b border-[#8EB1D1]/25 pb-4">
-                      <h2 className="text-3xl font-semibold text-[#1C2B48]">
-                        {category.title}
-                      </h2>
-                      <p className="mt-2 text-sm leading-6 text-[#35506B]">
-                        {category.description}
-                      </p>
-                    </div>
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                      {sectionProducts.map((product) => (
-                        <ShopProductCard
-                          key={product.id}
-                          product={product}
-                          onClick={() => openProductDetail(product)}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                );
-              })}
+                  return (
+                    <section
+                      key={category.id}
+                      id={category.id}
+                      className="scroll-mt-24"
+                    >
+                      <div className="mb-5 border-b border-[#8EB1D1]/25 pb-4">
+                        <h2 className="text-3xl font-semibold text-[#1C2B48]">
+                          {category.title}
+                        </h2>
+                        <p className="mt-2 text-sm leading-6 text-[#35506B]">
+                          {category.description}
+                        </p>
+                      </div>
+                      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {sectionProducts.map((product) => (
+                          <ShopProductCard
+                            key={product.id}
+                            product={product}
+                            onClick={() => openProductDetail(product)}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  );
+                })}
             </div>
           </div>
         </section>
