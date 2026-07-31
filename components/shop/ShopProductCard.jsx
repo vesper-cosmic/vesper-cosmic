@@ -34,7 +34,7 @@ export default function ShopProductCard({ product, onClick }) {
             </span>
           ) : null}
         </div>
-        <h3 className="mt-2 text-2xl font-semibold leading-tight text-[#1C2B48]">
+        <h3 className="mt-2 text-xl font-semibold leading-tight text-[#1C2B48] sm:text-2xl">
           {product.name}
         </h3>
         <p className="mt-3 text-sm leading-6 text-[#35506B]">
@@ -59,7 +59,7 @@ export default function ShopProductCard({ product, onClick }) {
                 ${product.originalPrice} {product.currency}
               </p>
             ) : null}
-            <p className="text-2xl font-semibold text-[#1C2B48]">
+            <p className="text-xl font-semibold text-[#1C2B48] sm:text-2xl">
               ${product.price} {product.currency}
             </p>
           </div>

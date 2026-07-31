@@ -86,7 +86,7 @@ export default function ShopPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#1C2B48]">
               Vesper Cosmic Shop
             </p>
-            <h1 className="mt-4 max-w-3xl text-5xl font-semibold leading-none text-white sm:text-6xl">
+            <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-none text-white sm:text-6xl">
               Ritual objects for your energy blueprint
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-7 text-[#1C2B48]">
@@ -123,12 +123,12 @@ export default function ShopPage() {
 
           {/* Sidebar + Content Layout */}
           <div className="mt-12 grid gap-8 lg:grid-cols-[240px_1fr] lg:items-start">
-            {/* Sidebar — Accordion Categories */}
+            {/* Sidebar — Category Filter (horizontal chips on mobile, vertical list on desktop) */}
             <aside className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-4 lg:sticky lg:top-24">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8EB1D1]">
                 Shop by Category
               </p>
-              <nav className="mt-4 space-y-1">
+              <nav className="mt-4 flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0">
                 {activeCategories.map((category) => {
                   const count = categoryProductCounts[category.id] || 0;
                   const isActive = selectedCategory === category.id;
@@ -142,7 +142,7 @@ export default function ShopPage() {
                           isActive ? null : category.id
                         )
                       }
-                      className={`flex w-full items-center justify-between rounded border px-3 py-2 text-left text-sm font-semibold transition ${
+                      className={`flex flex-shrink-0 items-center gap-2 rounded border px-3 py-2 text-left text-sm font-semibold transition lg:w-full ${
                         isActive
                           ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
                           : "border-[#8EB1D1]/20 text-[#1C2B48] hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
@@ -179,7 +179,7 @@ export default function ShopPage() {
                       className="scroll-mt-24"
                     >
                       <div className="mb-5 border-b border-[#8EB1D1]/25 pb-4">
-                        <h2 className="text-3xl font-semibold text-[#1C2B48]">
+                        <h2 className="text-2xl font-semibold text-[#1C2B48] sm:text-3xl">
                           {category.title}
                         </h2>
                         <p className="mt-2 text-sm leading-6 text-[#35506B]">

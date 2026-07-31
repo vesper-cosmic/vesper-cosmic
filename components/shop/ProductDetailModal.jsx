@@ -34,7 +34,7 @@ export default function ProductDetailModal({ product, onClose }) {
   const activeImage = product.images[activeImageIndex] || product.images[0];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-[#1C2B48]/70 backdrop-blur-sm"
@@ -42,7 +42,7 @@ export default function ProductDetailModal({ product, onClose }) {
       />
 
       {/* Modal */}
-      <div className="relative z-10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-y-auto rounded-2xl border border-[#8EB1D1]/30 bg-[#E8ECEF] shadow-[0_30px_80px_rgba(28,43,72,0.4)] sm:flex-row">
+      <div className="relative z-10 flex max-h-[100dvh] w-full max-w-4xl flex-col overflow-y-auto rounded-none border border-[#8EB1D1]/30 bg-[#E8ECEF] shadow-[0_30px_80px_rgba(28,43,72,0.4)] sm:max-h-[90vh] sm:flex-row sm:rounded-2xl">
         {/* Close button */}
         <button
           type="button"
@@ -55,7 +55,7 @@ export default function ProductDetailModal({ product, onClose }) {
 
         {/* Left: Images */}
         <div className="flex w-full flex-col sm:w-1/2">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-2xl sm:rounded-l-2xl sm:rounded-tr-none">
+          <div className="relative aspect-[4/3] w-full overflow-hidden sm:rounded-l-2xl sm:rounded-tr-none">
             <img
               src={activeImage}
               alt={product.name}
