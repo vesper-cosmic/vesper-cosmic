@@ -104,6 +104,51 @@ export default function HomePage() {
             </p>
           </header>
 
+          {/* About Section — 品牌故事 */}
+          <section
+            className="mx-auto max-w-3xl py-16 text-center"
+            aria-labelledby="about-vesper-cosmos"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#8EB1D1]">
+              About
+            </p>
+            <h2
+              id="about-vesper-cosmos"
+              className="mt-4 text-3xl font-semibold leading-tight text-[#1C2B48] sm:text-4xl"
+            >
+              About VESPER COSMOS
+            </h2>
+            <p className="mt-3 text-base italic text-[#5B7893] sm:text-lg">
+              where ancient eastern wisdom meets modern daily rituals.
+            </p>
+            <p className="mt-6 text-base leading-7 text-[#35506B] sm:text-lg sm:leading-8">
+              We believe energy isn&rsquo;t something abstract—it is a personal
+              frequency you carry every single day.
+            </p>
+            <p className="mt-5 text-base leading-7 text-[#35506B] sm:text-lg sm:leading-8">
+              <strong className="font-semibold text-[#1C2B48]">
+                VESPER COSMOS
+              </strong>{" "}
+              was born at the intersection of modern aesthetic design and
+              authentic BaZi (Four Pillars of Destiny) metaphysics. We
+              translate complex natal element analysis into tangible,
+              beautifully crafted physical ritual objects—from custom crystal
+              energy bottles to bespoke BaZi press-on nails tailored to your
+              personal birth chart.
+            </p>
+            <p className="mt-5 text-base leading-7 text-[#35506B] sm:text-lg sm:leading-8">
+              Every custom piece is individually aligned with your core
+              elements, designed not just to adorn, but to empower your daily
+              energy, intention, and growth.
+            </p>
+            <Link
+              href="/about"
+              className="mt-8 inline-block rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-6 py-3 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+            >
+              Discover Our Story
+            </Link>
+          </section>
+
           {/* Sidebar + Content Layout */}
           <div className="mt-12 grid gap-8 lg:grid-cols-[240px_1fr] lg:items-start">
             {/* Sidebar — Category Filter (persistent on the side) */}
