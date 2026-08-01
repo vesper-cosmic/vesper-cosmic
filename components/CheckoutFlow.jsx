@@ -26,19 +26,38 @@ export default function CheckoutFlow() {
     saveDefaultAddress,
   } = useCart();
 
-  const [form, setForm] = useState(() => ({
-    fullName: "",
-    email: "",
-    shipping: emptyAddress(),
-    saveAddressToMember: false,
-  }));
-  const [itemDetails, setItemDetails] = useState({});
+  const [form, setForm] = useState(() => {
+    const draft = readDraft();
+    if (draft?.form) {
+      return { ...emptyAddress(), ...draft.form, shipping: { ...emptyAddress(), ...(draft.form.shipping || {}) } };
+    }
+    return {
+      fullName: "",
+      email: "",
+      shipping: emptyAddress(),
+      saveAddressToMember: false,
+    };
+  });
+  const [itemDetails, setItemDetails] = useState(() => {
+    const draft = readDraft();
+    return draft?.itemDetails || {};
+  });
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
 
-  // Prefill from member profile
+  // Persist draft so a page refresh / back button never loses the form
   useEffect(() => {
+    sessionStorage.setItem(
+      "vesperCheckoutDraft",
+      JSON.stringify({ form, itemDetails })
+    );
+  }, [form, itemDetails]);
+
+  // Prefill from member profile — only when the user has not typed anything yet
+  useEffect(() => {
+    const hasDraft = sessionStorage.getItem("vesperCheckoutDraft");
+    if (hasDraft) return;
     if (member?.defaultAddress) {
       setForm((prev) => {
         const address = member.defaultAddress;
@@ -120,10 +139,14 @@ export default function CheckoutFlow() {
 
       if (!response.ok) {
         setErrors(data.errors || {});
-        setSubmitError(data.errors?.submit || "Please check the form and try again.");
+        setSubmitError(
+          data.errors?.submit ||
+            "Some required fields are missing. Please scroll down and check the highlighted fields."
+        );
         return;
       }
 
+      sessionStorage.removeItem("vesperCheckoutDraft");
       sessionStorage.setItem(
         "vesperCheckoutOrder",
         JSON.stringify({
@@ -616,6 +639,18 @@ function ShippingForm({ shipping, errors, onChange }) {
       </div>
     </div>
   );
+}
+
+function readDraft() {
+  try {
+    const raw = sessionStorage.getItem("vesperCheckoutDraft");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
 }
 
 function Field({ label, error, children }) {
