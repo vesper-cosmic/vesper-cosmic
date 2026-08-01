@@ -5,10 +5,10 @@ const footerNav = [
     title: "Shop",
     links: [
       { label: "All Products", href: "/shop" },
-      { label: "Press-On Nails", href: "/shop" },
-      { label: "Energy Bottles", href: "/shop" },
-      { label: "Sachets", href: "/shop" },
-      { label: "Digital Reports", href: "/shop" },
+      { label: "Press-On Nails", href: "/shop?category=nails" },
+      { label: "Energy Bottles", href: "/shop?category=energy-bottles" },
+      { label: "Sachets", href: "/shop?group=sachets" },
+      { label: "Digital Reports", href: "/shop?category=digital-reports" },
     ],
   },
   {

@@ -1,14 +1,41 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Suspense, useState, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { products, productCategories, singleIntentionOptions } from "@/data/products";
 import ShopProductCard from "@/components/shop/ShopProductCard";
 import ProductDetailModal from "@/components/shop/ProductDetailModal";
 
-export default function ShopPage() {
+function ShopPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const categoryParam = searchParams.get("category");
+  const groupParam = searchParams.get("group");
+
   // selectedFilter: null (all) | { type: "group", id } | { type: "category", id }
-  const [selectedFilter, setSelectedFilter] = useState(null);
+  const selectedFilter = useMemo(() => {
+    if (categoryParam) return { type: "category", id: categoryParam };
+    if (groupParam) return { type: "group", id: groupParam };
+    return null;
+  }, [categoryParam, groupParam]);
+
+  function updateFilter(filter) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (!filter) {
+      params.delete("category");
+      params.delete("group");
+    } else if (filter.type === "category") {
+      params.set("category", filter.id);
+      params.delete("group");
+    } else {
+      params.set("group", filter.id);
+      params.delete("category");
+    }
+    const qs = params.toString();
+    router.replace(qs ? `/shop?${qs}` : "/shop", { scroll: false });
+  }
 
   function openProductDetail(product) {
     setSelectedProduct(product);
@@ -30,8 +57,8 @@ export default function ShopPage() {
   function toggleGroup(item) {
     // Parent category with children → show all products in its sub-categories
     if (item.children) {
-      setSelectedFilter((prev) =>
-        prev && prev.type === "group" && prev.id === item.id
+      updateFilter(
+        selectedFilter && selectedFilter.type === "group" && selectedFilter.id === item.id
           ? null
           : { type: "group", id: item.id }
       );
@@ -39,8 +66,8 @@ export default function ShopPage() {
     }
     // Single-level category → filter by its product category id
     if (item.categoryId) {
-      setSelectedFilter((prev) =>
-        prev && prev.type === "category" && prev.id === item.categoryId
+      updateFilter(
+        selectedFilter && selectedFilter.type === "category" && selectedFilter.id === item.categoryId
           ? null
           : { type: "category", id: item.categoryId }
       );
@@ -49,8 +76,8 @@ export default function ShopPage() {
 
   function toggleCategory(categoryId) {
     if (!categoryId) return;
-    setSelectedFilter((prev) =>
-      prev && prev.type === "category" && prev.id === categoryId
+    updateFilter(
+      selectedFilter && selectedFilter.type === "category" && selectedFilter.id === categoryId
         ? null
         : { type: "category", id: categoryId }
     );
@@ -237,5 +264,13 @@ export default function ShopPage() {
         />
       ) : null}
     </>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={null}>
+      <ShopPageContent />
+    </Suspense>
   );
 }

@@ -3,10 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 
+const STATUS_STEPS = [
+  { key: "📋 訂單已發出", label: "訂單已發出", description: "我們已收到您的訂單" },
+  { key: "✅ 訂單已接受", label: "訂單已接受", description: "訂單已確認，準備製作" },
+  { key: "🎨 貨品製作中", label: "貨品製作中", description: "您的貨品正在用心製作中" },
+  { key: "🚚 貨品已寄出", label: "貨品已寄出", description: "貨品已寄出，請注意查收" },
+];
+
 export default function OrderTrackingForm() {
   const [orderId, setOrderId] = useState("");
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState("idle"); // idle | loading | success | error
+  const [status, setStatus] = useState("idle");
   const [order, setOrder] = useState(null);
   const [error, setError] = useState("");
 
@@ -35,6 +42,10 @@ export default function OrderTrackingForm() {
     setOrder(data.order);
     setStatus("success");
   }
+
+  const currentStatusIndex = STATUS_STEPS.findIndex(
+    (step) => step.key === order?.productionStatus
+  );
 
   return (
     <div>
@@ -96,21 +107,79 @@ export default function OrderTrackingForm() {
             </p>
           </div>
 
-          <StatusRow label="Payment">
-            {order.paymentStatus || "N/A"}
-          </StatusRow>
-          <StatusRow label="Production">
-            {order.productionStatus || "N/A"}
-          </StatusRow>
-          {order.trackingNumber ? (
-            <StatusRow label="Tracking Number">
-              <span className="font-mono">{order.trackingNumber}</span>
-            </StatusRow>
+          {currentStatusIndex >= 0 ? (
+            <div className="rounded bg-white/60 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
+                Order Status
+              </p>
+              <ol className="mt-4 space-y-0">
+                {STATUS_STEPS.map((step, index) => {
+                  const isActive = index === currentStatusIndex;
+                  const isCompleted = index < currentStatusIndex;
+                  return (
+                    <li key={step.key} className="relative flex gap-3 pb-6 last:pb-0">
+                      {index < STATUS_STEPS.length - 1 ? (
+                        <span
+                          className={`absolute left-[7px] top-5 h-full w-0.5 ${
+                            index < currentStatusIndex
+                              ? "bg-[#8EB1D1]"
+                              : "bg-[#D4DFE8]"
+                          }`}
+                        />
+                      ) : null}
+                      <span
+                        className={`relative mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
+                          isCompleted || isActive
+                            ? "border-[#8EB1D1] bg-[#8EB1D1]"
+                            : "border-[#B9C8D6] bg-white"
+                        }`}
+                      >
+                        {isCompleted || isActive ? (
+                          <svg aria-hidden="true" className="h-2.5 w-2.5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 111.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z" clipRule="evenodd" />
+                          </svg>
+                        ) : null}
+                      </span>
+                      <div className="min-w-0">
+                        <p
+                          className={`text-sm font-semibold ${
+                            isActive ? "text-[#1C2B48]" : isCompleted ? "text-[#5B7893]" : "text-[#9AA8B7]"
+                          }`}
+                        >
+                          {step.label}
+                        </p>
+                        <p className="text-xs text-[#8B99A8]">{step.description}</p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
           ) : (
+            <StatusRow label="Production">
+              {order.productionStatus || "N/A"}
+            </StatusRow>
+          )}
+
+          {order.trackingNumber ? (
+            <div className="rounded border border-[#8EB1D1]/40 bg-[#EAF2F8] p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
+                郵政追蹤碼 / Postal Tracking Number
+              </p>
+              <p className="mt-2 text-xl font-mono font-bold tracking-wider text-[#1C2B48]">
+                {order.trackingNumber}
+              </p>
+              <p className="mt-2 text-xs leading-5 text-[#5B7893]">
+                您可以使用此追蹤碼在郵政局網站查詢貨品寄送狀態。
+                Use this code on the postal service website to check delivery status.
+              </p>
+            </div>
+          ) : order.productionStatus === "🚚 貨品已寄出" ? null : (
             <StatusRow label="Tracking Number">
               Not shipped yet — you'll receive an email once it ships.
             </StatusRow>
           )}
+
           {order.shippingDate ? (
             <StatusRow label="Shipped On">
               {formatDate(order.shippingDate)}

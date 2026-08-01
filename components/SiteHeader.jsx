@@ -2,13 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useCart } from "@/lib/cartContext";
 import AccountButton from "@/components/AccountButton";
+
+const ADMIN_EMAILS = String(process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
+  .split(",")
+  .map((value) => value.trim().toLowerCase())
+  .filter(Boolean);
 
 export default function SiteHeader() {
   const pathname = usePathname();
   const isShop = pathname?.startsWith("/shop");
   const { totalItems, openCart } = useCart();
+  const { data: session } = useSession();
+
+  const isAdmin = Boolean(
+    session?.user?.email &&
+      ADMIN_EMAILS.includes(session.user.email.toLowerCase())
+  );
 
   return (
     <header className="sticky top-0 z-30 border-b border-[#8EB1D1]/20 bg-[#E8ECEF]/95 backdrop-blur-sm">
@@ -39,6 +51,14 @@ export default function SiteHeader() {
               className="rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
             >
               Shop
+            </Link>
+          ) : null}
+          {isAdmin ? (
+            <Link
+              href="/admin"
+              className="hidden rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5] md:block"
+            >
+              Admin
             </Link>
           ) : null}
           <button

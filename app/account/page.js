@@ -239,6 +239,11 @@ export default function AccountPage() {
                             order.paymentStatus ||
                             "Processing"}
                         </p>
+                        {order.trackingNumber ? (
+                          <p className="mt-1 font-mono text-[10px] text-[#5B7893]">
+                            追蹤碼 {order.trackingNumber}
+                          </p>
+                        ) : null}
                       </div>
                     </div>
                   </li>
