@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useCart } from "@/lib/cartContext";
@@ -18,6 +18,32 @@ export default function AccountPage() {
 
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [orders, setOrders] = useState(null); // null = loading
+  const [ordersError, setOrdersError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    if (isSignedIn) {
+      fetch("/api/member/orders")
+        .then((res) => res.json())
+        .then((data) => {
+          if (cancelled) return;
+          setOrders(data?.orders || []);
+          if (data?.error) setOrdersError(data.error);
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setOrders([]);
+            setOrdersError("Could not load your order history.");
+          }
+        });
+    } else {
+      setOrders([]);
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [isSignedIn]);
 
   const defaultAddress = member?.defaultAddress || emptyAddress();
 
@@ -170,6 +196,68 @@ export default function AccountPage() {
         <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold text-[#1C2B48]">
+              Order History
+            </h2>
+            <Link
+              href="/track"
+              className="text-xs font-medium text-[#8EB1D1] underline transition hover:text-[#1C2B48]"
+            >
+              Track an order
+            </Link>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-[#5B7893]">
+            Your past orders and their current status.
+          </p>
+          {orders === null ? (
+            <p className="mt-4 text-sm text-[#5B7893]">Loading your orders...</p>
+          ) : ordersError ? (
+            <p className="mt-4 text-sm text-red-500">{ordersError}</p>
+          ) : orders.length > 0 ? (
+            <div className="mt-4">
+              <ul className="space-y-2">
+                {orders.map((order) => (
+                  <li
+                    key={order.orderId}
+                    className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5 text-sm text-[#1C2B48]"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="font-semibold">
+                          {order.productName || "Order"}
+                        </p>
+                        <p className="mt-0.5 text-xs text-[#5B7893]">
+                          {order.orderId} ·{" "}
+                          {formatDate(order.createdAt)}
+                        </p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <p className="text-xs font-semibold text-[#1C2B48]">
+                          ${Number(order.amount || 0).toFixed(2)} USD
+                        </p>
+                        <p className="mt-1 inline-block rounded bg-[#D6E4EE] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#35506B]">
+                          {order.productionStatus ||
+                            order.paymentStatus ||
+                            "Processing"}
+                        </p>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-[#5B7893]">
+              No orders yet.{" "}
+              <Link href="/shop" className="text-[#8EB1D1] underline">
+                Browse the shop
+              </Link>
+            </p>
+          )}
+        </section>
+
+        <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold text-[#1C2B48]">
               Saved Cart
             </h2>
             <span className="text-sm text-[#5B7893]">{items.length} items</span>
@@ -227,4 +315,15 @@ function Field({ label, children }) {
       {children}
     </div>
   );
+}
+
+function formatDate(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }

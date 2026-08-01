@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   baziIntentions,
   countries,
@@ -42,6 +43,7 @@ const baseForm = {
 
 export default function OrderIntakeForm({ product }) {
   const router = useRouter();
+  const { data: session } = useSession();
   const [form, setForm] = useState(baseForm);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -157,6 +159,7 @@ export default function OrderIntakeForm({ product }) {
       requiresBirthData: product.requiresBirthData,
       requiresShipping: product.requiresShipping,
       requiresNailDetails: product.requiresNailDetails,
+      memberEmail: session?.user?.email || null,
       ...form,
     };
 
