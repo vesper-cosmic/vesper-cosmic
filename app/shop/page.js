@@ -1,20 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import {
-  productCategories,
-  products,
-  singleIntentionOptions,
-} from "@/data/products";
+import { products, singleIntentionOptions } from "@/data/products";
 import ShopProductCard from "@/components/shop/ShopProductCard";
 import ProductDetailModal from "@/components/shop/ProductDetailModal";
-import CartDrawer from "@/components/shop/CartDrawer";
-import { useCart } from "@/lib/cartContext";
 
 export default function ShopPage() {
-  const { totalItems } = useCart();
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [cartOpen, setCartOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   function openProductDetail(product) {
@@ -25,66 +17,28 @@ export default function ShopPage() {
     setSelectedProduct(null);
   }
 
-  // Count products per category
-  const categoryProductCounts = useMemo(() => {
+  // Build simple category list from the products' main labels (e.g. Press-On Nails)
+  const categoryCounts = useMemo(() => {
     const counts = {};
     products.forEach((p) => {
-      counts[p.category] = (counts[p.category] || 0) + 1;
+      counts[p.categoryLabel] = (counts[p.categoryLabel] || 0) + 1;
     });
     return counts;
   }, []);
 
-  // Only show categories that have products
-  const activeCategories = productCategories.filter(
-    (cat) => categoryProductCounts[cat.id] > 0
-  );
+  // Simple product list — all products, or just the selected category's products
+  const visibleProducts = selectedCategory
+    ? products.filter((product) => product.categoryLabel === selectedCategory)
+    : products;
 
   return (
     <>
-      {/* Fixed Header with Cart */}
-      <header className="sticky top-0 z-30 border-b border-[#8EB1D1]/20 bg-[#E8ECEF]/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <a
-            href="/shop"
-            className="text-sm font-semibold uppercase tracking-[0.24em] text-[#8EB1D1]"
-          >
-            Vesper Cosmic
-          </a>
-          <button
-            type="button"
-            onClick={() => setCartOpen(true)}
-            className="relative flex items-center gap-2 rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
-          >
-            <svg
-              aria-hidden="true"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"
-              />
-            </svg>
-            Cart
-            {totalItems > 0 ? (
-              <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#1C2B48] text-xs font-bold text-white">
-                {totalItems}
-              </span>
-            ) : null}
-          </button>
-        </div>
-      </header>
-
       <main className="min-h-screen bg-transparent">
         <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
           {/* Hero Banner */}
           <div className="rounded-lg border border-[#8EB1D1]/40 bg-[#8EB1D1] px-5 py-8 shadow-[0_18px_60px_rgba(28,43,72,0.18)] sm:px-8 sm:py-10">
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#1C2B48]">
-              Vesper Cosmic Shop
+              Vesper Cosmos Shop
             </p>
             <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-none text-white sm:text-6xl">
               Ritual objects for your energy blueprint
@@ -129,17 +83,16 @@ export default function ShopPage() {
                 Shop by Category
               </p>
               <nav className="mt-4 flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0">
-                {activeCategories.map((category) => {
-                  const count = categoryProductCounts[category.id] || 0;
-                  const isActive = selectedCategory === category.id;
+                {Object.entries(categoryCounts).map(([label, count]) => {
+                  const isActive = selectedCategory === label;
 
                   return (
                     <button
-                      key={category.id}
+                      key={label}
                       type="button"
                       onClick={() =>
                         setSelectedCategory(
-                          isActive ? null : category.id
+                          isActive ? null : label
                         )
                       }
                       className={`flex flex-shrink-0 items-center gap-2 rounded border px-3 py-2 text-left text-sm font-semibold transition lg:w-full ${
@@ -148,7 +101,7 @@ export default function ShopPage() {
                           : "border-[#8EB1D1]/20 text-[#1C2B48] hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
                       }`}
                     >
-                      <span>{category.title}</span>
+                      <span>{label}</span>
                       <span className="text-xs font-normal text-[#5B7893]">
                         {count}
                       </span>
@@ -158,46 +111,17 @@ export default function ShopPage() {
               </nav>
             </aside>
 
-            {/* Product Grid — grouped by category */}
-            <div className="space-y-14">
-              {activeCategories
-                .filter(
-                  (cat) =>
-                    !selectedCategory || cat.id === selectedCategory
-                )
-                .map((category) => {
-                  const sectionProducts = products.filter(
-                    (product) => product.category === category.id
-                  );
-
-                  if (sectionProducts.length === 0) return null;
-
-                  return (
-                    <section
-                      key={category.id}
-                      id={category.id}
-                      className="scroll-mt-24"
-                    >
-                      <div className="mb-5 border-b border-[#8EB1D1]/25 pb-4">
-                        <h2 className="text-2xl font-semibold text-[#1C2B48] sm:text-3xl">
-                          {category.title}
-                        </h2>
-                        <p className="mt-2 text-sm leading-6 text-[#35506B]">
-                          {category.description}
-                        </p>
-                      </div>
-                      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {sectionProducts.map((product) => (
-                          <ShopProductCard
-                            key={product.id}
-                            product={product}
-                            onClick={() => openProductDetail(product)}
-                          />
-                        ))}
-                      </div>
-                    </section>
-                  );
-                })}
+            {/* Product Grid — simple list of all products, or just the selected category's products */}
+            <div>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {visibleProducts.map((product) => (
+                  <ShopProductCard
+                    key={product.id}
+                    product={product}
+                    onClick={() => openProductDetail(product)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -210,9 +134,6 @@ export default function ShopPage() {
           onClose={closeProductDetail}
         />
       ) : null}
-
-      {/* Cart Drawer */}
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   );
 }

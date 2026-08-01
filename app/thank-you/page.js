@@ -1,9 +1,9 @@
 import ThankYouMessage from "@/components/ThankYouMessage";
 
 export const metadata = {
-  title: "Thank You | Vesper Cosmic",
+  title: "Thank You | Vesper Cosmos",
   description:
-    "Your Vesper Cosmic order has been received. Order confirmation and delivery details are shown here.",
+    "Your Vesper Cosmos order has been received. Order confirmation and delivery details are shown here.",
 };
 
 export default function ThankYouPage() {

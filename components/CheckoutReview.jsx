@@ -1,33 +1,32 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getProductById } from "@/data/products";
+import { useCart } from "@/lib/cartContext";
 
 export default function CheckoutReview() {
-  const [order, setOrder] = useState(null);
+  const { clearCart } = useCart();
+  const [checkout, setCheckout] = useState(null);
   const [paymentStarted, setPaymentStarted] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
 
   useEffect(() => {
-    const storedOrder = sessionStorage.getItem("vesperCheckoutOrder");
-    if (storedOrder) {
-      setOrder(JSON.parse(storedOrder));
+    const stored = sessionStorage.getItem("vesperCheckoutOrder");
+    if (stored) {
+      setCheckout(JSON.parse(stored));
     }
   }, []);
 
-  const product = useMemo(
-    () => (order ? getProductById(order.productId) : null),
-    [order]
-  );
-
-  if (!order || !product) {
+  if (!checkout?.orderId || !checkout?.order?.items?.length) {
     return (
       <div className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6 text-center">
         <h1 className="text-3xl font-semibold text-[#1C2B48]">
           No order to review
         </h1>
         <p className="mt-3 text-sm leading-6 text-[#35506B]">
-          Please choose a product first and complete the intake form.
+          Please add items to your cart and complete the checkout form first.
         </p>
         <Link
           href="/shop"
@@ -39,17 +38,45 @@ export default function CheckoutReview() {
     );
   }
 
-  function proceedToPayment() {
-    const thankYouUrl = `${window.location.origin}/thank-you`;
-    sessionStorage.setItem("vesperLastOrder", JSON.stringify(order));
-    sessionStorage.setItem("vesperPaypalReturnHint", thankYouUrl);
+  const order = checkout.order;
+  const enrichedItems = order.items
+    .map((item) => ({
+      ...item,
+      product: getProductById(item.productId),
+    }))
+    .filter((item) => item.product);
+
+  async function proceedToPayment() {
+    sessionStorage.setItem("vesperLastOrder", JSON.stringify(checkout));
+    sessionStorage.setItem("vesperPaypalReturnHint", `${window.location.origin}/checkout/review`);
     setPaymentStarted(true);
-    window.open(order.paypalUrl, "_blank", "noopener,noreferrer");
+    window.open(checkout.paypalUrl, "_blank", "noopener,noreferrer");
   }
 
-  function goToThankYou() {
-    sessionStorage.setItem("vesperLastOrder", JSON.stringify(order));
-    window.location.href = "/thank-you";
+  async function confirmOrder() {
+    if (confirming || confirmed) return;
+    setConfirming(true);
+
+    try {
+      const response = await fetch("/api/checkout/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: checkout.orderId,
+          order,
+          saveAddressToMember: Boolean(order.saveAddressToMember),
+        }),
+      });
+
+      if (response.ok) {
+        setConfirmed(true);
+        clearCart();
+        sessionStorage.setItem("vesperLastOrder", JSON.stringify(checkout));
+        window.location.href = "/thank-you";
+      }
+    } finally {
+      setConfirming(false);
+    }
   }
 
   return (
@@ -69,10 +96,36 @@ export default function CheckoutReview() {
       <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5">
         <h2 className="text-2xl font-semibold text-[#1C2B48]">Order Summary</h2>
         <dl className="mt-5 grid gap-4 text-sm">
-          <SummaryRow label="Order ID" value={order.orderId} />
-          <SummaryRow label="Product" value={order.productName} />
-          <SummaryRow label="Price" value={`$${order.price} ${order.currency}`} />
-          <SummaryRow label="Timeline" value={order.fulfillmentTime} />
+          <SummaryRow label="Order ID" value={checkout.orderId} />
+          <div className="border-b border-[#8EB1D1]/15 pb-3">
+            <dt className="mb-2 font-semibold text-[#8EB1D1]">Items</dt>
+            <ul className="space-y-2">
+              {enrichedItems.map((item) => (
+                <li
+                  key={`${item.productId}-${item.index}`}
+                  className="flex items-start justify-between gap-3"
+                >
+                  <div className="flex items-start gap-2">
+                    <span className="text-[#1C2B48]">
+                      {item.product?.name || item.productId}{" "}
+                      <span className="text-[#5B7893]">× {item.quantity}</span>
+                    </span>
+                  </div>
+                  <span className="text-[#1C2B48]">
+                    $
+                    {(
+                      (item.product?.price || checkout.order?.total ||
+                        item.price ||
+                        0) *
+                      item.quantity
+                    ).toFixed(2)}{" "}
+                    USD
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <SummaryRow label="Total" value={`$${order.total.toFixed(2)} USD`} />
         </dl>
       </section>
 
@@ -81,39 +134,20 @@ export default function CheckoutReview() {
         <dl className="mt-5 grid gap-4 text-sm">
           <SummaryRow label="Name" value={order.fullName} />
           <SummaryRow label="Email" value={order.email} />
-          {order.readyIntention ? (
-            <SummaryRow label="Single Intention" value={order.readyIntention} />
-          ) : null}
-          {order.requiresBirthData ? (
-            <>
-              <SummaryRow label="Birth Date" value={order.birthDate} />
-              <SummaryRow label="Birth Time" value={order.birthTime} />
-              <SummaryRow label="Birth Location" value={order.birthLocation} />
-              <SummaryRow label="Gender" value={order.biologicalGender} />
-            </>
-          ) : null}
-          {order.requiresShipping ? (
+          {order.shipping?.country ? (
             <SummaryRow
               label="Shipping Address"
               value={[
-                order.address.addressLine1,
-                order.address.addressLine2,
-                order.address.city,
-                order.address.stateProvince,
-                order.address.postalCode,
-                order.address.country,
+                order.shipping.addressLine1,
+                order.shipping.addressLine2,
+                order.shipping.city,
+                order.shipping.stateProvince,
+                order.shipping.postalCode,
+                order.shipping.country,
               ]
                 .filter(Boolean)
                 .join(", ")}
             />
-          ) : null}
-          {order.requiresNailDetails ? (
-            <>
-              <SummaryRow label="Nail Shape" value={order.nailShape} />
-              <SummaryRow label="Nail Length" value={order.nailLength} />
-              <SummaryRow label="Style Preference" value={order.stylePreference} />
-              <SummaryRow label="Mixed Set" value={order.mixedSet ? "Yes" : "No"} />
-            </>
           ) : null}
         </dl>
       </section>
@@ -123,26 +157,37 @@ export default function CheckoutReview() {
           Your order will only be confirmed after PayPal payment is completed.
           Unpaid submissions will not be processed.
         </p>
-        <button
-          type="button"
-          onClick={proceedToPayment}
-          className="mist-button w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7]"
-        >
-          Proceed to Payment
-        </button>
-        <p className="mt-3 text-xs leading-5 text-[#5B7893]">
-          PayPal will open in a new tab. After payment, return here and continue
-          to the confirmation page.
-        </p>
-        {paymentStarted ? (
-          <button
-            type="button"
-            onClick={goToThankYou}
-            className="mt-4 w-full rounded border border-[#1C2B48] bg-[#1C2B48] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#E8ECEF] transition hover:bg-[#35506B]"
-          >
-            I have completed PayPal payment
-          </button>
-        ) : null}
+        {!confirmed ? (
+          <>
+            <button
+              type="button"
+              onClick={proceedToPayment}
+              className="mist-button w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+            >
+              Proceed to Payment
+            </button>
+            <p className="mt-3 text-xs leading-5 text-[#5B7893]">
+              PayPal will open in a new tab. After payment, return here and
+              confirm below.
+            </p>
+            {paymentStarted ? (
+              <button
+                type="button"
+                onClick={confirmOrder}
+                disabled={confirming}
+                className="mt-4 w-full rounded border border-[#1C2B48] bg-[#1C2B48] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#E8ECEF] transition hover:bg-[#35506B] disabled:opacity-60"
+              >
+                {confirming
+                  ? "Confirming…"
+                  : "I have completed PayPal payment"}
+              </button>
+            ) : null}
+          </>
+        ) : (
+          <p className="py-4 text-sm text-[#35506B]">
+            Order confirmed. Redirecting…
+          </p>
+        )}
       </section>
     </div>
   );

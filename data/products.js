@@ -216,7 +216,7 @@ export const products = [
     originalPrice: 238,
     currency: "USD",
     description:
-      "The full Vesper Cosmic experience: a BaZi crystal energy bottle, a crystal sachet, a press-on nail set, and your Eastern Astrology Report — all aligned to your birth chart.",
+      "The full Vesper Cosmos experience: a BaZi crystal energy bottle, a crystal sachet, a press-on nail set, and your Eastern Astrology Report — all aligned to your birth chart.",
     fulfillmentTime: "Ships within 7–10 business days (report delivered via email)",
     fulfillmentMode: "Bundle",
     intentionType: "bazi",

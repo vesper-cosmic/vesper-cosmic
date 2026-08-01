@@ -11,12 +11,12 @@ export function generateMetadata({ params }) {
 
   if (!product) {
     return {
-      title: "Order | Vesper Cosmic",
+      title: "Order | Vesper Cosmos",
     };
   }
 
   return {
-    title: `Order ${product.name} | Vesper Cosmic`,
+    title: `Order ${product.name} | Vesper Cosmos`,
     description: `Submit your details for ${product.name}. ${product.fulfillmentTime}.`,
   };
 }

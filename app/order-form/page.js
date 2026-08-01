@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Order Form | Vesper Cosmic",
+  title: "Order Form | Vesper Cosmos",
   description:
-    "The order form has moved to product-specific intake pages in the Vesper Cosmic shop.",
+    "The order form has moved to product-specific intake pages in the Vesper Cosmos shop.",
 };
 
 export default function LegacyOrderFormPage() {

@@ -1,8 +1,11 @@
 import "./globals.css";
+import Providers from "@/components/Providers";
 import { CartProvider } from "@/lib/cartContext";
+import SiteHeader from "@/components/SiteHeader";
+import CartDrawer from "@/components/shop/CartDrawer";
 
 export const metadata = {
-  title: "Vesper Cosmic Blueprint",
+  title: "Vesper Cosmos",
   description:
     "High-end spiritual boutique for BaZi reports, crystal energy pieces, and custom press-on nails.",
 };
@@ -17,7 +20,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <CartProvider>{children}</CartProvider>
+        <Providers>
+          <CartProvider>
+            <SiteHeader />
+            {children}
+            <CartDrawer />
+          </CartProvider>
+        </Providers>
       </body>
     </html>
   );

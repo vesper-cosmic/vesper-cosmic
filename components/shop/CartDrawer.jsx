@@ -4,16 +4,24 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cartContext";
 
-export default function CartDrawer({ open, onClose }) {
-  const { items, totalItems, totalPrice, removeItem, updateQuantity, clearCart } =
-    useCart();
+export default function CartDrawer() {
+  const {
+    items,
+    totalItems,
+    totalPrice,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    cartOpen,
+    closeCart,
+  } = useCart();
 
   // Close on Escape
   useEffect(() => {
     function handleKeyDown(event) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") closeCart();
     }
-    if (open) {
+    if (cartOpen) {
       document.addEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "hidden";
     }
@@ -21,24 +29,26 @@ export default function CartDrawer({ open, onClose }) {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
     };
-  }, [open, onClose]);
+  }, [cartOpen, closeCart]);
 
   return (
     <div
       className={`fixed inset-0 z-50 transition-opacity duration-300 ${
-        open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        cartOpen
+          ? "pointer-events-auto opacity-100"
+          : "pointer-events-none opacity-0"
       }`}
     >
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-[#1C2B48]/60 backdrop-blur-sm"
-        onClick={onClose}
+        onClick={closeCart}
       />
 
       {/* Drawer */}
       <div
         className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-[#E8ECEF] shadow-[0_0_60px_rgba(28,43,72,0.3)] transition-transform duration-300 ${
-          open ? "translate-x-0" : "translate-x-full"
+          cartOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
@@ -48,7 +58,7 @@ export default function CartDrawer({ open, onClose }) {
           </h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={closeCart}
             className="flex h-8 w-8 items-center justify-center rounded-full border border-[#8EB1D1]/40 bg-white/60 text-[#1C2B48] transition hover:bg-[#C4D8E5]"
             aria-label="Close cart"
           >
@@ -141,7 +151,7 @@ export default function CartDrawer({ open, onClose }) {
             <Link
               href="/checkout"
               className="block w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-center text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7]"
-              onClick={onClose}
+              onClick={closeCart}
             >
               Proceed to Checkout
             </Link>

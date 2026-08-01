@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Success | Vesper Cosmic",
-  description: "Vesper Cosmic order success page.",
+  title: "Success | Vesper Cosmos",
+  description: "Vesper Cosmos order success page.",
 };
 
 export default function LegacySuccessPage() {
