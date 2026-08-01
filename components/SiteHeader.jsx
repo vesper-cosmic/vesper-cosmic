@@ -18,7 +18,7 @@ export default function SiteHeader() {
           <img
             src="/images/vesper-logo.png"
             alt="Vesper Cosmos"
-            className="h-10 w-auto shadow-[0_2px_10px_rgba(28,43,72,0.25)] transition group-hover:shadow-[0_4px_16px_rgba(28,43,72,0.35)]"
+            className="h-10 w-auto"
           />
           <span className="text-sm font-semibold uppercase tracking-[0.24em] text-[#1C2B48] transition group-hover:text-[#35506B] sm:text-base">
             Vesper<span className="text-[#8EB1D1]"> Cosmos</span>
