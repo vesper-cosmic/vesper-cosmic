@@ -69,10 +69,22 @@ export default function AccountButton() {
     );
   }
 
+  async function handleSignIn() {
+    try {
+      // Use the current page as the callback so the user returns to where
+      // they were (shop, home, checkout, …) instead of being redirected to a
+      // hard-coded path. Hard-coding "/shop" caused confusing jumps back to
+      // the home page when the callback URL was lost or rejected.
+      await signIn("google", { callbackUrl: window.location.href });
+    } catch (error) {
+      console.error("Google sign-in failed:", error);
+    }
+  }
+
   return (
     <button
       type="button"
-      onClick={() => signIn("google", { callbackUrl: "/shop" })}
+      onClick={handleSignIn}
       className="flex items-center gap-2 rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
     >
       <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24">
