@@ -2,11 +2,13 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { products, productCategories } from "@/data/products";
+import { staticCategories, groupCategoryIds } from "@/lib/productData";
+import { useProducts } from "@/components/ProductProvider";
 import ShopProductCard from "@/components/shop/ShopProductCard";
 import ProductDetailModal from "@/components/shop/ProductDetailModal";
 
 export default function HomePage() {
+  const { products } = useProducts();
   const [selectedProduct, setSelectedProduct] = useState(null);
   // selectedFilter: null (all) | { type: "group", id } | { type: "category", id }
   const [selectedFilter, setSelectedFilter] = useState(null);
@@ -30,7 +32,7 @@ export default function HomePage() {
       counts[p.category] = (counts[p.category] || 0) + 1;
     });
     return counts;
-  }, []);
+  }, [products]);
 
   function toggleGroup(item) {
     // Parent category with children → show all products in its sub-categories
@@ -66,10 +68,8 @@ export default function HomePage() {
     if (!selectedFilter) return visibleAllProducts;
 
     if (selectedFilter.type === "group") {
-      const group = productCategories.find((g) => g.id === selectedFilter.id);
-      const categoryIds = new Set(
-        (group.children || []).map((child) => child.categoryId).filter(Boolean)
-      );
+      const group = staticCategories.find((g) => g.id === selectedFilter.id);
+      const categoryIds = groupCategoryIds(group);
       return visibleAllProducts.filter((product) =>
         categoryIds.has(product.category)
       );
@@ -112,7 +112,7 @@ export default function HomePage() {
                 Shop by Category
               </p>
               <nav className="mt-4 flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0">
-                {productCategories.map((group) => {
+                {staticCategories.map((group) => {
                   const isParent = Boolean(group.children);
                   const groupCount = isParent
                     ? group.children.reduce(

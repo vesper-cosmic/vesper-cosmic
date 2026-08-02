@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getProductById } from "@/data/products";
+import { useProducts } from "@/components/ProductProvider";
 
 export default function ThankYouMessage() {
+  const { getProductById } = useProducts();
   const [order, setOrder] = useState(null);
   const [confirmationStatus, setConfirmationStatus] = useState("idle");
 

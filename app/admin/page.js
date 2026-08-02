@@ -136,12 +136,20 @@ export default function AdminPage() {
             <h1 className="mt-2 text-3xl font-semibold text-[#1C2B48]">訂單管理</h1>
             <p className="mt-2 text-sm text-[#35506B]">點選狀態更新每個顧客訂單的處理進度</p>
           </div>
-          <Link
-            href="/shop"
-            className="rounded border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
-          >
-            ← Back to Shop
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href="/admin/products"
+              className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+            >
+              產品管理 →
+            </Link>
+            <Link
+              href="/shop"
+              className="rounded border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+            >
+              ← Back to Shop
+            </Link>
+          </div>
         </div>
 
         {loadError ? (

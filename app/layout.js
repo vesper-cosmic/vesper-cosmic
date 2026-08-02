@@ -1,6 +1,7 @@
 import "./globals.css";
 import Providers from "@/components/Providers";
 import { CartProvider } from "@/lib/cartContext";
+import { ProductProvider } from "@/components/ProductProvider";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import CartDrawer from "@/components/shop/CartDrawer";
@@ -95,10 +96,12 @@ export default function RootLayout({ children }) {
         />
         <Providers>
           <CartProvider>
-            <SiteHeader />
-            {children}
-            <SiteFooter />
-            <CartDrawer />
+            <ProductProvider>
+              <SiteHeader />
+              {children}
+              <SiteFooter />
+              <CartDrawer />
+            </ProductProvider>
           </CartProvider>
         </Providers>
       </body>

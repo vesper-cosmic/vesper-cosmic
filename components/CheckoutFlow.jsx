@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { getProductById } from "@/data/products";
+import { useProducts } from "@/components/ProductProvider";
 import { useCart } from "@/lib/cartContext";
 import {
   countries,
@@ -17,6 +17,7 @@ import {
 } from "@/lib/formOptions";
 
 export default function CheckoutFlow() {
+  const { getProductById } = useProducts();
   const {
     items,
     totalPrice,
@@ -86,7 +87,7 @@ export default function CheckoutFlow() {
         ...item,
         product: getProductById(item.id) || null,
       })),
-    [items]
+    [items, getProductById]
   );
 
   const hasShippingItems = enrichedItems.some((item) => item.product?.requiresShipping);

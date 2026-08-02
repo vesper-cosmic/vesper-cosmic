@@ -18,7 +18,7 @@ export async function POST(request) {
     );
   }
 
-  const { errors, order } = validateOrderPayload(payload);
+  const { errors, order } = await validateOrderPayload(payload);
 
   if (Object.keys(errors).length > 0) {
     return NextResponse.json({ errors }, { status: 422 });

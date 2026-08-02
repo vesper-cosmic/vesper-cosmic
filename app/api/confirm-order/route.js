@@ -17,7 +17,7 @@ export async function POST(request) {
     );
   }
 
-  const { errors, order } = normalizeConfirmedOrderPayload(payload);
+  const { errors, order } = await normalizeConfirmedOrderPayload(payload);
 
   if (Object.keys(errors).length > 0) {
     return NextResponse.json({ errors }, { status: 422 });

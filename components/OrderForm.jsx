@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { products } from "@/data/products";
+import { staticProducts } from "@/lib/productData";
+import { useProducts } from "@/components/ProductProvider";
 
 const intentionOptions = ["Wealth", "Love", "Health", "Protection"];
 
@@ -13,7 +14,7 @@ const initialState = {
   birthDateTime: "",
   birthLocation: "",
   intentions: [],
-  purchasedProductId: products[0].id,
+  purchasedProductId: staticProducts[0].id,
   shippingAddress: "",
   postalCode: "",
 };
@@ -21,7 +22,8 @@ const initialState = {
 export default function OrderForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const defaultProductId = searchParams.get("product") || products[0].id;
+  const { products, getProductById } = useProducts();
+  const defaultProductId = searchParams.get("product") || products[0]?.id || staticProducts[0].id;
   const [form, setForm] = useState({
     ...initialState,
     purchasedProductId: defaultProductId,
@@ -30,8 +32,8 @@ export default function OrderForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedProduct = useMemo(
-    () => products.find((product) => product.id === form.purchasedProductId),
-    [form.purchasedProductId]
+    () => getProductById(form.purchasedProductId),
+    [form.purchasedProductId, getProductById]
   );
   const requiresShipping = selectedProduct?.type === "Physical";
 

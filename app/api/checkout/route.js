@@ -18,7 +18,7 @@ export async function POST(request) {
     );
   }
 
-  const { errors, order } = validateMultiCheckoutPayload(payload);
+  const { errors, order } = await validateMultiCheckoutPayload(payload);
 
   if (Object.keys(errors).length > 0) {
     return NextResponse.json({ errors }, { status: 422 });

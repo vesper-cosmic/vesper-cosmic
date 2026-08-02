@@ -1,13 +1,11 @@
 import { notFound } from "next/navigation";
 import OrderIntakeForm from "@/components/forms/OrderIntakeForm";
-import { getProductBySlug, products } from "@/data/products";
+import { getProductBySlug } from "@/lib/productServer";
 
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
-}
+export const dynamic = "force-dynamic";
 
-export function generateMetadata({ params }) {
-  const product = getProductBySlug(params.slug);
+export async function generateMetadata({ params }) {
+  const { product } = await getProductBySlug(params.slug);
 
   if (!product) {
     return {
@@ -21,8 +19,8 @@ export function generateMetadata({ params }) {
   };
 }
 
-export default function ProductOrderPage({ params }) {
-  const product = getProductBySlug(params.slug);
+export default async function ProductOrderPage({ params }) {
+  const { product } = await getProductBySlug(params.slug);
 
   if (!product) {
     notFound();

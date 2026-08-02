@@ -2,13 +2,15 @@
 
 import { Suspense, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { products, productCategories, singleIntentionOptions } from "@/data/products";
+import { staticCategories, staticSingleIntentions, groupCategoryIds } from "@/lib/productData";
+import { useProducts } from "@/components/ProductProvider";
 import ShopProductCard from "@/components/shop/ShopProductCard";
 import ProductDetailModal from "@/components/shop/ProductDetailModal";
 
 function ShopPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { products } = useProducts();
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const categoryParam = searchParams.get("category");
@@ -52,7 +54,7 @@ function ShopPageContent() {
       counts[p.category] = (counts[p.category] || 0) + 1;
     });
     return counts;
-  }, []);
+  }, [products]);
 
   function toggleGroup(item) {
     // Parent category with children → show all products in its sub-categories
@@ -88,15 +90,13 @@ function ShopPageContent() {
     if (!selectedFilter) return products;
 
     if (selectedFilter.type === "group") {
-      const group = productCategories.find((g) => g.id === selectedFilter.id);
-      const categoryIds = new Set(
-        (group.children || []).map((child) => child.categoryId).filter(Boolean)
-      );
+      const group = staticCategories.find((g) => g.id === selectedFilter.id);
+      const categoryIds = groupCategoryIds(group);
       return products.filter((product) => categoryIds.has(product.category));
     }
 
     return products.filter((product) => product.category === selectedFilter.id);
-  }, [selectedFilter]);
+  }, [selectedFilter, products]);
 
   const emptyMessage =
     selectedFilter && visibleProducts.length === 0
@@ -136,7 +136,7 @@ function ShopPageContent() {
               added later as separate products.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {singleIntentionOptions.map((option) => (
+              {staticSingleIntentions.map((option) => (
                 <span
                   key={option}
                   className="rounded-full border border-[#8EB1D1]/40 bg-[#C4D8E5] px-3 py-1 text-xs font-semibold text-[#1C2B48]"
@@ -155,7 +155,7 @@ function ShopPageContent() {
                 Shop by Category
               </p>
               <nav className="mt-4 flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0">
-                {productCategories.map((group) => {
+                {staticCategories.map((group) => {
                   const isParent = Boolean(group.children);
                   const groupCount = isParent
                     ? group.children.reduce(

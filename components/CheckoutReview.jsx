@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getProductById } from "@/data/products";
+import { useProducts } from "@/components/ProductProvider";
 import { useCart } from "@/lib/cartContext";
 
 export default function CheckoutReview() {
+  const { getProductById } = useProducts();
   const { clearCart } = useCart();
   const [checkout, setCheckout] = useState(null);
   const [paymentStarted, setPaymentStarted] = useState(false);
