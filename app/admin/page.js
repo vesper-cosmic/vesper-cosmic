@@ -229,7 +229,6 @@ function FilterPill({ active, onClick, children }) {
 function OrderCard({ order, draft, onChange, onSave, saving, message }) {
   const status = draft.status ?? normalizedStatus(order.productionStatus) ?? "";
   const trackingNumber = draft.trackingNumber ?? order.trackingNumber ?? "";
-  const showTrackingInput = status === "🚚 貨品已寄出";
 
   return (
     <div className="rounded border border-[#8EB1D1]/30 bg-white/60 p-4">
@@ -268,29 +267,21 @@ function OrderCard({ order, draft, onChange, onSave, saving, message }) {
           </select>
         </div>
 
-        {showTrackingInput ? (
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
-              郵政追蹤碼 (Postal Tracking)
-            </label>
-            <input
-              type="text"
-              value={trackingNumber}
-              onChange={(e) => onChange({ trackingNumber: e.target.value })}
-              placeholder="e.g. RC123456789TW"
-              className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 font-mono text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
-            />
-          </div>
-        ) : order.trackingNumber ? (
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
-              追蹤碼
-            </label>
-            <p className="rounded border border-[#8EB1D1]/30 bg-[#EAF2F8] px-3 py-2 font-mono text-sm text-[#1C2B48]">
-              {order.trackingNumber}
-            </p>
-          </div>
-        ) : null}
+        <div>
+          <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
+            郵政追蹤碼 (Postal Tracking)
+          </label>
+          <input
+            type="text"
+            value={trackingNumber}
+            onChange={(e) => onChange({ trackingNumber: e.target.value })}
+            placeholder="e.g. RC123456789TW"
+            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 font-mono text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+          />
+          <p className="mt-1 text-[11px] text-[#8B99A8]">
+            客戶會在這裡看到追蹤碼：/track 訂單追蹤頁、帳戶頁、以及寄出通知
+          </p>
+        </div>
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-3">
