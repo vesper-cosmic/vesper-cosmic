@@ -32,10 +32,10 @@ export default function ContactPage() {
             </h2>
             <p className="mt-3 text-sm leading-7 text-[#35506B]">
               <a
-                href="mailto:support@vespercosmos.com"
+                href="mailto:vesper.cosmic.blueprint@gmail.com"
                 className="font-semibold text-[#1C2B48] underline decoration-[#8EB1D1] decoration-2 underline-offset-2 transition hover:text-[#5B7893]"
               >
-                support@vespercosmos.com
+                vesper.cosmic.blueprint@gmail.com
               </a>
             </p>
             <p className="mt-2 text-sm leading-7 text-[#5B7893]">
@@ -54,10 +54,10 @@ export default function ContactPage() {
             <p className="mt-3 text-sm leading-7 text-[#35506B]">
               For collaborations, press, or wholesale inquiries, please contact:{" "}
               <a
-                href="mailto:hello@vespercosmos.com"
+                href="mailto:vesper.cosmic.blueprint@gmail.com"
                 className="font-semibold text-[#1C2B48] underline decoration-[#8EB1D1] decoration-2 underline-offset-2 transition hover:text-[#5B7893]"
               >
-                hello@vespercosmos.com
+                vesper.cosmic.blueprint@gmail.com
               </a>
               .
             </p>

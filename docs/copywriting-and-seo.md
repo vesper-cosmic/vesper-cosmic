@@ -119,7 +119,7 @@ export default function AboutPage() {
 | **Shop** | All Products · Press-On Nails · Energy Bottles · Sachets · Digital Reports |
 | **Customer Care** | Shipping & Delivery · Return & Refund Policy · FAQ · Contact Us |
 | **Legal** | Privacy Policy · Terms of Service |
-| **Payment** | Apple Pay · Visa · Mastercard · PayPal · Shopify Payments |
+| **Payment** | PayPal |
 
 ### 2-2. Footer 完整 JSX 元件
 
@@ -159,20 +159,7 @@ const footerNav = [
 
 // Payment badge placeholders — replace with official SVGs / icons
 const paymentMethods = [
-  { label: "Apple Pay", initials: "",
-    symbol: (
-      <svg aria-hidden="true" className="h-5 w-8" viewBox="0 0 32 20" role="img">
-        <rect width="32" height="20" rx="3" fill="#fff" stroke="#1C2B48/20" />
-        <text x="16" y="14" textAnchor="middle" fontSize="9" fontWeight="700" fill="#1C2B48">
-           Pay
-        </text>
-      </svg>
-    ),
-  },
-  { label: "Visa", initials: "VISA" },
-  { label: "Mastercard", initials: "MC" },
   { label: "PayPal", initials: "PayPal" },
-  { label: "Shopify Payments", initials: "Shop" },
 ];
 
 export default function SiteFooter() {

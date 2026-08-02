@@ -72,14 +72,13 @@ Optional Vercel environment variables:
 
 ```txt
 RESEND_API_KEY=...
-RESEND_FROM_EMAIL=onboarding@resend.dev
+RESEND_FROM_EMAIL=vesper.cosmic.blueprint@gmail.com
 RESEND_REPLY_TO=vesper.cosmic.blueprint@gmail.com
 NOTION_SETUP_SECRET=...
 ```
 
 Resend requires the `from` address to use a verified sending domain. Use
-`onboarding@resend.dev` only for early testing, then verify a custom domain in
-Resend and set `RESEND_FROM_EMAIL` to an address on that domain. Keep
+`vesper.cosmic.blueprint@gmail.com` as the sending address. Keep
 `RESEND_REPLY_TO=vesper.cosmic.blueprint@gmail.com` so customer replies go to
 the shop inbox.
 

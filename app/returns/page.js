@@ -144,10 +144,10 @@ export default function ReturnsPage() {
               <p className="text-sm leading-7 text-[#35506B] sm:text-base">
                 Contact us at{" "}
                 <a
-                  href="mailto:support@vespercosmos.com"
+                  href="mailto:vesper.cosmic.blueprint@gmail.com"
                   className="font-semibold text-[#1C2B48] underline decoration-[#8EB1D1] decoration-2 underline-offset-2 transition hover:text-[#5B7893]"
                 >
-                  support@vespercosmos.com
+                  vesper.cosmic.blueprint@gmail.com
                 </a>{" "}
                 within{" "}
                 <strong className="font-semibold text-[#1C2B48]">
@@ -192,10 +192,10 @@ export default function ReturnsPage() {
             If you have any questions regarding our Return & Refund Policy,
             please email us at{" "}
             <a
-              href="mailto:support@vespercosmos.com"
+              href="mailto:vesper.cosmic.blueprint@gmail.com"
               className="font-semibold text-[#1C2B48] underline decoration-[#8EB1D1] decoration-2 underline-offset-2 transition hover:text-[#5B7893]"
             >
-              support@vespercosmos.com
+              vesper.cosmic.blueprint@gmail.com
             </a>
             .
           </p>

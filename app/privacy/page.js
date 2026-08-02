@@ -15,7 +15,7 @@ const infoItems = [
   },
   {
     title: "Payment Information",
-    text: "Processed securely through encrypted third-party payment gateways (Visa, MasterCard, PayPal, Apple Pay). We do not store your credit card details on our servers.",
+    text: "Processed securely through encrypted third-party payment gateway (PayPal). We do not store your credit card details on our servers.",
   },
 ];
 
@@ -129,10 +129,10 @@ export default function PrivacyPage() {
             If you have questions regarding our Privacy Policy, please email us
             at{" "}
             <a
-              href="mailto:privacy@vespercosmos.com"
+              href="mailto:vesper.cosmic.blueprint@gmail.com"
               className="font-semibold text-[#1C2B48] underline decoration-[#8EB1D1] decoration-2 underline-offset-2 transition hover:text-[#5B7893]"
             >
-              privacy@vespercosmos.com
+              vesper.cosmic.blueprint@gmail.com
             </a>
             .
           </p>

@@ -90,7 +90,7 @@ export async function POST(request) {
   ].join("\n");
 
   const from = `${storeName} <${
-    process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev"
+    process.env.RESEND_FROM_EMAIL || "vesper.cosmic.blueprint@gmail.com"
   }>`;
 
   const results = await Promise.all([

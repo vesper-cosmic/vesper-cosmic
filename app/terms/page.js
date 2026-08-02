@@ -117,10 +117,10 @@ export default function TermsPage() {
             If you have questions regarding our Terms of Service, please email
             us at{" "}
             <a
-              href="mailto:legal@vespercosmos.com"
+              href="mailto:vesper.cosmic.blueprint@gmail.com"
               className="font-semibold text-[#1C2B48] underline decoration-[#8EB1D1] decoration-2 underline-offset-2 transition hover:text-[#5B7893]"
             >
-              legal@vespercosmos.com
+              vesper.cosmic.blueprint@gmail.com
             </a>
             .
           </p>
