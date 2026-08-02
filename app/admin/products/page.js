@@ -45,7 +45,7 @@ function emptyForm() {
     nailIntro: "",
     includes: "",
     badge: "",
-    images: "",
+    images: [],
     inventory: "",
     isNew: false,
   };
@@ -128,7 +128,7 @@ export default function AdminProductsPage() {
       nailIntro: product.nailIntro || "",
       includes: product.includes || "",
       badge: product.badge || "",
-      images: Array.isArray(product.images) ? product.images.join("\n") : "",
+      images: Array.isArray(product.images) ? product.images.map(String) : [],
       inventory: product.inventory ?? "",
       isNew: Boolean(product.isNew),
     });
@@ -143,6 +143,25 @@ export default function AdminProductsPage() {
 
   function toggleCheckbox(key) {
     setForm((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
+
+  function addImageField() {
+    setForm((prev) => ({ ...prev, images: [...prev.images, ""] }));
+  }
+
+  function updateImageField(index, value) {
+    setForm((prev) => {
+      const next = [...prev.images];
+      next[index] = value;
+      return { ...prev, images: next };
+    });
+  }
+
+  function removeImageField(index) {
+    setForm((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
   }
 
   async function handleSubmit(event) {
@@ -160,10 +179,9 @@ export default function AdminProductsPage() {
         .split(",")
         .map((item) => item.trim())
         .filter(Boolean),
-      images: form.images
-        .split("\n")
-        .map((item) => item.trim())
-        .filter(Boolean),
+      images: Array.isArray(form.images)
+        ? form.images.map((item) => String(item || "").trim()).filter(Boolean)
+        : [],
     };
 
     try {
@@ -546,14 +564,53 @@ export default function AdminProductsPage() {
               />
             </Field>
 
-            <Field label="圖片網址 Images（每行一張）" error={formErrors.images}>
-              <textarea
-                value={form.images}
-                onChange={(e) => updateField("images", e.target.value)}
-                rows="3"
-                placeholder={"/images/celestial-nails-1.svg\n/images/celestial-nails-2.svg"}
-                className={inputClass(!!formErrors.images, "font-mono")}
-              />
+            <Field label="產品圖片 Product Images" error={formErrors.images}>
+              <div className="space-y-2">
+                {form.images.length === 0 ? (
+                  <p className="rounded border border-dashed border-[#8EB1D1]/40 bg-white/40 px-3 py-5 text-center text-sm text-[#5B7893]">
+                    尚未新增圖片。點擊下方「＋ 新增圖片」貼上圖片網址。
+                  </p>
+                ) : null}
+                {form.images.map((imageUrl, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    {String(imageUrl || "").trim() ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={String(imageUrl).trim()}
+                        alt={`Product image ${index + 1}`}
+                        className="h-12 w-12 shrink-0 rounded border border-[#8EB1D1]/30 bg-white object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <div className="h-12 w-12 shrink-0 rounded border border-dashed border-[#8EB1D1]/30 bg-white/40" />
+                    )}
+                    <input
+                      type="text"
+                      value={imageUrl}
+                      onChange={(e) => updateImageField(index, e.target.value)}
+                      placeholder="https://… 或 /images/xxx.png"
+                      className={inputClass(false, "font-mono")}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImageField(index)}
+                      className="shrink-0 rounded border border-[#C0392B]/40 px-2 py-1.5 text-xs font-semibold text-[#C0392B] transition hover:bg-[#C0392B]/10"
+                      title="移除圖片"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addImageField}
+                  className="rounded border border-[#8EB1D1]/40 px-3 py-1.5 text-xs font-semibold text-[#35506B] transition hover:bg-[#C4D8E5]"
+                >
+                  ＋ 新增圖片
+                </button>
+              </div>
             </Field>
 
             <Field label="庫存 Inventory（可選，留空表示不限制）">
