@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
@@ -259,10 +259,7 @@ export default function AdminProductsPage() {
     );
   }
 
-  const paginated = useMemo(
-    () => products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
-    [products, page]
-  );
+  const paginated = products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
 
   return (
