@@ -3,13 +3,9 @@
 import { useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { ORDER_STATUSES, normalizedStatus } from "@/lib/orderStatus";
 
-const STATUS_OPTIONS = [
-  "📋 訂單已發出",
-  "✅ 訂單已接受",
-  "🎨 貨品製作中",
-  "🚚 貨品已寄出",
-];
+const STATUS_OPTIONS = ORDER_STATUSES;
 
 export default function AdminPage() {
   const { status: authStatus } = useSession();
@@ -127,7 +123,9 @@ export default function AdminPage() {
   }
 
   const filteredOrders =
-    filter === "all" ? orders : orders.filter((order) => order.productionStatus === filter);
+    filter === "all"
+      ? orders
+      : orders.filter((order) => normalizedStatus(order.productionStatus) === filter);
 
   return (
     <AdminShell>
@@ -162,7 +160,9 @@ export default function AdminPage() {
               active={filter === status}
               onClick={() => setFilter(filter === status ? "all" : status)}
             >
-              {status} ({orders.filter((order) => order.productionStatus === status).length})
+              {status} (
+              {orders.filter((order) => normalizedStatus(order.productionStatus) === status).length}
+              )
             </FilterPill>
           ))}
         </div>
@@ -219,7 +219,7 @@ function FilterPill({ active, onClick, children }) {
 }
 
 function OrderCard({ order, draft, onChange, onSave, saving, message }) {
-  const status = draft.status ?? order.productionStatus ?? "";
+  const status = draft.status ?? normalizedStatus(order.productionStatus) ?? "";
   const trackingNumber = draft.trackingNumber ?? order.trackingNumber ?? "";
   const showTrackingInput = status === "🚚 貨品已寄出";
 

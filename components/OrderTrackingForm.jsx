@@ -2,13 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ORDER_STATUSES, normalizedStatus } from "@/lib/orderStatus";
 
-const STATUS_STEPS = [
-  { key: "📋 訂單已發出", label: "訂單已發出", description: "我們已收到您的訂單" },
-  { key: "✅ 訂單已接受", label: "訂單已接受", description: "訂單已確認，準備製作" },
-  { key: "🎨 貨品製作中", label: "貨品製作中", description: "您的貨品正在用心製作中" },
-  { key: "🚚 貨品已寄出", label: "貨品已寄出", description: "貨品已寄出，請注意查收" },
-];
+const STATUS_STEPS = ORDER_STATUSES.map((key) => ({
+  key,
+  label: key.replace(/^[^\u4e00-\u9fff]*/, ""),
+  description:
+    key === "📋 訂單已發出"
+      ? "我們已收到您的訂單"
+      : key === "✅ 訂單已接受"
+      ? "訂單已確認，準備製作"
+      : key === "🎨 貨品製作中"
+      ? "您的貨品正在用心製作中"
+      : "貨品已寄出，請注意查收",
+}));
 
 export default function OrderTrackingForm() {
   const [orderId, setOrderId] = useState("");
@@ -43,8 +50,11 @@ export default function OrderTrackingForm() {
     setStatus("success");
   }
 
+  const displayStatus = order?.productionStatus
+    ? normalizedStatus(order.productionStatus)
+    : "";
   const currentStatusIndex = STATUS_STEPS.findIndex(
-    (step) => step.key === order?.productionStatus
+    (step) => step.key === displayStatus
   );
 
   return (
@@ -174,7 +184,7 @@ export default function OrderTrackingForm() {
                 Use this code on the postal service website to check delivery status.
               </p>
             </div>
-          ) : order.productionStatus === "🚚 貨品已寄出" ? null : (
+          ) : displayStatus === "🚚 貨品已寄出" ? null : (
             <StatusRow label="Tracking Number">
               Not shipped yet — you'll receive an email once it ships.
             </StatusRow>
