@@ -18,8 +18,9 @@ export default function TrackPage() {
             Track Your Order
           </h1>
           <p className="mt-4 text-sm leading-6 text-[#35506B]">
-            Enter your order ID (e.g. VC-20260801-AB12) and the email you used
-            at checkout to see the current status of your order.
+            Signed in? Your order history appears automatically — just select
+            an order to see its status. Otherwise, enter your order ID (e.g.
+            VC-20260801-AB12) and the email you used at checkout.
           </p>
           <div className="mt-6">
             <OrderTrackingForm />
