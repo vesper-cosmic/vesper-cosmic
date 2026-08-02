@@ -3,18 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ORDER_STATUSES, normalizedStatus } from "@/lib/orderStatus";
+import { ORDER_STATUS_EN, ORDER_STATUS_DESCRIPTION_EN } from "@/lib/orderStatus";
 
 const STATUS_STEPS = ORDER_STATUSES.map((key) => ({
   key,
-  label: key.replace(/^[^\u4e00-\u9fff]*/, ""),
-  description:
-    key === "📋 訂單已發出"
-      ? "我們已收到您的訂單"
-      : key === "✅ 訂單已接受"
-      ? "訂單已確認，準備製作"
-      : key === "🎨 貨品製作中"
-      ? "您的貨品正在用心製作中"
-      : "貨品已寄出，請注意查收",
+  label: ORDER_STATUS_EN[key] || key,
+  description: ORDER_STATUS_DESCRIPTION_EN[key] || "",
 }));
 
 export default function OrderTrackingForm() {
@@ -174,13 +168,12 @@ export default function OrderTrackingForm() {
           {order.trackingNumber ? (
             <div className="rounded border border-[#8EB1D1]/40 bg-[#EAF2F8] p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
-                郵政追蹤碼 / Postal Tracking Number
+                Postal Tracking Number
               </p>
               <p className="mt-2 text-xl font-mono font-bold tracking-wider text-[#1C2B48]">
                 {order.trackingNumber}
               </p>
               <p className="mt-2 text-xs leading-5 text-[#5B7893]">
-                您可以使用此追蹤碼在郵政局網站查詢貨品寄送狀態。
                 Use this code on the postal service website to check delivery status.
               </p>
             </div>

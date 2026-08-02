@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useCart } from "@/lib/cartContext";
 import { countries, emptyAddress } from "@/lib/formOptions";
+import { normalizedStatus, ORDER_STATUS_EN } from "@/lib/orderStatus";
 
 export default function AccountPage() {
   const {
@@ -235,13 +236,14 @@ export default function AccountPage() {
                           ${Number(order.amount || 0).toFixed(2)} USD
                         </p>
                         <p className="mt-1 inline-block rounded bg-[#D6E4EE] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#35506B]">
-                          {order.productionStatus ||
+                          {ORDER_STATUS_EN[normalizedStatus(order.productionStatus)] ||
+                            order.productionStatus ||
                             order.paymentStatus ||
                             "Processing"}
                         </p>
                         {order.trackingNumber ? (
                           <p className="mt-1 font-mono text-[10px] text-[#5B7893]">
-                            追蹤碼 {order.trackingNumber}
+                            Tracking: {order.trackingNumber}
                           </p>
                         ) : null}
                       </div>
