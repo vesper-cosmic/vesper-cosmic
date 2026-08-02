@@ -16,7 +16,7 @@ export const products = [
     fulfillmentTime: "Ships within 3–5 business days",
     fulfillmentMode: "Ready to Ship",
     intentionType: "single",
-    availableIntentions: ["Health & Energy", "Career & Growth", "Love & Relationships", "Wealth & Abundance"],
+    availableIntentions: ["Health", "Career", "Love", "Wealth", "Protection", "General Energy"],
     requiresBirthData: true,
     requiresShipping: true,
     requiresNailDetails: true,
@@ -78,7 +78,7 @@ export const products = [
     fulfillmentTime: "Ships within 2–3 business days",
     fulfillmentMode: "Ready to Ship",
     intentionType: "single",
-    availableIntentions: ["Health & Energy", "Career & Growth", "Love & Relationships", "Wealth & Abundance"],
+    availableIntentions: ["Health", "Career", "Love", "Wealth", "Protection", "General Energy"],
     requiresBirthData: false,
     requiresShipping: true,
     requiresNailDetails: false,
@@ -135,7 +135,7 @@ export const products = [
     fulfillmentTime: "Ships within 2–3 business days",
     fulfillmentMode: "Ready to Ship",
     intentionType: "single",
-    availableIntentions: ["Health & Energy", "Career & Growth", "Love & Relationships", "Wealth & Abundance"],
+    availableIntentions: ["Health", "Career", "Love", "Wealth", "Protection", "General Energy"],
     requiresBirthData: false,
     requiresShipping: true,
     requiresNailDetails: false,
@@ -261,10 +261,12 @@ export const productCategories = [
 ];
 
 export const singleIntentionOptions = [
-  "Health & Energy",
-  "Career & Growth",
-  "Love & Relationships",
-  "Wealth & Abundance",
+  "Health",
+  "Career",
+  "Love",
+  "Wealth",
+  "Protection",
+  "General Energy",
 ];
 
 export function getProductBySlug(slug) {

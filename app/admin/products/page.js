@@ -513,7 +513,7 @@ export default function AdminProductsPage() {
                   type="text"
                   value={form.availableIntentions}
                   onChange={(e) => updateField("availableIntentions", e.target.value)}
-                  placeholder="Health & Energy, Career & Growth"
+                  placeholder="Health, Career, Love, Wealth"
                   className={inputClass(!!formErrors.availableIntentions)}
                 />
               </Field>

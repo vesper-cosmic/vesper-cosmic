@@ -10,6 +10,9 @@ import {
   digitalCuriosityAreas,
   emptyAddress,
   emptyNailMeasurements,
+  fortuneAreas,
+  fortuneSelectionHint,
+  maxFortuneSelections,
   nailLengths,
   nailShapes,
   nailSizeKeys,
@@ -26,9 +29,9 @@ const baseForm = {
   biologicalGender: "",
   daylightSavingTime: "",
   birthLocation: "",
-  baziIntention: "",
-  digitalCuriosityArea: "",
-  readyIntention: "",
+  baziIntentions: [],
+  digitalCuriosityAreas: [],
+  readyIntentions: [],
   specificIntentions: "",
   address: emptyAddress(),
   nailMeasurements: emptyNailMeasurements(),
@@ -51,6 +54,20 @@ export default function OrderIntakeForm({ product }) {
   function updateField(event) {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
+  }
+
+  function updateFortuneCheckbox(field, option, checked) {
+    setForm((current) => {
+      const currentList = current[field] || [];
+      if (checked) {
+        if (currentList.length >= maxFortuneSelections) return current;
+        return { ...current, [field]: [...currentList, option] };
+      }
+      return {
+        ...current,
+        [field]: currentList.filter((item) => item !== option),
+      };
+    });
   }
 
   function updateAddress(event) {
@@ -95,8 +112,11 @@ export default function OrderIntakeForm({ product }) {
     if (!form.fullName.trim()) nextErrors.fullName = "Full name is required.";
     if (!emailPattern.test(form.email)) nextErrors.email = "Enter a valid email.";
 
-    if (product.intentionType === "single" && !form.readyIntention) {
-      nextErrors.readyIntention = "Select one intention for this piece.";
+    if (product.intentionType === "single" && form.readyIntentions.length === 0) {
+      nextErrors.readyIntentions = "Check at least one focus area for this piece.";
+    }
+    if (product.intentionType === "single" && form.readyIntentions.length > maxFortuneSelections) {
+      nextErrors.readyIntentions = `Please select up to ${maxFortuneSelections} areas to keep your energy focused.`;
     }
 
     if (product.requiresBirthData) {
@@ -105,11 +125,17 @@ export default function OrderIntakeForm({ product }) {
       if (!form.biologicalGender) nextErrors.biologicalGender = "Select biological gender.";
       if (!form.daylightSavingTime) nextErrors.daylightSavingTime = "Select daylight saving time.";
       if (!form.birthLocation.trim()) nextErrors.birthLocation = "City and country of birth are required.";
-      if (product.formType === "C" && !form.digitalCuriosityArea) {
-        nextErrors.digitalCuriosityArea = "Select the area you are most curious about.";
+      if (product.formType === "C" && form.digitalCuriosityAreas.length === 0) {
+        nextErrors.digitalCuriosityAreas = "Check at least one area you are curious about.";
       }
-      if (product.formType !== "C" && !form.baziIntention) {
-        nextErrors.baziIntention = "Select what you are hoping to achieve.";
+      if (product.formType === "C" && form.digitalCuriosityAreas.length > maxFortuneSelections) {
+        nextErrors.digitalCuriosityAreas = `Please select up to ${maxFortuneSelections} areas to keep your energy focused.`;
+      }
+      if (product.formType !== "C" && form.baziIntentions.length === 0) {
+        nextErrors.baziIntentions = "Check at least one area you are hoping to work on.";
+      }
+      if (product.formType !== "C" && form.baziIntentions.length > maxFortuneSelections) {
+        nextErrors.baziIntentions = `Please select up to ${maxFortuneSelections} areas to keep your energy focused.`;
       }
     }
 
@@ -224,7 +250,7 @@ export default function OrderIntakeForm({ product }) {
           form={form}
           product={product}
           errors={errors}
-          updateField={updateField}
+          updateFortuneCheckbox={updateFortuneCheckbox}
         />
       ) : null}
 
@@ -234,6 +260,7 @@ export default function OrderIntakeForm({ product }) {
           product={product}
           errors={errors}
           updateField={updateField}
+          updateFortuneCheckbox={updateFortuneCheckbox}
         />
       ) : null}
 
@@ -269,42 +296,33 @@ export default function OrderIntakeForm({ product }) {
   );
 }
 
-function SingleIntentionFields({ form, product, errors, updateField }) {
+function SingleIntentionFields({ form, product, errors, updateFortuneCheckbox }) {
   const options = product.availableIntentions || singleIntentionOptions;
+  const selected = form.readyIntentions || [];
 
   return (
     <FormPanel title="Single Intention">
-      <Field
-        label="Choose one focus for this piece"
-        error={errors.readyIntention}
-        hint="This ready-made piece will be selected or prepared around one main intention. Dual-focus combinations can be added later as separate products."
-      >
-        <select
-          name="readyIntention"
-          value={form.readyIntention}
-          onChange={updateField}
-          required
-          className={inputClass}
-        >
-          <option value="">Select one</option>
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </Field>
+      <FortuneCheckbox
+        label="Choose your focus areas"
+        hint={fortuneSelectionHint}
+        options={options}
+        selected={selected}
+        error={errors.readyIntentions}
+        onChange={(option, checked) =>
+          updateFortuneCheckbox("readyIntentions", option, checked)
+        }
+      />
     </FormPanel>
   );
 }
 
-function BirthDataFields({ form, product, errors, updateField }) {
+function BirthDataFields({ form, product, errors, updateField, updateFortuneCheckbox }) {
   const isDigitalOnly = product.formType === "C";
-  const selectOptions = isDigitalOnly ? digitalCuriosityAreas : baziIntentions;
-  const selectName = isDigitalOnly ? "digitalCuriosityArea" : "baziIntention";
-  const selectLabel = isDigitalOnly
-    ? "What area are you most curious about?"
-    : "What are you hoping to achieve?";
+  const fieldName = isDigitalOnly ? "digitalCuriosityAreas" : "baziIntentions";
+  const fieldLabel = isDigitalOnly
+    ? "What areas are you most curious about?"
+    : "What areas are you hoping to work on?";
+  const selected = form[fieldName] || [];
 
   return (
     <FormPanel title="Birth Data">
@@ -337,20 +355,59 @@ function BirthDataFields({ form, product, errors, updateField }) {
       >
         <input name="birthLocation" value={form.birthLocation} onChange={updateField} required className={inputClass} placeholder="Taipei, Taiwan" />
       </Field>
-      <Field label={selectLabel} error={errors[selectName]}>
-        <select name={selectName} value={form[selectName]} onChange={updateField} required className={inputClass}>
-          <option value="">Select one</option>
-          {selectOptions.map((option) => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-      </Field>
+      <FortuneCheckbox
+        label={fieldLabel}
+        hint={fortuneSelectionHint}
+        options={isDigitalOnly ? digitalCuriosityAreas : baziIntentions}
+        selected={selected}
+        error={errors[fieldName]}
+        onChange={(option, checked) =>
+          updateFortuneCheckbox(fieldName, option, checked)
+        }
+      />
       {!isDigitalOnly ? (
         <Field label="Any specific intentions for this piece?">
           <textarea name="specificIntentions" value={form.specificIntentions} onChange={updateField} className={`${inputClass} min-h-28`} />
         </Field>
       ) : null}
     </FormPanel>
+  );
+}
+
+function FortuneCheckbox({ label, hint, options, selected, error, onChange }) {
+  return (
+    <fieldset>
+      <legend className="mb-2 block text-sm font-semibold text-[#1C2B48]">
+        {label}
+      </legend>
+      <p className="mb-3 text-xs leading-5 text-[#5B7893]">{hint}</p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {options.map((option) => {
+          const isChecked = selected.includes(option);
+          const isDisabled = !isChecked && selected.length >= maxFortuneSelections;
+          return (
+            <label
+              key={option}
+              className={`flex items-center gap-3 rounded border p-3 text-sm transition ${
+                isChecked
+                  ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
+                  : "border-[#8EB1D1]/25 bg-white text-[#35506B] hover:border-[#8EB1D1]"
+              } ${isDisabled ? "cursor-not-allowed opacity-45" : "cursor-pointer"}`}
+            >
+              <input
+                type="checkbox"
+                checked={isChecked}
+                disabled={isDisabled}
+                onChange={(event) => onChange(option, event.target.checked)}
+                className="mt-0.5"
+              />
+              <span>{option}</span>
+            </label>
+          );
+        })}
+      </div>
+      {error ? <ErrorText>{error}</ErrorText> : null}
+    </fieldset>
   );
 }
 

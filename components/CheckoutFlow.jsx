@@ -14,6 +14,8 @@ import {
   baziIntentions,
   digitalCuriosityAreas,
   daylightSavingOptions,
+  fortuneSelectionHint,
+  maxFortuneSelections,
 } from "@/lib/formOptions";
 
 export default function CheckoutFlow() {
@@ -108,6 +110,21 @@ export default function CheckoutFlow() {
       ...prev,
       [itemId]: { ...(prev[itemId] || {}), [key]: value },
     }));
+  }
+
+  function updateFortuneCheckbox(itemId, field, option, checked) {
+    setItemDetails((prev) => {
+      const current = prev[itemId] || {};
+      const currentList = current[field] || [];
+      let nextList;
+      if (checked) {
+        if (currentList.length >= maxFortuneSelections) return prev;
+        nextList = [...currentList, option];
+      } else {
+        nextList = currentList.filter((item) => item !== option);
+      }
+      return { ...prev, [itemId]: { ...current, [field]: nextList } };
+    });
   }
 
   async function handleSubmit(event) {
@@ -333,22 +350,16 @@ function ItemFormSection({ item, index, details, errors, onChange }) {
 
       <div className="mt-4 space-y-4">
         {product.intentionType === "single" ? (
-          <Field label="Single Intention" error={errors.readyIntention}>
-            <select
-              value={details.readyIntention || ""}
-              onChange={(event) =>
-                onChange(item.id, "readyIntention", event.target.value)
-              }
-              className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
-            >
-              <option value="">Select an intention…</option>
-              {(product.availableIntentions || []).map((intention) => (
-                <option key={intention} value={intention}>
-                  {intention}
-                </option>
-              ))}
-            </select>
-          </Field>
+          <FortuneCheckboxGroup
+            label="Choose your focus areas"
+            hint={fortuneSelectionHint}
+            options={product.availableIntentions || []}
+            selected={details.readyIntentions || []}
+            error={errors.readyIntentions}
+            onChange={(option, checked) =>
+              onChange(item.id, "readyIntentions", toggleInList(details.readyIntentions || [], option, checked))
+            }
+          />
         ) : null}
 
         {product.requiresBirthData ? (
@@ -438,35 +449,27 @@ function BirthFields({ itemId, product, details, errors, onChange }) {
         />
       </Field>
       {product.formType === "C" ? (
-        <Field label="Area You Are Most Curious About" error={errors.digitalCuriosityArea}>
-          <select
-            value={birth.digitalCuriosityArea || ""}
-            onChange={(event) => update("digitalCuriosityArea", event.target.value)}
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
-          >
-            <option value="">Select…</option>
-            {digitalCuriosityAreas.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </Field>
+        <FortuneCheckboxGroup
+          label="What areas are you most curious about?"
+          hint={fortuneSelectionHint}
+          options={digitalCuriosityAreas}
+          selected={birth.digitalCuriosityAreas || []}
+          error={errors.digitalCuriosityAreas}
+          onChange={(option, checked) =>
+            update("digitalCuriosityAreas", toggleInList(birth.digitalCuriosityAreas || [], option, checked))
+          }
+        />
       ) : (
-        <Field label="What Are You Hoping to Achieve?" error={errors.baziIntention}>
-          <select
-            value={birth.baziIntention || ""}
-            onChange={(event) => update("baziIntention", event.target.value)}
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
-          >
-            <option value="">Select…</option>
-            {baziIntentions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </Field>
+        <FortuneCheckboxGroup
+          label="What areas are you hoping to work on?"
+          hint={fortuneSelectionHint}
+          options={baziIntentions}
+          selected={birth.baziIntentions || []}
+          error={errors.baziIntentions}
+          onChange={(option, checked) =>
+            update("baziIntentions", toggleInList(birth.baziIntentions || [], option, checked))
+          }
+        />
       )}
     </div>
   );
@@ -568,6 +571,53 @@ function NailFields({ itemId, details, errors, onChange }) {
       </Field>
     </div>
   );
+}
+
+function FortuneCheckboxGroup({ label, hint, options, selected, error, onChange }) {
+  return (
+    <div>
+      <p className="mb-1 block text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
+        {label}
+      </p>
+      {hint ? (
+        <p className="mb-3 text-xs leading-5 text-[#5B7893]">{hint}</p>
+      ) : null}
+      <div className="grid gap-3 sm:grid-cols-2">
+        {options.map((option) => {
+          const isChecked = selected.includes(option);
+          const isDisabled = !isChecked && selected.length >= maxFortuneSelections;
+          return (
+            <label
+              key={option}
+              className={`flex items-center gap-3 rounded border p-3 text-sm transition ${
+                isChecked
+                  ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
+                  : "border-[#8EB1D1]/25 bg-white text-[#35506B] hover:border-[#8EB1D1]"
+              } ${isDisabled ? "cursor-not-allowed opacity-45" : "cursor-pointer"}`}
+            >
+              <input
+                type="checkbox"
+                checked={isChecked}
+                disabled={isDisabled}
+                onChange={(event) => onChange(option, event.target.checked)}
+                className="mt-0.5"
+              />
+              <span>{option}</span>
+            </label>
+          );
+        })}
+      </div>
+      {error ? <p className="mt-1 text-xs text-red-500">{error}</p> : null}
+    </div>
+  );
+}
+
+function toggleInList(list, option, checked) {
+  if (checked) {
+    if (list.length >= maxFortuneSelections) return list;
+    return [...list, option];
+  }
+  return list.filter((item) => item !== option);
 }
 
 function ShippingForm({ shipping, errors, onChange }) {
