@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimitResponse } from "@/lib/rateLimit";
 import {
   createNotionOrder,
   createPaypalUrl,
@@ -7,6 +8,9 @@ import {
 } from "@/lib/orderServer";
 
 export async function POST(request) {
+  const rateLimited = rateLimitResponse(request);
+  if (rateLimited) return rateLimited;
+
   let payload;
 
   try {

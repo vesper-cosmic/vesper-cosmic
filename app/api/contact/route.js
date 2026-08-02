@@ -4,7 +4,41 @@ import { Resend } from "resend";
 const ownerEmail = "vesper.cosmic.blueprint@gmail.com";
 const storeName = "Vesper Cosmos";
 
+// Simple in-memory rate limiter: max 5 submissions per IP per 10 minutes.
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX = 5;
+const rateLimitStore = new Map();
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const entry = rateLimitStore.get(ip);
+
+  if (!entry || now - entry.startedAt > RATE_LIMIT_WINDOW_MS) {
+    rateLimitStore.set(ip, { startedAt: now, count: 1 });
+    return false;
+  }
+
+  entry.count += 1;
+  if (entry.count > RATE_LIMIT_MAX) {
+    return true;
+  }
+
+  return false;
+}
+
 export async function POST(request) {
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
+
+  if (isRateLimited(ip)) {
+    return NextResponse.json(
+      { success: false, errors: { submit: "Too many requests. Please try again later." } },
+      { status: 429 }
+    );
+  }
+
   const payload = await request.json().catch(() => ({}));
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

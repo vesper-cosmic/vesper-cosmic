@@ -41,6 +41,7 @@ function emptyForm() {
     availableIntentions: "",
     requiresBirthData: false,
     requiresShipping: true,
+    shippingTier: "LIGHT",
     requiresNailDetails: false,
     nailIntro: "",
     includes: "",
@@ -124,6 +125,7 @@ export default function AdminProductsPage() {
         : "",
       requiresBirthData: Boolean(product.requiresBirthData),
       requiresShipping: Boolean(product.requiresShipping),
+      shippingTier: product.shippingTier || "LIGHT",
       requiresNailDetails: Boolean(product.requiresNailDetails),
       nailIntro: product.nailIntro || "",
       includes: product.includes || "",
@@ -541,6 +543,20 @@ export default function AdminProductsPage() {
                 label="標示為新品"
               />
             </CheckboxGrid>
+
+            {form.requiresShipping ? (
+              <Field label="運送等級 Shipping Tier">
+                <select
+                  value={form.shippingTier}
+                  onChange={(e) => updateField("shippingTier", e.target.value)}
+                  className={inputClass()}
+                >
+                  <option value="LIGHT">LIGHT — 輕量實體（泡泡信封，~100–150g）</option>
+                  <option value="HEAVY">HEAVY — 重型/易碎（玻璃瓶，~300–500g）</option>
+                  <option value="DIGITAL">DIGITAL — 數位商品（不需寄送）</option>
+                </select>
+              </Field>
+            ) : null}
 
             {form.requiresNailDetails ? (
               <Field label="指甲說明 Nail Intro">

@@ -1,24 +1,23 @@
+import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { setupNotionDatabase } from "@/lib/orderServer";
 
 export async function POST(request) {
   const setupSecret = process.env.NOTION_SETUP_SECRET;
 
-  if (process.env.NODE_ENV === "production" && !setupSecret) {
+  if (!setupSecret) {
     return NextResponse.json(
       {
         success: false,
         error:
-          "Set NOTION_SETUP_SECRET before enabling production database setup.",
+          "Set NOTION_SETUP_SECRET before enabling database setup.",
       },
       { status: 403 }
     );
   }
 
-  if (
-    setupSecret &&
-    setupSecret !== requestHeaderSecret(request)
-  ) {
+  const providedSecret = request.headers.get("x-setup-secret") || "";
+  if (!timingSafeEqual(setupSecret, providedSecret)) {
     return NextResponse.json(
       { success: false, error: "Invalid setup secret." },
       { status: 401 }
@@ -37,6 +36,13 @@ export async function POST(request) {
   }
 }
 
-function requestHeaderSecret(request) {
-  return request?.headers?.get("x-setup-secret") || "";
+/**
+ * Constant-time string comparison to prevent timing attacks when
+ * verifying the setup secret.
+ */
+function timingSafeEqual(a, b) {
+  const aBuf = Buffer.from(String(a));
+  const bBuf = Buffer.from(String(b));
+  if (aBuf.length !== bBuf.length) return false;
+  return crypto.timingSafeEqual(aBuf, bBuf);
 }

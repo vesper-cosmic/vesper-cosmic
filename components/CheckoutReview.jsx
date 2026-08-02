@@ -126,6 +126,18 @@ export default function CheckoutReview() {
               ))}
             </ul>
           </div>
+          <SummaryRow
+            label="Subtotal"
+            value={`$${(order.subtotal ?? order.total).toFixed(2)} USD`}
+          />
+          <SummaryRow
+            label="Shipping"
+            value={
+              order.freeShipping
+                ? "FREE SHIPPING"
+                : `$${(order.shippingFee ?? 0).toFixed(2)} USD`
+            }
+          />
           <SummaryRow label="Total" value={`$${order.total.toFixed(2)} USD`} />
         </dl>
       </section>

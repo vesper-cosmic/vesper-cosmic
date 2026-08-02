@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
+import { rateLimitResponse } from "@/lib/rateLimit";
 import { findNotionOrder } from "@/lib/orderServer";
 
 export async function GET(request) {
+  const rateLimited = rateLimitResponse(request);
+  if (rateLimited) return rateLimited;
+
   const { searchParams } = new URL(request.url);
   const orderId = String(searchParams.get("orderId") || "").trim();
   const email = String(searchParams.get("email") || "").trim().toLowerCase();

@@ -1,9 +1,16 @@
-export { POST } from "@/app/api/create-order/route";
-
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { authOptions, isAdminEmail } from "@/lib/auth";
 import { updateStoredTracking } from "@/lib/orderServer";
 
+export { POST } from "@/app/api/create-order/route";
+
 export async function PATCH(request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email || !isAdminEmail(session.user.email)) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 403 });
+  }
+
   let payload;
 
   try {
