@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { ORDER_STATUSES, normalizedStatus } from "@/lib/orderStatus";
 
@@ -91,14 +91,13 @@ export default function AdminPage() {
       <AdminShell>
         <div className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-8 text-center shadow-[0_18px_60px_rgba(0,0,0,0.28)]">
           <h1 className="text-2xl font-semibold text-[#1C2B48]">後台管理員登入</h1>
-          <p className="mt-3 text-sm text-[#35506B]">請使用管理員 Google 帳號登入</p>
-          <button
-            type="button"
-            onClick={() => signIn("google", { callbackUrl: "/admin" })}
-            className="mt-6 rounded border border-[#8EB1D1] bg-[#8EB1D1] px-6 py-2.5 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+          <p className="mt-3 text-sm text-[#35506B]">請使用管理員帳號登入</p>
+          <Link
+            href={`/auth/signin?callbackUrl=${encodeURIComponent("/admin")}`}
+            className="mt-6 inline-block rounded border border-[#8EB1D1] bg-[#8EB1D1] px-6 py-2.5 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7]"
           >
-            Sign in
-          </button>
+            Sign in 登入
+          </Link>
         </div>
       </AdminShell>
     );

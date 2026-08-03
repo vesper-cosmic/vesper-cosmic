@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useCart } from "@/lib/cartContext";
 
@@ -69,43 +69,30 @@ export default function AccountButton() {
     );
   }
 
-  async function handleSignIn() {
-    try {
-      // Use the current page as the callback so the user returns to where
-      // they were (shop, home, checkout, …) instead of being redirected to a
-      // hard-coded path. Hard-coding "/shop" caused confusing jumps back to
-      // the home page when the callback URL was lost or rejected.
-      await signIn("google", { callbackUrl: window.location.href });
-    } catch (error) {
-      console.error("Google sign-in failed:", error);
-    }
-  }
+  const target = `/auth/signin?callbackUrl=${encodeURIComponent(
+    typeof window !== "undefined" ? window.location.href : "/"
+  )}`;
 
   return (
-    <button
-      type="button"
-      onClick={handleSignIn}
+    <Link
+      href={target}
       className="flex items-center gap-2 rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
     >
-      <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24">
+      <svg
+        aria-hidden="true"
+        className="h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
         <path
-          fill="#4285F4"
-          d="M23.5 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.46a5.5 5.5 0 01-2.38 3.6v3h3.85c2.26-2.08 3.57-5.16 3.57-8.84z"
-        />
-        <path
-          fill="#34A853"
-          d="M12 24c3.24 0 5.96-1.08 7.94-2.9l-3.85-3c-1.07.72-2.44 1.15-4.09 1.15-3.14 0-5.8-2.12-6.75-4.97H1.33v3.1A12 12 0 0012 24z"
-        />
-        <path
-          fill="#FBBC05"
-          d="M5.25 14.28A7.2 7.2 0 014.83 12c0-.8.15-1.57.42-2.28v-3.1H1.33a12 12 0 000 10.76l3.92-3.1z"
-        />
-        <path
-          fill="#EA4335"
-          d="M12 4.75c1.74 0 3.3.6 4.53 1.77l3.4-3.4A11.97 11.97 0 0012 0 12 12 0 001.33 6.62l3.92 3.1c.95-2.85 3.61-4.97 6.75-4.97z"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
         />
       </svg>
       <span className="hidden sm:inline">Sign in</span>
-    </button>
+    </Link>
   );
 }

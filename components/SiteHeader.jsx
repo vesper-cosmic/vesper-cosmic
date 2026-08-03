@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useCart } from "@/lib/cartContext";
 import AccountButton from "@/components/AccountButton";
 
@@ -58,6 +58,9 @@ export default function SiteHeader() {
     if (href === "/shop") return isShop;
     return pathname === href;
   };
+
+  const currentUrl =
+    typeof window !== "undefined" ? window.location.href : "/";
 
   return (
     <header className="sticky top-0 z-30 border-b border-[#8EB1D1]/20 bg-[#E8ECEF]/95 backdrop-blur-sm">
@@ -270,16 +273,13 @@ export default function SiteHeader() {
                 </button>
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  signIn("google", { callbackUrl: window.location.href });
-                }}
-                className="w-full rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-3 text-base font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+              <Link
+                href={`/auth/signin?callbackUrl=${encodeURIComponent(currentUrl)}`}
+                onClick={() => setMenuOpen(false)}
+                className="block w-full rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-3 text-center text-base font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
               >
-                Sign in with Google
-              </button>
+                Sign in 登入
+              </Link>
             )}
           </div>
         </nav>

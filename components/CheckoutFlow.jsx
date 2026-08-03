@@ -300,7 +300,7 @@ export default function CheckoutFlow() {
             </label>
           ) : (
             <p className="rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-3 text-xs leading-5 text-[#35506B]">
-              Sign in with Google to save your address and cart for next time.
+              Sign in to save your address and cart for next time.
             </p>
           )}
         </div>
