@@ -52,14 +52,14 @@ export default function CartDrawer() {
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#8EB1D1]/25 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-[#8EB1D1]/25 px-4 py-4 sm:px-5 [padding-top:max(1rem,env(safe-area-inset-top))]">
           <h2 className="text-xl font-semibold text-[#1C2B48]">
             Cart ({totalItems})
           </h2>
           <button
             type="button"
             onClick={closeCart}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-[#8EB1D1]/40 bg-white/60 text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#8EB1D1]/40 bg-white/60 text-[#1C2B48] transition hover:bg-[#C4D8E5]"
             aria-label="Close cart"
           >
             ✕
@@ -67,7 +67,7 @@ export default function CartDrawer() {
         </div>
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto px-5 py-4">
+        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-5">
           {items.length === 0 ? (
             <div className="mt-12 text-center">
               <p className="text-lg font-semibold text-[#1C2B48]">
@@ -82,12 +82,12 @@ export default function CartDrawer() {
               {items.map((item) => (
                 <li
                   key={item.id}
-                  className="flex gap-4 rounded-lg border border-[#8EB1D1]/20 bg-white/60 p-3"
+                  className="flex gap-3 rounded-lg border border-[#8EB1D1]/20 bg-white/60 p-3 sm:gap-4"
                 >
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="h-20 w-20 flex-shrink-0 rounded object-cover"
+                    className="h-16 w-16 flex-shrink-0 rounded object-cover sm:h-20 sm:w-20"
                   />
                   <div className="flex flex-1 flex-col justify-between">
                     <div>
@@ -98,18 +98,19 @@ export default function CartDrawer() {
                         ${item.price} {item.currency}
                       </p>
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center rounded border border-[#8EB1D1]/30 bg-white">
                         <button
                           type="button"
                           onClick={() =>
                             updateQuantity(item.id, item.quantity - 1)
                           }
-                          className="flex h-7 w-7 items-center justify-center text-xs text-[#1C2B48] hover:bg-[#C4D8E5]"
+                          className="flex h-9 w-9 items-center justify-center text-sm text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+                          aria-label="Decrease quantity"
                         >
                           −
                         </button>
-                        <span className="flex h-7 w-8 items-center justify-center text-xs font-semibold text-[#1C2B48]">
+                        <span className="flex h-9 w-8 items-center justify-center text-sm font-semibold text-[#1C2B48]">
                           {item.quantity}
                         </span>
                         <button
@@ -117,7 +118,8 @@ export default function CartDrawer() {
                           onClick={() =>
                             updateQuantity(item.id, item.quantity + 1)
                           }
-                          className="flex h-7 w-7 items-center justify-center text-xs text-[#1C2B48] hover:bg-[#C4D8E5]"
+                          className="flex h-9 w-9 items-center justify-center text-sm text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+                          aria-label="Increase quantity"
                         >
                           +
                         </button>
@@ -125,7 +127,7 @@ export default function CartDrawer() {
                       <button
                         type="button"
                         onClick={() => removeItem(item.id)}
-                        className="text-xs font-medium text-[#8EB1D1] hover:text-red-400 transition"
+                        className="rounded px-2 py-2 text-xs font-medium text-[#8EB1D1] transition hover:text-red-400"
                       >
                         Remove
                       </button>
@@ -139,8 +141,8 @@ export default function CartDrawer() {
 
         {/* Footer */}
         {items.length > 0 ? (
-          <div className="border-t border-[#8EB1D1]/25 px-5 py-4">
-            <div className="mb-4 flex items-center justify-between">
+          <div className="border-t border-[#8EB1D1]/25 px-4 py-4 sm:px-5 [padding-bottom:max(1rem,env(safe-area-inset-bottom))]">
+            <div className="mb-3 flex items-center justify-between sm:mb-4">
               <span className="text-base font-semibold text-[#1C2B48]">
                 Total
               </span>
@@ -158,7 +160,7 @@ export default function CartDrawer() {
             <button
               type="button"
               onClick={clearCart}
-              className="mt-3 w-full text-center text-xs font-medium text-[#5B7893] underline transition hover:text-[#1C2B48]"
+              className="mt-3 w-full py-2 text-center text-xs font-medium text-[#5B7893] underline transition hover:text-[#1C2B48]"
             >
               Clear Cart
             </button>

@@ -94,7 +94,7 @@ export default function HomePage() {
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#1C2B48]">
               Vesper Cosmos
             </p>
-            <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-none text-white sm:text-6xl">
+            <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-none text-white sm:text-6xl">
               Cosmos goods and personalized BaZi reports
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-7 text-[#1C2B48]">
@@ -234,7 +234,7 @@ export default function HomePage() {
                   </p>
                 </div>
               ) : (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-3">
                   {visibleProducts.map((product) => (
                     <ShopProductCard
                       key={product.id}

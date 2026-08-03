@@ -3,7 +3,12 @@ export default function ShopProductCard({ product, onClick }) {
     <article
       className="mist-card group flex h-full flex-col overflow-hidden rounded-lg border border-[#8EB1D1]/45 bg-[#E8ECEF]"
       onClick={onClick}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick?.(); } }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
@@ -20,53 +25,56 @@ export default function ShopProductCard({ product, onClick }) {
         ) : null}
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        {/* Tags — hide the less important fulfillment/intention tags on small screens */}
         <div className="flex flex-wrap gap-2">
           <span className="rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#8EB1D1]">
             {product.categoryLabel}
           </span>
-          <span className="rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#35506B]">
+          <span className="hidden rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#35506B] sm:inline-block">
             {product.fulfillmentMode}
           </span>
           {product.intentionType === "single" ? (
-            <span className="rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#35506B]">
+            <span className="hidden rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#35506B] sm:inline-block">
               Single Intention
             </span>
           ) : null}
         </div>
-        <h3 className="mt-2 text-xl font-semibold leading-tight text-[#1C2B48] sm:text-2xl">
+
+        <h3 className="mt-2 text-lg font-semibold leading-tight text-[#1C2B48] sm:text-2xl">
           {product.name}
         </h3>
-        <p className="mt-3 text-sm leading-6 text-[#35506B]">
+
+        <p className="mt-2 text-sm leading-6 text-[#35506B] line-clamp-3 sm:line-clamp-none">
           {product.description}
         </p>
         {product.availableIntentions?.length ? (
-          <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#5B7893]">
+          <p className="mt-2 hidden text-xs font-semibold uppercase tracking-[0.16em] text-[#5B7893] sm:block">
             Focus: {product.availableIntentions.join(" / ")}
           </p>
         ) : null}
         {product.includes ? (
-          <p className="mt-3 text-sm leading-6 text-[#1C2B48]">
+          <p className="mt-2 hidden text-sm leading-6 text-[#1C2B48] sm:block">
             Includes: {product.includes}
           </p>
         ) : null}
-        <p className="mt-4 text-sm text-[#5B7893]">{product.fulfillmentTime}</p>
+        <p className="mt-3 text-xs text-[#5B7893] sm:mt-4 sm:text-sm">
+          {product.fulfillmentTime}
+        </p>
 
-        <div className="mt-auto flex items-end justify-between gap-4 pt-6">
+        <div className="mt-auto flex items-end justify-between gap-3 pt-4 sm:gap-4 sm:pt-6">
           <div>
             {product.originalPrice ? (
-              <p className="text-sm text-[#5B7893] line-through">
+              <p className="text-xs text-[#5B7893] line-through sm:text-sm">
                 ${product.originalPrice} {product.currency}
               </p>
             ) : null}
-            <p className="text-xl font-semibold text-[#1C2B48] sm:text-2xl">
+            <p className="text-lg font-semibold text-[#1C2B48] sm:text-2xl">
               ${product.price} {product.currency}
             </p>
           </div>
           {onClick ? (
-            <span
-              className="mist-button inline-block cursor-pointer rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
-            >
+            <span className="mist-button inline-block cursor-pointer rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]">
               View Details
             </span>
           ) : (

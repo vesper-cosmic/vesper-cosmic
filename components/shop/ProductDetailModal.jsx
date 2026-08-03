@@ -47,7 +47,7 @@ export default function ProductDetailModal({ product, onClose }) {
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-[#8EB1D1]/40 bg-[#1C2B48]/80 text-[#E8ECEF] text-lg transition hover:bg-[#1C2B48]"
+          className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-[#8EB1D1]/40 bg-[#1C2B48]/80 text-[#E8ECEF] text-lg transition hover:bg-[#1C2B48]"
           aria-label="Close"
         >
           ✕
@@ -68,7 +68,7 @@ export default function ProductDetailModal({ product, onClose }) {
             ) : null}
           </div>
           {product.images.length > 1 ? (
-            <div className="flex gap-2 border-t border-[#8EB1D1]/20 bg-[#C4D8E5]/50 p-3">
+            <div className="flex gap-2 overflow-x-auto border-t border-[#8EB1D1]/20 bg-[#C4D8E5]/50 p-3">
               {product.images.map((image, index) => (
                 <button
                   key={image}
@@ -93,7 +93,7 @@ export default function ProductDetailModal({ product, onClose }) {
 
         {/* Right: Details */}
         <div className="flex w-full flex-col sm:w-1/2">
-          <div className="flex-1 space-y-4 p-6">
+          <div className="flex-1 space-y-4 p-5 pb-4 sm:p-6">
             {/* Tags */}
             <div className="flex flex-wrap gap-2">
               <span className="rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#8EB1D1]">
@@ -104,7 +104,7 @@ export default function ProductDetailModal({ product, onClose }) {
               </span>
             </div>
 
-            <h2 className="text-2xl font-semibold leading-tight text-[#1C2B48]">
+            <h2 className="text-xl font-semibold leading-tight text-[#1C2B48] sm:text-2xl">
               {product.name}
             </h2>
 
@@ -154,17 +154,19 @@ export default function ProductDetailModal({ product, onClose }) {
                 <button
                   type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="flex h-9 w-9 items-center justify-center text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+                  className="flex h-10 w-10 items-center justify-center text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+                  aria-label="Decrease quantity"
                 >
                   −
                 </button>
-                <span className="flex h-9 w-10 items-center justify-center text-sm font-semibold text-[#1C2B48]">
+                <span className="flex h-10 w-11 items-center justify-center text-sm font-semibold text-[#1C2B48]">
                   {quantity}
                 </span>
                 <button
                   type="button"
                   onClick={() => setQuantity(quantity + 1)}
-                  className="flex h-9 w-9 items-center justify-center text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+                  className="flex h-10 w-10 items-center justify-center text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+                  aria-label="Increase quantity"
                 >
                   +
                 </button>
@@ -172,8 +174,8 @@ export default function ProductDetailModal({ product, onClose }) {
             </div>
           </div>
 
-          {/* Price & Add to Cart */}
-          <div className="border-t border-[#8EB1D1]/20 p-6">
+          {/* Price & Add to Cart — fixed footer on mobile so the CTA is always visible */}
+          <div className="sticky bottom-0 z-10 border-t border-[#8EB1D1]/20 bg-[#E8ECEF]/95 p-5 backdrop-blur-sm sm:static sm:bg-transparent sm:backdrop-blur-none sm:p-6 [padding-top:max(1.25rem,env(safe-area-inset-top))]">
             <div className="mb-4 flex items-baseline gap-3">
               {product.originalPrice ? (
                 <p className="text-lg text-[#5B7893] line-through">
@@ -187,7 +189,7 @@ export default function ProductDetailModal({ product, onClose }) {
             <button
               type="button"
               onClick={handleAddToCart}
-              className={`w-full rounded border px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] transition ${
+              className={`w-full rounded border px-5 py-3.5 text-sm font-bold uppercase tracking-[0.16em] transition ${
                 added
                   ? "border-green-500 bg-green-500 text-white"
                   : "border-[#8EB1D1] bg-[#8EB1D1] text-[#1C2B48] hover:bg-[#A7C7E7]"
