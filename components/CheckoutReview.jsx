@@ -12,6 +12,7 @@ export default function CheckoutReview() {
   const [paymentStarted, setPaymentStarted] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [confirmError, setConfirmError] = useState(null);
 
   useEffect(() => {
     const stored = sessionStorage.getItem("vesperCheckoutOrder");
@@ -57,6 +58,7 @@ export default function CheckoutReview() {
   async function confirmOrder() {
     if (confirming || confirmed) return;
     setConfirming(true);
+    setConfirmError(null);
 
     try {
       const response = await fetch("/api/checkout/confirm", {
@@ -69,12 +71,38 @@ export default function CheckoutReview() {
         }),
       });
 
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        // Non-JSON response body — fall back to status-based messaging below.
+      }
+
       if (response.ok) {
         setConfirmed(true);
         clearCart();
         sessionStorage.setItem("vesperLastOrder", JSON.stringify(checkout));
         window.location.href = "/thank-you";
+        return;
       }
+
+      const message =
+        data?.errors?.orderId ||
+        data?.errors?.submit ||
+        (typeof data?.error === "string" ? data.error : null) ||
+        (response.status === 503
+          ? "We couldn't verify your order right now. Please wait a moment and try again."
+          : response.status === 404
+          ? "This order could not be found. Please check your order ID or contact us with your order ID."
+          : response.status === 409
+          ? "The order details don't match the original order. Please contact us if you think this is a mistake."
+          : `Confirmation failed (${response.status}). Please try again or contact us with your order ID ${checkout.orderId}.`);
+      setConfirmError(message);
+    } catch (error) {
+      console.error("Confirm order failed:", error);
+      setConfirmError(
+        "A network error occurred while confirming your order. Please check your connection and try again."
+      );
     } finally {
       setConfirming(false);
     }
@@ -184,16 +212,26 @@ export default function CheckoutReview() {
               confirm below.
             </p>
             {paymentStarted ? (
-              <button
-                type="button"
-                onClick={confirmOrder}
-                disabled={confirming}
-                className="mt-4 w-full rounded border border-[#1C2B48] bg-[#1C2B48] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#E8ECEF] transition hover:bg-[#35506B] disabled:opacity-60"
-              >
-                {confirming
-                  ? "Confirming…"
-                  : "I have completed PayPal payment"}
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={confirmOrder}
+                  disabled={confirming}
+                  className="mt-4 w-full rounded border border-[#1C2B48] bg-[#1C2B48] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#E8ECEF] transition hover:bg-[#35506B] disabled:opacity-60"
+                >
+                  {confirming
+                    ? "Confirming…"
+                    : "I have completed PayPal payment"}
+                </button>
+                {confirmError ? (
+                  <p
+                    role="alert"
+                    className="mt-3 rounded border border-[#ffb8b1]/50 bg-[#2d171d] p-3 text-left text-sm leading-5 text-[#ffe1dd]"
+                  >
+                    {confirmError}
+                  </p>
+                ) : null}
+              </>
             ) : null}
           </>
         ) : (
