@@ -26,40 +26,13 @@ export default function ShopProductCard({ product, onClick }) {
       </div>
 
       <div className="flex flex-1 flex-col p-4 sm:p-5">
-        {/* Tags — hide the less important fulfillment/intention tags on small screens */}
-        <div className="flex flex-wrap gap-2">
-          <span className="rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#8EB1D1]">
-            {product.categoryLabel}
-          </span>
-          <span className="hidden rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#35506B] sm:inline-block">
-            {product.fulfillmentMode}
-          </span>
-          {product.intentionType === "single" ? (
-            <span className="hidden rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#35506B] sm:inline-block">
-              Single Intention
-            </span>
-          ) : null}
-        </div>
-
-        <h3 className="mt-2 text-lg font-semibold leading-tight text-[#1C2B48] sm:text-2xl">
+        <h3 className="text-lg font-semibold leading-tight text-[#1C2B48] sm:text-2xl">
           {product.name}
         </h3>
 
-        <p className="mt-2 text-sm leading-6 text-[#35506B] line-clamp-3 sm:line-clamp-none">
+        {/* 主要功效 — 卡片上只顯示一句主要功效，其餘詳細資訊在點擊後顯示 */}
+        <p className="mt-2 text-sm leading-6 text-[#35506B] line-clamp-2">
           {product.description}
-        </p>
-        {product.availableIntentions?.length ? (
-          <p className="mt-2 hidden text-xs font-semibold uppercase tracking-[0.16em] text-[#5B7893] sm:block">
-            Focus: {product.availableIntentions.join(" / ")}
-          </p>
-        ) : null}
-        {product.includes ? (
-          <p className="mt-2 hidden text-sm leading-6 text-[#1C2B48] sm:block">
-            Includes: {product.includes}
-          </p>
-        ) : null}
-        <p className="mt-3 text-xs text-[#5B7893] sm:mt-4 sm:text-sm">
-          {product.fulfillmentTime}
         </p>
 
         <div className="mt-auto flex items-end justify-between gap-3 pt-4 sm:gap-4 sm:pt-6">
