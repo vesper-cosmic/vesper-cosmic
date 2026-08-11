@@ -38,23 +38,27 @@ export async function PATCH(request) {
     );
   }
 
-  const updatedOrder = await updateStoredTracking({
+  const result = await updateStoredTracking({
     orderId,
     trackingNumber,
     carrier,
   });
 
-  if (!updatedOrder) {
+  if (result?.skipped || result?.error) {
     return NextResponse.json(
-      { errors: { orderId: "Order not found in temporary storage." } },
+      {
+        errors: {
+          orderId: result?.reason || result?.error || "Tracking update failed.",
+        },
+      },
       { status: 404 }
     );
   }
 
   return NextResponse.json({
     ok: true,
-    orderId: updatedOrder.orderId,
-    trackingNumber: updatedOrder.trackingNumber,
+    orderId,
+    trackingNumber,
     message: "Tracking number updated.",
   });
 }

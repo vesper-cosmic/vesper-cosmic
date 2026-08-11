@@ -43,6 +43,7 @@ export async function POST(request) {
       success: true,
       orderId: order.orderId,
       createdAt: order.createdAt,
+      order,
       paypalUrl: createPaypalUrl(order.total),
       notion: notionResult?.error ? "failed" : "ok",
       emails: "will_send_after_payment_return",

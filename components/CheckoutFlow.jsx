@@ -165,25 +165,12 @@ export default function CheckoutFlow() {
       }
 
       sessionStorage.removeItem("vesperCheckoutDraft");
+      // Use the server-computed order (includes shippingFee, subtotal and
+      // total) so the review page shows the correct shipping charge and the
+      // confirmation request matches the stored order exactly.
       sessionStorage.setItem(
         "vesperCheckoutOrder",
-        JSON.stringify({
-          ...data,
-          order: {
-            fullName: form.fullName,
-            email: form.email,
-            shipping: hasShippingItems ? form.shipping : {},
-            items: enrichedItems.map((item, index) => ({
-              productId: item.id,
-              quantity: item.quantity,
-              details: itemDetails[item.id] || {},
-              index,
-            })),
-            total: totalPrice,
-            memberEmail: isSignedIn ? userEmail : null,
-            saveAddressToMember: form.saveAddressToMember && isSignedIn,
-          },
-        })
+        JSON.stringify({ ...data, order: data.order })
       );
 
       if (form.saveAddressToMember && isSignedIn) {

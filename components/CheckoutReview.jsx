@@ -129,9 +129,9 @@ export default function CheckoutReview() {
           <div className="border-b border-[#8EB1D1]/15 pb-3">
             <dt className="mb-2 font-semibold text-[#8EB1D1]">Items</dt>
             <ul className="space-y-2">
-              {enrichedItems.map((item) => (
+              {enrichedItems.map((item, index) => (
                 <li
-                  key={`${item.productId}-${item.index}`}
+                  key={`${item.productId}-${item.quantity}-${index}`}
                   className="flex items-start justify-between gap-3"
                 >
                   <div className="flex items-start gap-2">
@@ -141,14 +141,7 @@ export default function CheckoutReview() {
                     </span>
                   </div>
                   <span className="text-[#1C2B48]">
-                    $
-                    {(
-                      (item.product?.price || checkout.order?.total ||
-                        item.price ||
-                        0) *
-                      item.quantity
-                    ).toFixed(2)}{" "}
-                    USD
+                    ${(item.price * item.quantity).toFixed(2)} USD
                   </span>
                 </li>
               ))}

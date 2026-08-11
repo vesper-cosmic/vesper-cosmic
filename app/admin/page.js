@@ -228,6 +228,7 @@ function FilterPill({ active, onClick, children }) {
 function OrderCard({ order, draft, onChange, onSave, saving, message }) {
   const status = draft.status ?? normalizedStatus(order.productionStatus) ?? "";
   const trackingNumber = draft.trackingNumber ?? order.trackingNumber ?? "";
+  const items = Array.isArray(order.items) ? order.items : [];
 
   return (
     <div className="rounded border border-[#8EB1D1]/30 bg-white/60 p-4">
@@ -238,7 +239,9 @@ function OrderCard({ order, draft, onChange, onSave, saving, message }) {
           <p className="truncate text-xs text-[#5B7893]">{order.email}</p>
         </div>
         <div className="text-right">
-          <p className="text-sm font-semibold text-[#1C2B48]">{order.productName}</p>
+          <p className="text-sm font-semibold text-[#1C2B48]">
+            {items.length > 1 ? `${order.productName} (+${items.length - 1} more)` : order.productName}
+          </p>
           <p className="text-xs text-[#5B7893]">
             {order.createdAt ? formatDate(order.createdAt) : "—"} · $
             {Number(order.amount || 0).toFixed(2)} USD
@@ -246,6 +249,22 @@ function OrderCard({ order, draft, onChange, onSave, saving, message }) {
           <p className="mt-1 text-xs text-[#5B7893]">付款: {order.paymentStatus || "—"}</p>
         </div>
       </div>
+
+      {items.length > 0 ? (
+        <div className="mt-3 rounded border border-[#8EB1D1]/20 bg-[#F3F6F8] p-3">
+          <p className="mb-1.5 text-xs font-bold uppercase tracking-[0.1em] text-[#35506B]">
+            訂單明細 / Items
+          </p>
+          <ul className="space-y-1">
+            {items.map((item, index) => (
+              <li key={`${item.productId}-${index}`} className="text-xs text-[#5B7893]">
+                {index + 1}. {item.productName} × {item.quantity || 1}
+                {item.intention ? <span className="text-[#8B99A8]"> — {item.intention}</span> : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <div>
