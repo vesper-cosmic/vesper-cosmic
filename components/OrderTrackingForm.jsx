@@ -237,13 +237,10 @@ export default function OrderTrackingForm() {
 
 function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
   return (
-    <div className="mt-6 space-y-4">
+    <div className="space-y-4">
       <div className="rounded bg-white/60 p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
-          Order {order.orderId}
-        </p>
-        <p className="mt-2 text-base font-semibold text-[#1C2B48]">
-          {order.productName}
+          Order Details
         </p>
         <p className="mt-1 text-sm text-[#5B7893]">
           Placed {formatDate(order.createdAt)} · ${Number(order.amount).toFixed(2)} USD
