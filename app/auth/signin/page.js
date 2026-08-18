@@ -32,6 +32,7 @@ function SignInContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
   const authError = searchParams.get("error");
+  const referralCode = searchParams.get("ref");
 
   const [mode, setMode] = useState("signin"); // "signin" | "register"
   const [email, setEmail] = useState("");
@@ -41,6 +42,7 @@ function SignInContent() {
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [referralInfo, setReferralInfo] = useState(referralCode ? { code: referralCode, trying: false, done: false } : null);
 
   const errorMessage = useMemo(
     () => (authError ? ERROR_MESSAGES[authError] || ERROR_MESSAGES.default : ""),
@@ -49,7 +51,34 @@ function SignInContent() {
 
   async function handleGoogle() {
     setFormError("");
+    if (referralCode) {
+      localStorage.setItem("pendingReferralCode", referralCode);
+    }
     await signIn("google", { callbackUrl });
+  }
+
+  async function tryApplyReferral() {
+    if (!referralInfo || referralInfo.trying || referralInfo.done) return;
+
+    setReferralInfo((prev) => ({ ...prev, trying: true }));
+
+    try {
+      const res = await fetch("/api/member/referral", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ referralCode: referralInfo.code }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setReferralInfo((prev) => ({ ...prev, done: true, trying: false, success: true }));
+        localStorage.removeItem("pendingReferralCode");
+      } else {
+        setReferralInfo((prev) => ({ ...prev, trying: false, error: data.error }));
+      }
+    } catch (error) {
+      setReferralInfo((prev) => ({ ...prev, trying: false, error: "Failed to apply referral code" }));
+    }
   }
 
   async function handleRegister(event) {
@@ -104,6 +133,19 @@ function SignInContent() {
         return;
       }
 
+      // Try to apply referral code if present
+      if (referralCode) {
+        try {
+          await fetch("/api/member/referral", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ referralCode }),
+          });
+        } catch {
+          // Silently fail, don't block the sign-in flow
+        }
+      }
+
       router.push(callbackUrl);
       router.refresh();
     } catch {
@@ -129,6 +171,19 @@ function SignInContent() {
     if (result?.error) {
       setFormError(ERROR_MESSAGES.CredentialsSignin);
       return;
+    }
+
+    // Try to apply referral code if present
+    if (referralCode) {
+      try {
+        await fetch("/api/member/referral", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ referralCode }),
+        });
+      } catch {
+        // Silently fail, don't block the sign-in flow
+      }
     }
 
     router.push(callbackUrl);

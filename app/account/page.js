@@ -21,6 +21,9 @@ export default function AccountPage() {
   const [error, setError] = useState("");
   const [orders, setOrders] = useState(null); // null = loading
   const [ordersError, setOrdersError] = useState("");
+  const [referral, setReferral] = useState(null);
+  const [referralError, setReferralError] = useState("");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,8 +41,24 @@ export default function AccountPage() {
             setOrdersError("Could not load your order history.");
           }
         });
+
+      fetch("/api/member/referral")
+        .then((res) => res.json())
+        .then((data) => {
+          if (cancelled) return;
+          if (data?.referral) {
+            setReferral(data.referral);
+          }
+          if (data?.error) setReferralError(data.error);
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setReferralError("Could not load referral info.");
+          }
+        });
     } else {
       setOrders([]);
+      setReferral(null);
     }
     return () => {
       cancelled = true;
@@ -192,6 +211,84 @@ export default function AccountPage() {
               {saved ? "✓ Saved" : "Save Address"}
             </button>
           </form>
+        </section>
+
+        <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
+          <h2 className="text-2xl font-semibold text-[#1C2B48]">
+            Share & Earn Rewards
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-[#5B7893]">
+            Share your referral link with friends. When they sign up and make their first purchase, you'll earn cash rewards.
+          </p>
+          {referralError ? (
+            <p className="mt-4 text-sm text-red-500">{referralError}</p>
+          ) : referral ? (
+            <div className="mt-5 space-y-3">
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
+                  Your Referral Code
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={referral.referralCode || ""}
+                    className="flex-1 rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm font-mono text-[#1C2B48]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(referral.referralCode);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+                  >
+                    {copied ? "✓ Copied" : "Copy"}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
+                  Your Referral Link
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={`${typeof window !== "undefined" ? window.location.origin : ""}/auth/signin?ref=${referral.referralCode}`}
+                    className="flex-1 rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] overflow-hidden text-ellipsis"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const link = `${typeof window !== "undefined" ? window.location.origin : ""}/auth/signin?ref=${referral.referralCode}`;
+                      navigator.clipboard.writeText(link);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7] whitespace-nowrap"
+                  >
+                    {copied ? "✓ Copied" : "Copy"}
+                  </button>
+                </div>
+              </div>
+
+              {referral.totalReferralReward > 0 && (
+                <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
+                    Total Earned
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold text-[#1C2B48]">
+                    ${Number(referral.totalReferralReward || 0).toFixed(2)}
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-[#5B7893]">Loading referral info...</p>
+          )}
         </section>
 
         <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">

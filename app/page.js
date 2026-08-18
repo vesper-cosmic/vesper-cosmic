@@ -1,13 +1,23 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { staticCategories, groupCategoryIds } from "@/lib/productData";
 import { useProducts } from "@/components/ProductProvider";
 import ShopProductCard from "@/components/shop/ShopProductCard";
 import ProductDetailModal from "@/components/shop/ProductDetailModal";
+import { useReferral } from "@/lib/useReferral";
 
 export default function HomePage() {
+  return (
+    <Suspense>
+      <HomePageContent />
+    </Suspense>
+  );
+}
+
+function HomePageContent() {
+  useReferral();
   const { products } = useProducts();
   const [selectedProduct, setSelectedProduct] = useState(null);
   // selectedFilter: null (all) | { type: "group", id } | { type: "category", id }
