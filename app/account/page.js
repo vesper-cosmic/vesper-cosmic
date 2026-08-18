@@ -135,6 +135,54 @@ export default function AccountPage() {
 
         <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
           <h2 className="text-2xl font-semibold text-[#1C2B48]">
+            會員資訊 Member Info
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-[#5B7893]">
+            你的會員等級和個人資訊。
+          </p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
+              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
+                會員等級
+              </p>
+              <p className="mt-1 text-lg font-semibold text-[#1C2B48]">
+                {member?.memberLevel || "銅級"}
+              </p>
+            </div>
+            <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
+              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
+                總消費
+              </p>
+              <p className="mt-1 text-lg font-semibold text-[#1C2B48]">
+                NT${Number(member?.totalSpending || 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
+              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
+                訂單數
+              </p>
+              <p className="mt-1 text-lg font-semibold text-[#1C2B48]">
+                {member?.orderCount || 0} 筆
+              </p>
+            </div>
+            <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
+              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
+                生日
+              </p>
+              <p className="mt-1 text-sm text-[#1C2B48]">
+                {member?.birthday
+                  ? new Date(member.birthday + "T00:00:00").toLocaleDateString(
+                      "zh-TW",
+                      { year: "numeric", month: "2-digit", day: "2-digit" }
+                    )
+                  : "未設定"}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
+          <h2 className="text-2xl font-semibold text-[#1C2B48]">
             Default Shipping Address
           </h2>
           <p className="mt-2 text-sm leading-6 text-[#5B7893]">
@@ -166,15 +214,6 @@ export default function AccountPage() {
                   type="text"
                   name="city"
                   defaultValue={defaultAddress.city || ""}
-                  required
-                  className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
-                />
-              </Field>
-              <Field label="State / Province">
-                <input
-                  type="text"
-                  name="stateProvince"
-                  defaultValue={defaultAddress.stateProvince || ""}
                   required
                   className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
                 />
