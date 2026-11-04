@@ -1,4 +1,7 @@
+import { isProductSoldOut } from "@/lib/productData";
+
 export default function ShopProductCard({ product, onClick }) {
+  const soldOut = isProductSoldOut(product);
   return (
     <article
       className="mist-card group flex h-full flex-col overflow-hidden rounded-lg border border-[#8EB1D1]/45 bg-[#E8ECEF]"
@@ -16,8 +19,15 @@ export default function ShopProductCard({ product, onClick }) {
         <img
           src={product.images[0]}
           alt={product.name}
-          className="h-full w-full object-cover opacity-90 transition duration-300 group-hover:scale-[1.03]"
+          className={`h-full w-full object-cover transition duration-300 group-hover:scale-[1.03] ${
+            soldOut ? "opacity-50 grayscale" : "opacity-90"
+          }`}
         />
+        {soldOut ? (
+          <span className="absolute right-3 top-3 rounded-full bg-[#1C2B48] px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
+            Sold Out
+          </span>
+        ) : null}
         {product.badge ? (
           <span className="absolute left-3 top-3 rounded-full border border-[#8EB1D1] bg-[#1C2B48]/85 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#E8ECEF]">
             {product.badge}

@@ -48,6 +48,7 @@ function emptyForm() {
     badge: "",
     images: [],
     inventory: "",
+    published: true,
     isNew: false,
   };
 }
@@ -58,6 +59,12 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState([]);
   const [loadError, setLoadError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [configured, setConfigured] = useState(true);
+
+  // Setup state
+  const [setupBusy, setSetupBusy] = useState(false);
+  const [setupMessage, setSetupMessage] = useState({ type: "", text: "" });
+  const [createdDatabaseId, setCreatedDatabaseId] = useState("");
 
   // Form state
   const [form, setForm] = useState(emptyForm());
@@ -68,6 +75,7 @@ export default function AdminProductsPage() {
 
   // List state
   const [deletingId, setDeletingId] = useState("");
+  const [stockSavingId, setStockSavingId] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [page, setPage] = useState(1);
 
@@ -87,12 +95,70 @@ export default function AdminProductsPage() {
         return;
       }
       setIsAdmin(true);
-      setLoadError(data?.error || "");
+      setConfigured(data?.configured !== false);
+      setLoadError(data?.configured === false ? "" : data?.error || "");
       setProducts(data?.products || []);
     } catch {
       setLoadError("Failed to load products.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function runSetup(action) {
+    setSetupBusy(true);
+    setSetupMessage({ type: "", text: "" });
+    try {
+      const response = await fetch("/api/admin/products/setup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        setSetupMessage({ type: "error", text: data.error || "Setup failed." });
+        return;
+      }
+      if (action === "database" && data.created) {
+        setCreatedDatabaseId(data.databaseId);
+        setSetupMessage({ type: "success", text: "產品資料庫已建立 / Product database created." });
+      } else if (action === "database") {
+        setSetupMessage({ type: "success", text: "資料庫欄位已更新 / Database columns are up to date." });
+      } else {
+        setSetupMessage({
+          type: "success",
+          text: `已匯入 ${data.imported.length} 個內建產品 / Imported ${data.imported.length} products.`,
+        });
+        await loadProducts();
+      }
+    } catch {
+      setSetupMessage({ type: "error", text: "Network error — please try again." });
+    } finally {
+      setSetupBusy(false);
+    }
+  }
+
+  // Quick shelf / stock change from the product list.
+  async function handleStockUpdate(id, changes) {
+    setStockSavingId(id);
+    try {
+      const response = await fetch("/api/admin/products", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, mode: "stock", ...changes }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.error || "Update failed.");
+        return false;
+      }
+      await loadProducts();
+      return true;
+    } catch {
+      alert("Network error — please try again.");
+      return false;
+    } finally {
+      setStockSavingId("");
     }
   }
 
@@ -132,6 +198,7 @@ export default function AdminProductsPage() {
       badge: product.badge || "",
       images: Array.isArray(product.images) ? product.images.map(String) : [],
       inventory: product.inventory ?? "",
+      published: product.published !== false,
       isNew: Boolean(product.isNew),
     });
     setFormErrors({});
@@ -313,6 +380,16 @@ export default function AdminProductsPage() {
             {loadError}
           </div>
         ) : null}
+
+        <SetupPanel
+          configured={configured}
+          staticCount={products.filter((p) => p.source === "static").length}
+          busy={setupBusy}
+          message={setupMessage}
+          createdDatabaseId={createdDatabaseId}
+          onCreateDatabase={() => runSetup("database")}
+          onImport={() => runSetup("import")}
+        />
 
         {/* ── Product form ── */}
         <section className="mt-8">
@@ -522,6 +599,11 @@ export default function AdminProductsPage() {
 
             <CheckboxGrid>
               <CheckboxPill
+                checked={form.published}
+                onChange={() => toggleCheckbox("published")}
+                label="上架中（顯示在商店）"
+              />
+              <CheckboxPill
                 checked={form.requiresBirthData}
                 onChange={() => toggleCheckbox("requiresBirthData")}
                 label="需要出生資料（八字）"
@@ -641,7 +723,7 @@ export default function AdminProductsPage() {
 
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !configured}
               className="w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:opacity-60"
             >
               {submitting
@@ -679,6 +761,9 @@ export default function AdminProductsPage() {
                     onEdit={() => startEdit(product)}
                     onDelete={() => handleDelete(product.id)}
                     deleting={deletingId === product.id}
+                    canChange={configured}
+                    stockSaving={stockSavingId === product.id}
+                    onStockUpdate={(changes) => handleStockUpdate(product.id, changes)}
                   />
                 ))}
               </div>
@@ -751,12 +836,157 @@ function CheckboxPill({ checked, onChange, label }) {
   );
 }
 
-function ProductRow({ product, expanded, onToggle, onEdit, onDelete, deleting }) {
+function SetupPanel({
+  configured,
+  staticCount,
+  busy,
+  message,
+  createdDatabaseId,
+  onCreateDatabase,
+  onImport,
+}) {
+  if (configured && staticCount === 0 && !message.text) return null;
+
   return (
-    <div className="rounded border border-[#8EB1D1]/30 bg-white/60 p-4">
+    <section className="mt-6 rounded border border-[#8EB1D1]/40 bg-white/60 p-4 text-sm text-[#35506B]">
+      {!configured ? (
+        <>
+          <h2 className="text-base font-semibold text-[#1C2B48]">步驟 1：建立產品資料庫</h2>
+          <p className="mt-1">
+            尚未設定 <code>NOTION_PRODUCTS_DATABASE_ID</code>，所以目前無法上下架或改庫存。
+            按下按鈕會在訂單資料庫旁邊建立一個 Notion 產品資料庫。
+          </p>
+          <button
+            type="button"
+            onClick={onCreateDatabase}
+            disabled={busy || Boolean(createdDatabaseId)}
+            className="mt-3 rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-xs font-bold text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:opacity-50"
+          >
+            {busy ? "建立中…" : "建立產品資料庫"}
+          </button>
+          {createdDatabaseId ? (
+            <div className="mt-3 rounded border border-[#2E8B57]/40 bg-[#EAF6EF] p-3 text-[#1C2B48]">
+              <p>
+                到 Vercel → Settings → Environment Variables 新增：
+              </p>
+              <p className="mt-2 break-all font-mono text-xs">
+                NOTION_PRODUCTS_DATABASE_ID={createdDatabaseId}
+              </p>
+              <p className="mt-2">
+                勾選 Production 和 Preview，存檔後重新部署（Redeploy），再回到這頁進行步驟 2。
+              </p>
+            </div>
+          ) : null}
+        </>
+      ) : staticCount > 0 ? (
+        <>
+          <h2 className="text-base font-semibold text-[#1C2B48]">步驟 2：匯入內建產品</h2>
+          <p className="mt-1">
+            還有 {staticCount} 個產品寫在程式裡（標示「內建」）。匯入 Notion
+            後就能完整編輯；不匯入也可以，第一次修改時會自動存進 Notion。
+          </p>
+          <button
+            type="button"
+            onClick={onImport}
+            disabled={busy}
+            className="mt-3 rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-xs font-bold text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:opacity-50"
+          >
+            {busy ? "匯入中…" : `匯入 ${staticCount} 個產品`}
+          </button>
+        </>
+      ) : null}
+      {message.text ? (
+        <p
+          className={`mt-3 ${
+            message.type === "success" ? "text-[#2E8B57]" : "text-[#C0392B]"
+          }`}
+        >
+          {message.text}
+        </p>
+      ) : null}
+    </section>
+  );
+}
+
+function InventoryEditor({ product, disabled, saving, onSave }) {
+  const current = product.inventory == null ? "" : String(product.inventory);
+  const [value, setValue] = useState(current);
+
+  useEffect(() => {
+    setValue(current);
+  }, [current]);
+
+  const changed = value !== current;
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <label className="text-xs font-semibold text-[#5B7893]" htmlFor={`stock-${product.id}`}>
+        庫存
+      </label>
+      <input
+        id={`stock-${product.id}`}
+        type="number"
+        min="0"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="不限"
+        disabled={disabled}
+        className="w-20 rounded border border-[#8EB1D1]/40 bg-white px-2 py-1 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1] disabled:opacity-50"
+      />
+      {changed ? (
+        <button
+          type="button"
+          disabled={disabled || saving}
+          onClick={() => onSave({ inventory: value === "" ? null : Number(value) })}
+          className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-2 py-1 text-xs font-bold text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:opacity-50"
+        >
+          {saving ? "…" : "儲存"}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+function ProductRow({
+  product,
+  expanded,
+  onToggle,
+  onEdit,
+  onDelete,
+  deleting,
+  canChange,
+  stockSaving,
+  onStockUpdate,
+}) {
+  const published = product.published !== false;
+  const soldOut = product.inventory != null && product.inventory <= 0;
+
+  return (
+    <div
+      className={`rounded border border-[#8EB1D1]/30 p-4 ${
+        published ? "bg-white/60" : "bg-[#D5DCE2]/70"
+      }`}
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                published ? "bg-[#2E8B57] text-white" : "bg-[#5B7893] text-white"
+              }`}
+            >
+              {published ? "上架中" : "已下架"}
+            </span>
+            {soldOut ? (
+              <span className="rounded-full bg-[#C0392B] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                售完
+              </span>
+            ) : null}
+            {product.source === "static" ? (
+              <span className="rounded-full border border-[#5B7893]/40 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#5B7893]">
+                內建
+              </span>
+            ) : null}
             {product.isNew ? (
               <span className="rounded-full bg-[#8EB1D1] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#1C2B48]">
                 New
@@ -785,20 +1015,44 @@ function ProductRow({ product, expanded, onToggle, onEdit, onDelete, deleting })
           </button>
           <button
             type="button"
-            onClick={onEdit}
-            className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-3 py-1.5 text-xs font-bold text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+            onClick={() => onStockUpdate({ published: !published })}
+            disabled={!canChange || stockSaving}
+            className={`rounded border px-3 py-1.5 text-xs font-bold transition disabled:opacity-50 ${
+              published
+                ? "border-[#5B7893]/50 text-[#35506B] hover:bg-[#C4D8E5]"
+                : "border-[#2E8B57] bg-[#2E8B57] text-white hover:bg-[#3A9E68]"
+            }`}
           >
-            編輯
+            {stockSaving ? "…" : published ? "下架" : "上架"}
           </button>
           <button
             type="button"
-            onClick={onDelete}
-            disabled={deleting}
-            className="rounded border border-[#C0392B]/40 px-3 py-1.5 text-xs font-semibold text-[#C0392B] transition hover:bg-[#C0392B]/10 disabled:opacity-50"
+            onClick={onEdit}
+            disabled={!canChange}
+            className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-3 py-1.5 text-xs font-bold text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:opacity-50"
           >
-            {deleting ? "刪除中…" : "刪除"}
+            編輯
           </button>
+          {product.source !== "static" ? (
+            <button
+              type="button"
+              onClick={onDelete}
+              disabled={deleting}
+              className="rounded border border-[#C0392B]/40 px-3 py-1.5 text-xs font-semibold text-[#C0392B] transition hover:bg-[#C0392B]/10 disabled:opacity-50"
+            >
+              {deleting ? "刪除中…" : "刪除"}
+            </button>
+          ) : null}
         </div>
+      </div>
+
+      <div className="mt-3">
+        <InventoryEditor
+          product={product}
+          disabled={!canChange}
+          saving={stockSaving}
+          onSave={onStockUpdate}
+        />
       </div>
 
       {expanded ? (

@@ -4,8 +4,9 @@ import { authOptions, isAdminEmail } from "@/lib/auth";
 import {
   createNotionProduct,
   deleteNotionProduct,
-  findNotionProducts,
+  findAdminProducts,
   updateNotionProduct,
+  updateProductStock,
 } from "@/lib/productServer";
 
 async function requireAdmin() {
@@ -21,11 +22,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized." }, { status: 403 });
   }
 
-  const result = await findNotionProducts();
-  if (result?.skipped) {
-    return NextResponse.json({ error: result.reason, products: [] }, { status: 200 });
-  }
-  return NextResponse.json({ products: result.products || [] });
+  const result = await findAdminProducts();
+  return NextResponse.json(result);
 }
 
 export async function POST(request) {
@@ -88,7 +86,11 @@ export async function PATCH(request) {
     );
   }
 
-  const result = await updateNotionProduct(id, payload);
+  // mode "stock" only touches 上架中 / 庫存 (list toggles); otherwise full edit.
+  const result =
+    payload.mode === "stock"
+      ? await updateProductStock(id, pickStockChanges(payload))
+      : await updateNotionProduct(id, payload);
 
   if (result?.skipped) {
     return NextResponse.json(
@@ -142,4 +144,11 @@ export async function DELETE(request) {
     ok: true,
     message: "Product deleted.",
   });
+}
+
+function pickStockChanges(payload) {
+  const changes = {};
+  if ("published" in payload) changes.published = payload.published;
+  if ("inventory" in payload) changes.inventory = payload.inventory;
+  return changes;
 }

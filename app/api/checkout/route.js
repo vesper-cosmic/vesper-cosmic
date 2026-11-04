@@ -6,6 +6,7 @@ import {
   persistOrder,
   validateMultiCheckoutPayload,
 } from "@/lib/orderServer";
+import { decrementProductInventory } from "@/lib/productServer";
 
 export async function POST(request) {
   const rateLimited = rateLimitResponse(request);
@@ -36,6 +37,12 @@ export async function POST(request) {
   } catch (error) {
     notionResult = { error: error.message };
     console.error("Notion multi order creation failed:", error);
+  }
+
+  try {
+    await decrementProductInventory(order.items);
+  } catch (error) {
+    console.error("Inventory update failed:", error);
   }
 
   return NextResponse.json(

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { mergeProducts, staticProducts } from "@/lib/productData";
+import { isProductPublished, mergeProducts, staticProducts } from "@/lib/productData";
 
 const ProductContext = createContext({
   products: staticProducts,
@@ -49,9 +49,15 @@ export function ProductProvider({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tick]);
 
-  const products = useMemo(
+  // Lookups by id/slug include unpublished products so existing carts and
+  // past orders still render; the shop listing only shows published ones.
+  const allProducts = useMemo(
     () => mergeProducts(staticProducts, dynamicProducts),
     [dynamicProducts]
+  );
+  const products = useMemo(
+    () => allProducts.filter(isProductPublished),
+    [allProducts]
   );
 
   const value = useMemo(
@@ -59,11 +65,11 @@ export function ProductProvider({ children }) {
       products,
       dynamicProducts,
       status,
-      getProductById: (id) => products.find((product) => product.id === id) || null,
-      getProductBySlug: (slug) => products.find((product) => product.slug === slug) || null,
+      getProductById: (id) => allProducts.find((product) => product.id === id) || null,
+      getProductBySlug: (slug) => allProducts.find((product) => product.slug === slug) || null,
       refresh: () => setTick((current) => current + 1),
     }),
-    [products, dynamicProducts, status]
+    [products, allProducts, dynamicProducts, status]
   );
 
   return (

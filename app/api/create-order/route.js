@@ -5,6 +5,7 @@ import {
   createPaypalUrl,
   validateOrderPayload,
 } from "@/lib/orderServer";
+import { decrementProductInventory } from "@/lib/productServer";
 
 export async function POST(request) {
   const rateLimited = rateLimitResponse(request);
@@ -33,6 +34,12 @@ export async function POST(request) {
   } catch (error) {
     notionResult = { error: error.message };
     console.error("Notion order creation failed:", error);
+  }
+
+  try {
+    await decrementProductInventory([{ productId: order.productId, quantity: 1 }]);
+  } catch (error) {
+    console.error("Inventory update failed:", error);
   }
 
   return NextResponse.json(

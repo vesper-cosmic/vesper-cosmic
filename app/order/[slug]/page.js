@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import OrderIntakeForm from "@/components/forms/OrderIntakeForm";
 import { getProductBySlug } from "@/lib/productServer";
+import { isProductPublished } from "@/lib/productData";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }) {
 export default async function ProductOrderPage({ params }) {
   const { product } = await getProductBySlug(params.slug);
 
-  if (!product) {
+  if (!isProductPublished(product)) {
     notFound();
   }
 

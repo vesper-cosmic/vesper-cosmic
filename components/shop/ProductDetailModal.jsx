@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cartContext";
+import { isProductSoldOut } from "@/lib/productData";
 
 export default function ProductDetailModal({ product, onClose }) {
   const { addItem } = useCart();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const soldOut = isProductSoldOut(product);
+  const maxQuantity = product?.inventory != null ? Number(product.inventory) : Infinity;
 
   // Close on Escape key
   useEffect(() => {
@@ -24,7 +27,8 @@ export default function ProductDetailModal({ product, onClose }) {
   }, [onClose]);
 
   function handleAddToCart() {
-    addItem(product, quantity);
+    if (soldOut) return;
+    addItem(product, Math.min(quantity, maxQuantity));
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
@@ -164,13 +168,19 @@ export default function ProductDetailModal({ product, onClose }) {
                 </span>
                 <button
                   type="button"
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="flex h-10 w-10 items-center justify-center text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+                  onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
+                  disabled={quantity >= maxQuantity}
+                  className="flex h-10 w-10 items-center justify-center text-[#1C2B48] transition hover:bg-[#C4D8E5] disabled:opacity-40"
                   aria-label="Increase quantity"
                 >
                   +
                 </button>
               </div>
+              {!soldOut && maxQuantity <= 5 ? (
+                <span className="text-sm font-semibold text-[#C0392B]">
+                  Only {maxQuantity} left
+                </span>
+              ) : null}
             </div>
           </div>
 
@@ -189,13 +199,14 @@ export default function ProductDetailModal({ product, onClose }) {
             <button
               type="button"
               onClick={handleAddToCart}
-              className={`w-full rounded border px-5 py-3.5 text-sm font-bold uppercase tracking-[0.16em] transition ${
+              disabled={soldOut}
+              className={`w-full rounded border px-5 py-3.5 text-sm font-bold uppercase tracking-[0.16em] transition disabled:cursor-not-allowed disabled:border-[#8EB1D1]/40 disabled:bg-[#C4D8E5] disabled:text-[#5B7893] ${
                 added
                   ? "border-green-500 bg-green-500 text-white"
                   : "border-[#8EB1D1] bg-[#8EB1D1] text-[#1C2B48] hover:bg-[#A7C7E7]"
               }`}
             >
-              {added ? "✓ Added to Cart" : "Add to Cart"}
+              {soldOut ? "Sold Out" : added ? "✓ Added to Cart" : "Add to Cart"}
             </button>
           </div>
         </div>
