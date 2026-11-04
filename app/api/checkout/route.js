@@ -3,7 +3,6 @@ import { rateLimitResponse } from "@/lib/rateLimit";
 import {
   createMultiNotionOrder,
   createPaypalUrl,
-  persistOrder,
   validateMultiCheckoutPayload,
 } from "@/lib/orderServer";
 import { decrementProductInventory } from "@/lib/productServer";
@@ -28,8 +27,6 @@ export async function POST(request) {
   if (Object.keys(errors).length > 0) {
     return NextResponse.json({ errors }, { status: 422 });
   }
-
-  await persistOrder(order);
 
   let notionResult = null;
   try {
