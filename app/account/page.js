@@ -5,7 +5,15 @@ import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useCart } from "@/lib/cartContext";
 import { countries, emptyAddress } from "@/lib/formOptions";
-import { normalizedStatus, ORDER_STATUS_EN } from "@/lib/orderStatus";
+import { customerStatusLabel } from "@/lib/orderStatus";
+
+// Member levels are stored in Chinese in Notion; show them in English.
+const MEMBER_LEVEL_EN = {
+  銅級: "Bronze",
+  銀級: "Silver",
+  金級: "Gold",
+  白金級: "Platinum",
+};
 
 export default function AccountPage() {
   const {
@@ -135,23 +143,23 @@ export default function AccountPage() {
 
         <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
           <h2 className="text-2xl font-semibold text-[#1C2B48]">
-            會員資訊 Member Info
+            Member Info
           </h2>
           <p className="mt-2 text-sm leading-6 text-[#5B7893]">
-            你的會員等級和個人資訊。
+            Your membership level and profile details.
           </p>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
-                會員等級
+                Member Level
               </p>
               <p className="mt-1 text-lg font-semibold text-[#1C2B48]">
-                {member?.memberLevel || "銅級"}
+                {MEMBER_LEVEL_EN[member?.memberLevel] || member?.memberLevel || "Bronze"}
               </p>
             </div>
             <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
-                總消費
+                Total Spent
               </p>
               <p className="mt-1 text-lg font-semibold text-[#1C2B48]">
                 NT${Number(member?.totalSpending || 0).toLocaleString()}
@@ -159,23 +167,23 @@ export default function AccountPage() {
             </div>
             <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
-                訂單數
+                Orders
               </p>
               <p className="mt-1 text-lg font-semibold text-[#1C2B48]">
-                {member?.orderCount || 0} 筆
+                {member?.orderCount || 0}
               </p>
             </div>
             <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
-                生日
+                Birthday
               </p>
               <p className="mt-1 text-sm text-[#1C2B48]">
                 {member?.birthday
                   ? new Date(member.birthday + "T00:00:00").toLocaleDateString(
-                      "zh-TW",
-                      { year: "numeric", month: "2-digit", day: "2-digit" }
+                      "en-US",
+                      { year: "numeric", month: "short", day: "numeric" }
                     )
-                  : "未設定"}
+                  : "Not set"}
               </p>
             </div>
           </div>
@@ -372,10 +380,7 @@ export default function AccountPage() {
                           ${Number(order.amount || 0).toFixed(2)} USD
                         </p>
                         <p className="mt-1 inline-block rounded bg-[#D6E4EE] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#35506B]">
-                          {ORDER_STATUS_EN[normalizedStatus(order.productionStatus)] ||
-                            order.productionStatus ||
-                            order.paymentStatus ||
-                            "Processing"}
+                          {customerStatusLabel(order.productionStatus, order.paymentStatus)}
                         </p>
                         {order.trackingNumber ? (
                           <p className="mt-1 font-mono text-[10px] text-[#5B7893]">

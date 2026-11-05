@@ -26,10 +26,10 @@ export async function POST(request) {
 
   const errors = {};
   if (!email || !EMAIL_PATTERN.test(email)) {
-    errors.email = "請輸入有效的 Email。";
+    errors.email = "Please enter a valid email.";
   }
   if (!password || password.length < 8) {
-    errors.password = "密碼至少需要 8 個字元。";
+    errors.password = "Password must be at least 8 characters.";
   }
   if (Object.keys(errors).length > 0) {
     return NextResponse.json({ errors }, { status: 400 });
@@ -44,8 +44,8 @@ export async function POST(request) {
           errors: {
             form:
               existing.reason === "Missing member database config."
-                ? "會員系統尚未設定完成，請稍後再試。"
-                : "暫時無法完成註冊，請稍後再試。",
+                ? "Membership is not available yet. Please try again later."
+                : "We could not complete your registration. Please try again later.",
           },
         },
         { status: 500 }
@@ -64,7 +64,7 @@ export async function POST(request) {
       return NextResponse.json({
         success: true,
         linked: true,
-        message: "此 Email 已與 Google 帳號連結，現已可同時使用 Email + 密碼登入。",
+        message: "This email is linked to your Google account. You can now also sign in with email and password.",
       });
     }
 
@@ -72,7 +72,7 @@ export async function POST(request) {
     const created = await upsertMember({ email, name: "" });
     if (created?.skipped) {
       return NextResponse.json(
-        { errors: { form: "暫時無法完成註冊，請稍後再試。" } },
+        { errors: { form: "We could not complete your registration. Please try again later." } },
         { status: 500 }
       );
     }
@@ -84,7 +84,7 @@ export async function POST(request) {
   } catch (error) {
     console.error("Registration failed:", error);
     return NextResponse.json(
-      { errors: { form: "暫時無法完成註冊，請稍後再試。" } },
+      { errors: { form: "We could not complete your registration. Please try again later." } },
       { status: 500 }
     );
   }

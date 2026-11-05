@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cartContext";
 import { ORDER_STATUSES, normalizedStatus } from "@/lib/orderStatus";
-import { ORDER_STATUS_EN, ORDER_STATUS_DESCRIPTION_EN } from "@/lib/orderStatus";
+import {
+  ORDER_STATUS_EN,
+  ORDER_STATUS_DESCRIPTION_EN,
+  customerStatusLabel,
+} from "@/lib/orderStatus";
 
 const STATUS_STEPS = ORDER_STATUSES.map((key) => ({
   key,
@@ -147,10 +151,7 @@ export default function OrderTrackingForm() {
                             ${Number(item.amount || 0).toFixed(2)} USD
                           </p>
                           <p className="mt-1 inline-block rounded bg-[#D6E4EE] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#35506B]">
-                            {ORDER_STATUS_EN[normalizedStatus(item.productionStatus)] ||
-                              item.productionStatus ||
-                              item.paymentStatus ||
-                              "Processing"}
+                            {customerStatusLabel(item.productionStatus, item.paymentStatus)}
                           </p>
                         </div>
                       </div>
@@ -297,7 +298,9 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
         </div>
       ) : (
         <StatusRow label="Production">
-          {order.productionStatus || "N/A"}
+          {order.productionStatus
+            ? customerStatusLabel(order.productionStatus, order.paymentStatus)
+            : "N/A"}
         </StatusRow>
       )}
 

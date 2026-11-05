@@ -8,15 +8,15 @@ import { Suspense } from "react";
 
 const ERROR_MESSAGES = {
   CredentialsSignin:
-    "Email 或密碼不正確，或是此帳號尚未設定密碼。若你之前是用 Google 登入，請改用「使用 Google 登入」。",
-  OAuthSignin: "發生錯誤，請再試一次。",
-  OAuthCallback: "發生錯誤，請再試一次。",
-  OAuthCreateAccount: "發生錯誤，請再試一次。",
-  EmailCreateAccount: "發生錯誤，請再試一次。",
-  Callback: "登入流程發生問題，請再試一次。",
+    "Incorrect email or password, or this account has no password yet. If you signed up with Google, please use “Continue with Google”.",
+  OAuthSignin: "Something went wrong. Please try again.",
+  OAuthCallback: "Something went wrong. Please try again.",
+  OAuthCreateAccount: "Something went wrong. Please try again.",
+  EmailCreateAccount: "Something went wrong. Please try again.",
+  Callback: "There was a problem signing you in. Please try again.",
   OAuthAccountNotLinked:
-    "此 Email 已使用其他方式登入過。請選擇與你原本註冊時相同的登入方式。",
-  default: "登入失敗，請再試一次。",
+    "This email was used with a different sign-in method. Please sign in the same way you originally signed up.",
+  default: "Sign-in failed. Please try again.",
 };
 
 export default function SignInPage() {
@@ -87,7 +87,7 @@ function SignInContent() {
     setSuccessMessage("");
 
     if (password !== confirmPassword) {
-      setFormError("兩次輸入的密碼不一致。");
+      setFormError("Passwords do not match.");
       return;
     }
 
@@ -106,7 +106,7 @@ function SignInContent() {
           errors.email ||
             errors.password ||
             errors.form ||
-            "註冊失敗，請再試一次。"
+            "Registration failed. Please try again."
         );
         return;
       }
@@ -124,10 +124,10 @@ function SignInContent() {
         // but still tell the user their account is ready.
         if (data?.linked) {
           setSuccessMessage(
-            "此 Email 已成功連結至你的帳號。請前往登入。"
+            "This email is now linked to your account. Please sign in."
           );
         } else {
-          setSuccessMessage("註冊成功！請登入。");
+          setSuccessMessage("Account created! Please sign in.");
         }
         setMode("signin");
         return;
@@ -149,7 +149,7 @@ function SignInContent() {
       router.push(callbackUrl);
       router.refresh();
     } catch {
-      setFormError("註冊時發生錯誤，請再試一次。");
+      setFormError("Something went wrong during registration. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -201,12 +201,12 @@ function SignInContent() {
             Vesper Cosmos
           </p>
           <h1 className="mt-2 text-center text-3xl font-semibold text-[#1C2B48]">
-            {mode === "signin" ? "Sign In 登入" : "Create Account 註冊"}
+            {mode === "signin" ? "Sign In" : "Create Account"}
           </h1>
           <p className="mt-2 text-center text-sm leading-6 text-[#5B7893]">
             {mode === "signin"
-              ? "登入以同步購物車與預設地址。"
-              : "註冊帳號以同步購物車與預設地址。"}
+              ? "Sign in to sync your cart and default address."
+              : "Create an account to sync your cart and default address."}
           </p>
 
           {errorMessage ? (
@@ -252,13 +252,13 @@ function SignInContent() {
                 d="M12 4.75c1.74 0 3.3.6 4.53 1.77l3.4-3.4A11.97 11.97 0 0012 0 12 12 0 001.33 6.62l3.92 3.1c.95-2.85 3.61-4.97 6.75-4.97z"
               />
             </svg>
-            <span>使用 Google 登入</span>
+            <span>Continue with Google</span>
           </button>
 
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-[#8EB1D1]/30" />
             <span className="text-xs uppercase tracking-wide text-[#5B7893]">
-              或
+              or
             </span>
             <div className="h-px flex-1 bg-[#8EB1D1]/30" />
           </div>
@@ -278,7 +278,7 @@ function SignInContent() {
                   : "text-[#5B7893] hover:text-[#1C2B48]"
               }`}
             >
-              登入
+              Sign In
             </button>
             <button
               type="button"
@@ -293,7 +293,7 @@ function SignInContent() {
                   : "text-[#5B7893] hover:text-[#1C2B48]"
               }`}
             >
-              註冊
+              Register
             </button>
           </div>
 
@@ -324,7 +324,7 @@ function SignInContent() {
                 htmlFor="password"
                 className="mb-1 block text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]"
               >
-                密碼 Password
+                Password
               </label>
               <div className="relative">
                 <input
@@ -343,14 +343,14 @@ function SignInContent() {
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute inset-y-0 right-0 flex items-center px-3 text-xs font-medium text-[#5B7893] hover:text-[#1C2B48]"
-                  aria-label={showPassword ? "隱藏密碼" : "顯示密碼"}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? "隱藏" : "顯示"}
+                  {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
               {mode === "register" ? (
                 <p className="mt-1 text-xs text-[#5B7893]">
-                  至少 8 個字元。若此 Email 已用 Google 登入過，會自動連結至同一帳號。
+                  At least 8 characters. If you have signed in with Google using this email, it will be linked to the same account.
                 </p>
               ) : null}
             </div>
@@ -361,7 +361,7 @@ function SignInContent() {
                   htmlFor="confirmPassword"
                   className="mb-1 block text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]"
                 >
-                  確認密碼 Confirm Password
+                  Confirm Password
                 </label>
                 <input
                   id="confirmPassword"
@@ -382,32 +382,30 @@ function SignInContent() {
               className="w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2.5 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:opacity-60"
             >
               {loading
-                ? "處理中…"
+                ? "Please wait…"
                 : mode === "signin"
-                ? "登入 Sign In"
-                : "註冊 Create Account"}
+                ? "Sign In"
+                : "Create Account"}
             </button>
           </form>
 
           <p className="mt-4 text-center text-xs text-[#5B7893]">
-            註冊即表示你同意我們的
+            By creating an account, you agree to our{" "}
             <Link href="/terms" className="text-[#8EB1D1] underline">
-              {" "}
-              條款
+              Terms
             </Link>{" "}
-            與
+            and{" "}
             <Link href="/privacy" className="text-[#8EB1D1] underline">
-              {" "}
-              隱私政策
+              Privacy Policy
             </Link>
-            。
+            .
           </p>
 
           <Link
             href="/shop"
             className="mt-4 block text-center text-xs font-medium text-[#5B7893] underline transition hover:text-[#1C2B48]"
           >
-            返回購物頁 Back to shop
+            Back to shop
           </Link>
         </div>
       </div>
