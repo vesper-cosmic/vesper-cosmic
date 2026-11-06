@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { ORDER_STATUSES, normalizedStatus } from "@/lib/orderStatus";
+import {
+  ORDER_STATUSES,
+  PAYMENT_PAID,
+  PAYMENT_REVIEW,
+  normalizedStatus,
+} from "@/lib/orderStatus";
 
 const STATUS_OPTIONS = ORDER_STATUSES;
 
@@ -82,6 +87,43 @@ export default function AdminPage() {
     }
   }
 
+  async function handleMarkPaid(orderId) {
+    if (!window.confirm(`確認已在 PayPal 收到 ${orderId} 的款項？`)) return;
+    setSavingId(orderId);
+    setSaveMessage((prev) => ({ ...prev, [orderId]: "" }));
+    try {
+      const response = await fetch("/api/admin/orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, paymentStatus: PAYMENT_PAID }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setSaveMessage((prev) => ({
+          ...prev,
+          [orderId]: { type: "error", text: data?.error || "更新失敗" },
+        }));
+        return;
+      }
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.orderId === orderId ? { ...order, paymentStatus: PAYMENT_PAID } : order
+        )
+      );
+      setSaveMessage((prev) => ({
+        ...prev,
+        [orderId]: { type: "success", text: "已標記為已付款" },
+      }));
+    } catch {
+      setSaveMessage((prev) => ({
+        ...prev,
+        [orderId]: { type: "error", text: "網路錯誤，請再試一次" },
+      }));
+    } finally {
+      setSavingId("");
+    }
+  }
+
   if (authStatus === "loading") {
     return <AdminShell>Loading…</AdminShell>;
   }
@@ -124,6 +166,8 @@ export default function AdminPage() {
   const filteredOrders =
     filter === "all"
       ? orders
+      : filter === PAYMENT_REVIEW
+      ? orders.filter((order) => order.paymentStatus === PAYMENT_REVIEW)
       : orders.filter((order) => normalizedStatus(order.productionStatus) === filter);
 
   return (
@@ -161,6 +205,13 @@ export default function AdminPage() {
           <FilterPill active={filter === "all"} onClick={() => setFilter("all")}>
             全部 ({orders.length})
           </FilterPill>
+          <FilterPill
+            active={filter === PAYMENT_REVIEW}
+            onClick={() => setFilter(filter === PAYMENT_REVIEW ? "all" : PAYMENT_REVIEW)}
+          >
+            {PAYMENT_REVIEW} (
+            {orders.filter((order) => order.paymentStatus === PAYMENT_REVIEW).length})
+          </FilterPill>
           {STATUS_OPTIONS.map((status) => (
             <FilterPill
               key={status}
@@ -190,6 +241,7 @@ export default function AdminPage() {
                   }))
                 }
                 onSave={() => handleSave(order.orderId)}
+                onMarkPaid={() => handleMarkPaid(order.orderId)}
                 saving={savingId === order.orderId}
                 message={saveMessage[order.orderId]}
               />
@@ -225,7 +277,7 @@ function FilterPill({ active, onClick, children }) {
   );
 }
 
-function OrderCard({ order, draft, onChange, onSave, saving, message }) {
+function OrderCard({ order, draft, onChange, onSave, onMarkPaid, saving, message }) {
   const status = draft.status ?? normalizedStatus(order.productionStatus) ?? "";
   const trackingNumber = draft.trackingNumber ?? order.trackingNumber ?? "";
   const items = Array.isArray(order.items) ? order.items : [];
@@ -247,6 +299,20 @@ function OrderCard({ order, draft, onChange, onSave, saving, message }) {
             {Number(order.amount || 0).toFixed(2)} USD
           </p>
           <p className="mt-1 text-xs text-[#5B7893]">付款: {order.paymentStatus || "—"}</p>
+          {order.paymentStatus && order.paymentStatus !== PAYMENT_PAID ? (
+            <button
+              type="button"
+              onClick={onMarkPaid}
+              disabled={saving}
+              className={`mt-2 rounded border px-3 py-1 text-xs font-semibold transition disabled:opacity-40 ${
+                order.paymentStatus === PAYMENT_REVIEW
+                  ? "border-[#2E8B57] bg-[#2E8B57] text-white hover:bg-[#256f46]"
+                  : "border-[#8EB1D1]/50 bg-white text-[#35506B] hover:bg-[#C4D8E5]"
+              }`}
+            >
+              標記已付款
+            </button>
+          ) : null}
         </div>
       </div>
 

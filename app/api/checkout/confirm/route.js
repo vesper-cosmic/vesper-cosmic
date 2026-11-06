@@ -1,5 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { rateLimitResponse } from "@/lib/rateLimit";
+import { PAYMENT_PENDING } from "@/lib/orderStatus";
 import { authOptions } from "@/lib/auth";
 import {
   findOrderForConfirmation,
@@ -9,6 +11,9 @@ import { upsertMember } from "@/lib/memberServer";
 import { sendMultiOrderEmails } from "@/lib/orderEmails";
 
 export async function POST(request) {
+  const rateLimited = rateLimitResponse(request);
+  if (rateLimited) return rateLimited;
+
   let payload;
 
   try {
@@ -48,8 +53,9 @@ export async function POST(request) {
   const found = await findOrderForConfirmation(orderId);
 
   if (found.skipped) {
+    console.error("Order confirmation lookup failed:", found.reason);
     return NextResponse.json(
-      { errors: { orderId: `Unable to verify order: ${found.reason}` } },
+      { errors: { orderId: "Unable to verify order right now. Please try again shortly." } },
       { status: 503 }
     );
   }
@@ -62,6 +68,15 @@ export async function POST(request) {
   }
 
   const storedOrder = found.order;
+
+  // Only an order still awaiting payment can be confirmed. This stops the
+  // same order from being re-confirmed to resend emails or reset status.
+  if (storedOrder.paymentStatus && storedOrder.paymentStatus !== PAYMENT_PENDING) {
+    return NextResponse.json(
+      { errors: { orderId: "This order has already been confirmed." } },
+      { status: 409 }
+    );
+  }
 
   if (!ordersMatch(storedOrder, order, found.source)) {
     return NextResponse.json(

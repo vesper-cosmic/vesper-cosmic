@@ -25,8 +25,9 @@ export async function GET(request) {
   const result = await findNotionOrder(orderId);
 
   if (result?.skipped) {
+    console.error("/api/track lookup failed:", result.reason);
     return NextResponse.json(
-      { error: result.reason, order: null },
+      { error: "Order lookup is temporarily unavailable. Please try again later.", order: null },
       { status: 500 }
     );
   }

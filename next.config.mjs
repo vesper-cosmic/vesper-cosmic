@@ -1,10 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  poweredByHeader: false,
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: [
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "object-src 'none'",
+              "upgrade-insecure-requests",
+            ].join("; "),
+          },
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin-allow-popups",
+          },
           {
             key: "X-Frame-Options",
             value: "DENY",
