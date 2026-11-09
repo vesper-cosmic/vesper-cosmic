@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cartContext";
-import { ORDER_STATUSES, normalizedStatus } from "@/lib/orderStatus";
+import { ORDER_STATUSES, OS_CANCELLED, normalizedStatus } from "@/lib/orderStatus";
 import {
   ORDER_STATUS_EN,
   ORDER_STATUS_DESCRIPTION_EN,
@@ -98,7 +98,8 @@ export default function OrderTrackingForm() {
   }
 
   const displayOrder = selectedOrder || order;
-  const displayStatus = displayOrder?.productionStatus
+  // A cancelled order shows a plain "Cancelled" row instead of the timeline.
+  const displayStatus = displayOrder?.productionStatus && displayOrder.orderStatus !== OS_CANCELLED
     ? normalizedStatus(displayOrder.productionStatus)
     : "";
   const currentStatusIndex = STATUS_STEPS.findIndex(
@@ -151,7 +152,7 @@ export default function OrderTrackingForm() {
                             ${Number(item.amount || 0).toFixed(2)} USD
                           </p>
                           <p className="mt-1 inline-block rounded bg-[#D6E4EE] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#35506B]">
-                            {customerStatusLabel(item.productionStatus, item.paymentStatus)}
+                            {customerStatusLabel(item.productionStatus, item.paymentStatus, item.orderStatus)}
                           </p>
                         </div>
                       </div>
@@ -297,9 +298,9 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
           </ol>
         </div>
       ) : (
-        <StatusRow label="Production">
+        <StatusRow label="Status">
           {order.productionStatus
-            ? customerStatusLabel(order.productionStatus, order.paymentStatus)
+            ? customerStatusLabel(order.productionStatus, order.paymentStatus, order.orderStatus)
             : "N/A"}
         </StatusRow>
       )}

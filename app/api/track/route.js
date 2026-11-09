@@ -59,6 +59,7 @@ export async function GET(request) {
       amount: order.amount,
       paymentStatus: order.paymentStatus,
       productionStatus: order.productionStatus,
+      orderStatus: order.orderStatus,
       trackingNumber: order.trackingNumber,
       shippingDate: order.shippingDate,
     },
