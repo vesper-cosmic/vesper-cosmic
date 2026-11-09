@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { safeSendEmail } from "@/lib/orderServer";
 
 const ownerEmail = "vesper.cosmic.blueprint@gmail.com";
 const storeName = "Vesper Cosmos";
@@ -120,6 +121,10 @@ export async function POST(request) {
 }
 
 async function sendWithResend({ from, to, replyTo, subject, text }) {
+  // Gmail sending (if configured) is handled by the shared helper.
+  if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    return safeSendEmail({ to, replyTo, subject, text });
+  }
   try {
     if (!process.env.RESEND_API_KEY) {
       console.log("Email placeholder:", { to, subject, text });

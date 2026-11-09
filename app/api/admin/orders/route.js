@@ -3,10 +3,23 @@ import { NextResponse } from "next/server";
 import { authOptions, isAdminEmail } from "@/lib/auth";
 import {
   findAllNotionOrders,
+  findNotionOrder,
   setOrderPaymentStatus,
   updateNotionOrderStatus,
 } from "@/lib/orderServer";
-import { PAYMENT_STATUSES } from "@/lib/orderStatus";
+import { PAYMENT_PAID, PAYMENT_STATUSES, normalizedStatus } from "@/lib/orderStatus";
+import { sendPaymentConfirmedEmail, sendShippedEmail } from "@/lib/customerEmails";
+
+const SHIPPED = "🚚 貨品已寄出";
+
+async function loadOrder(orderId) {
+  try {
+    const found = await findNotionOrder(orderId);
+    return found?.found ? found.order : null;
+  } catch {
+    return null;
+  }
+}
 import { syncOrderReferrer } from "@/lib/referral";
 
 export async function GET() {
@@ -49,6 +62,7 @@ export async function PATCH(request) {
         { status: 422 }
       );
     }
+    const before = await loadOrder(orderId);
     try {
       const result = await setOrderPaymentStatus(orderId, paymentStatus);
       if (result?.skipped) {
@@ -60,7 +74,13 @@ export async function PATCH(request) {
     }
 
     await syncOrderReferrer(orderId);
-    return NextResponse.json({ ok: true, orderId, paymentStatus });
+
+    // Tell the customer once, when the order first becomes paid.
+    let email = null;
+    if (paymentStatus === PAYMENT_PAID && before && before.paymentStatus !== PAYMENT_PAID) {
+      email = await sendPaymentConfirmedEmail(before);
+    }
+    return NextResponse.json({ ok: true, orderId, paymentStatus, email });
   }
 
   const status = String(payload.status || "").trim();
@@ -78,6 +98,7 @@ export async function PATCH(request) {
     );
   }
 
+  const before = await loadOrder(orderId);
   const result = await updateNotionOrderStatus({
     orderId,
     status,
@@ -93,10 +114,21 @@ export async function PATCH(request) {
 
   await syncOrderReferrer(orderId);
 
+  // Shipping email: when the order first ships, or a new tracking number is added.
+  let email = null;
+  if (status === SHIPPED && before) {
+    const firstShipment = normalizedStatus(before.productionStatus) !== SHIPPED;
+    const newTracking = trackingNumber && trackingNumber !== before.trackingNumber;
+    if (firstShipment || newTracking) {
+      email = await sendShippedEmail(before, trackingNumber);
+    }
+  }
+
   return NextResponse.json({
     ok: true,
     orderId,
     status,
+    email,
     trackingNumber: trackingNumber || null,
     message: "Order status updated.",
   });

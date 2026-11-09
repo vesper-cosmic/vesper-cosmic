@@ -75,7 +75,7 @@ export default function AdminPage() {
       );
       setSaveMessage((prev) => ({
         ...prev,
-        [orderId]: { type: "success", text: "已更新 / Updated" },
+        [orderId]: { type: "success", text: data?.email?.success ? "已更新，已寄出貨通知給顧客" : "已更新 / Updated" },
       }));
     } catch {
       setSaveMessage((prev) => ({
@@ -114,7 +114,7 @@ export default function AdminPage() {
       );
       setSaveMessage((prev) => ({
         ...prev,
-        [orderId]: { type: "success", text: "已標記為已付款" },
+        [orderId]: { type: "success", text: data?.email?.success ? "已標記為已付款，已寄確認信給顧客" : "已標記為已付款" },
       }));
     } catch {
       setSaveMessage((prev) => ({
