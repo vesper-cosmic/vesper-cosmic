@@ -265,7 +265,7 @@ export default function AccountPage() {
             Share & Earn Rewards
           </h2>
           <p className="mt-2 text-sm leading-6 text-[#5B7893]">
-            Share your referral link with friends. When they sign up and make their first purchase, you'll earn cash rewards.
+            Share your referral link with friends. Every time a friend who signed up through your link makes a purchase, you earn a reward once their payment is confirmed. To redeem your rewards, email us.
           </p>
           {referralError ? (
             <p className="mt-4 text-sm text-red-500">{referralError}</p>
@@ -322,7 +322,7 @@ export default function AccountPage() {
                 </div>
               </div>
 
-              {referral.totalReferralReward > 0 && (
+              <div className="grid grid-cols-2 gap-3">
                 <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
                   <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
                     Total Earned
@@ -331,7 +331,64 @@ export default function AccountPage() {
                     ${Number(referral.totalReferralReward || 0).toFixed(2)}
                   </p>
                 </div>
-              )}
+                <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
+                    Pending
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold text-[#5B7893]">
+                    ${Number(referral.pendingReferralReward || 0).toFixed(2)}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
+                  Reward History
+                </p>
+                {referral.history?.length ? (
+                  <ul className="divide-y divide-[#8EB1D1]/20 rounded border border-[#8EB1D1]/20 bg-white/60">
+                    {referral.history.map((entry, index) => (
+                      <li
+                        key={`${entry.date}-${index}`}
+                        className="flex items-center justify-between gap-3 px-3 py-2 text-sm"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-[#1C2B48]">Order from {entry.friend}</p>
+                          <p className="text-xs text-[#5B7893]">
+                            {entry.date
+                              ? new Date(entry.date).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                })
+                              : "—"}
+                          </p>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <p className="font-semibold text-[#1C2B48]">
+                            +${Number(entry.amount || 0).toFixed(2)}
+                          </p>
+                          <p
+                            className={`text-[10px] font-medium uppercase tracking-wide ${
+                              entry.status === "credited" ? "text-[#2E8B57]" : "text-[#8B99A8]"
+                            }`}
+                          >
+                            {entry.status === "credited"
+                              ? "Credited"
+                              : entry.status === "processing"
+                              ? "Processing"
+                              : "Awaiting payment"}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-[#5B7893]">
+                    No rewards yet. Share your link to start earning.
+                  </p>
+                )}
+              </div>
             </div>
           ) : (
             <p className="mt-4 text-sm text-[#5B7893]">Loading referral info...</p>

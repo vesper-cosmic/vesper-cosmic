@@ -6,7 +6,8 @@ import {
   setOrderPaymentStatus,
   updateNotionOrderStatus,
 } from "@/lib/orderServer";
-import { PAYMENT_STATUSES } from "@/lib/orderStatus";
+import { PAYMENT_PAID, PAYMENT_STATUSES } from "@/lib/orderStatus";
+import { creditOrderReferral } from "@/lib/referral";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -57,7 +58,19 @@ export async function PATCH(request) {
       console.error("Admin payment status update failed:", error);
       return NextResponse.json({ error: "Payment status update failed.", ok: false }, { status: 500 });
     }
-    return NextResponse.json({ ok: true, orderId, paymentStatus });
+
+    // Payment confirmed → credit the referrer's commission (once per order).
+    let referral = null;
+    if (paymentStatus === PAYMENT_PAID) {
+      try {
+        referral = await creditOrderReferral(orderId);
+      } catch (error) {
+        console.error("Referral credit failed:", error);
+        referral = { credited: false, reason: "Referral credit failed." };
+      }
+    }
+
+    return NextResponse.json({ ok: true, orderId, paymentStatus, referral });
   }
 
   const status = String(payload.status || "").trim();

@@ -107,12 +107,23 @@ export default function AdminPage() {
       }
       setOrders((prev) =>
         prev.map((order) =>
-          order.orderId === orderId ? { ...order, paymentStatus: PAYMENT_PAID } : order
+          order.orderId === orderId
+            ? {
+                ...order,
+                paymentStatus: PAYMENT_PAID,
+                referralStatus: data?.referral?.credited ? "✅ 已入帳" : order.referralStatus,
+              }
+            : order
         )
       );
       setSaveMessage((prev) => ({
         ...prev,
-        [orderId]: { type: "success", text: "已標記為已付款" },
+        [orderId]: {
+          type: "success",
+          text: data?.referral?.credited
+            ? `已標記為已付款，並入帳推薦回饋 ${Number(data.referral.amount).toFixed(2)} 給 ${data.referral.referrerEmail}`
+            : "已標記為已付款",
+        },
       }));
     } catch {
       setSaveMessage((prev) => ({
@@ -299,6 +310,12 @@ function OrderCard({ order, draft, onChange, onSave, onMarkPaid, saving, message
             {Number(order.amount || 0).toFixed(2)} USD
           </p>
           <p className="mt-1 text-xs text-[#5B7893]">付款: {order.paymentStatus || "—"}</p>
+          {order.referrerEmail && order.referralReward > 0 ? (
+            <p className="mt-1 text-xs text-[#5B7893]">
+              推薦回饋 ${Number(order.referralReward).toFixed(2)} → {order.referrerEmail}
+              （{order.referralStatus || "⏳ 未入帳"}）
+            </p>
+          ) : null}
           {order.paymentStatus && order.paymentStatus !== PAYMENT_PAID ? (
             <button
               type="button"

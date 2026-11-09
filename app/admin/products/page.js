@@ -987,6 +987,11 @@ function ProductRow({
                 內建
               </span>
             ) : null}
+            {product.referralCommission > 0 ? (
+              <span className="rounded-full border border-[#2E8B57]/50 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#2E8B57]">
+                分潤 ${Number(product.referralCommission).toFixed(2)}
+              </span>
+            ) : null}
             {product.isNew ? (
               <span className="rounded-full bg-[#8EB1D1] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#1C2B48]">
                 New

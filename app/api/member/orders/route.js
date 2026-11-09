@@ -13,11 +13,16 @@ export async function GET() {
   const result = await findNotionOrdersByEmail(session.user.email);
 
   if (result?.skipped) {
+    console.error("/api/member/orders failed:", result.reason);
     return NextResponse.json(
-      { error: result.reason, orders: [] },
+      { error: "Could not load your orders right now.", orders: [] },
       { status: 200 }
     );
   }
 
-  return NextResponse.json({ orders: result.orders || [] });
+  // Hide internal bookkeeping (referrer, commission, Notion ids).
+  const orders = (result.orders || []).map(
+    ({ referrerEmail, referralReward, referralStatus, pageId, ...order }) => order
+  );
+  return NextResponse.json({ orders });
 }

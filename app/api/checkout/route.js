@@ -1,4 +1,7 @@
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { authOptions } from "@/lib/auth";
+import { getOrderReferral } from "@/lib/referral";
 import { rateLimitResponse } from "@/lib/rateLimit";
 import {
   createMultiNotionOrder,
@@ -28,9 +31,20 @@ export async function POST(request) {
     return NextResponse.json({ errors }, { status: 422 });
   }
 
+  // The member link comes from the session, never from the request body.
+  const session = await getServerSession(authOptions);
+  order.memberEmail = session?.user?.email?.toLowerCase() || null;
+
+  let referral = null;
+  try {
+    referral = await getOrderReferral(order.memberEmail, order.items);
+  } catch (error) {
+    console.error("Referral lookup failed:", error);
+  }
+
   let notionResult = null;
   try {
-    notionResult = await createMultiNotionOrder(order);
+    notionResult = await createMultiNotionOrder(order, referral);
   } catch (error) {
     notionResult = { error: error.message };
     console.error("Notion multi order creation failed:", error);

@@ -8,7 +8,10 @@ export async function GET() {
 
   return NextResponse.json(
     {
-      products: result.skipped ? [] : result.products,
+      // Commission amounts are internal; don't send them to shoppers.
+      products: result.skipped
+        ? []
+        : result.products.map(({ referralCommission, ...product }) => product),
       source: result.skipped ? "static" : "notion",
     },
     {
