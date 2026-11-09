@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { getOrderReferral, syncReferrerBalances } from "@/lib/referral";
+import { saveMemberNailSizing } from "@/lib/memberServer";
 import { rateLimitResponse } from "@/lib/rateLimit";
 import {
   createMultiNotionOrder,
@@ -53,6 +54,14 @@ export async function POST(request) {
   } catch (error) {
     notionResult = { error: error.message };
     console.error("Notion multi order creation failed:", error);
+  }
+
+  // Remember the member's nail sizing for their next custom nail order.
+  const sizedItem = order.items.find((item) => item.nails?.sizeMode);
+  if (order.memberEmail && sizedItem && !notionResult?.error) {
+    await saveMemberNailSizing(order.memberEmail, sizedItem.nails).catch((error) =>
+      console.error("Saving nail sizing failed:", error)
+    );
   }
 
   if (referral && !notionResult?.error) {

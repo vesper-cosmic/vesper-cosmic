@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getReferralCode } from "@/lib/referralClient";
+import { useCart } from "@/lib/cartContext";
+import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import NailSizePicker from "@/components/NailSizePicker";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -52,7 +54,26 @@ const baseForm = {
 export default function OrderIntakeForm({ product }) {
   const router = useRouter();
   const { data: session } = useSession();
+  const { member } = useCart();
   const [form, setForm] = useState(baseForm);
+
+  // Pre-fill nail size from the customer's last order (if not chosen yet).
+  useEffect(() => {
+    if (!product.requiresNailDetails) return;
+    const saved = getSavedNailSizing(member);
+    if (!saved?.sizeMode) return;
+    setForm((current) =>
+      current.sizeMode
+        ? current
+        : {
+            ...current,
+            sizeMode: saved.sizeMode,
+            standardSize: saved.standardSize || "",
+            nailMeasurements: { ...current.nailMeasurements, ...(saved.measurements || {}) },
+            sizePrefilled: true,
+          }
+    );
+  }, [member, product.requiresNailDetails]);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -210,6 +231,13 @@ export default function OrderIntakeForm({ product }) {
     }
 
     const payload = await response.json();
+    if (product.requiresNailDetails && form.sizeMode) {
+      rememberNailSizing({
+        sizeMode: form.sizeMode,
+        standardSize: form.standardSize,
+        measurements: form.nailMeasurements,
+      });
+    }
     const checkoutOrder = {
       ...orderDraft,
       orderId: payload.orderId,
@@ -436,9 +464,11 @@ function NailDetailsFields({
         standardSize={form.standardSize}
         measurements={form.nailMeasurements}
         errors={errors}
+        prefilled={Boolean(form.sizePrefilled)}
         onChange={(patch) =>
           setForm((current) => ({
             ...current,
+            sizePrefilled: false,
             ...(patch.measurements ? { nailMeasurements: patch.measurements } : {}),
             ...(patch.sizeMode ? { sizeMode: patch.sizeMode } : {}),
             ...(patch.standardSize ? { standardSize: patch.standardSize } : {}),

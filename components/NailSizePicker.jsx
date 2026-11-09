@@ -12,10 +12,22 @@ import {
  * nail widths. Controlled: onChange(patch) with sizeMode / standardSize /
  * measurements.
  */
-export default function NailSizePicker({ sizeMode, standardSize, measurements = {}, errors = {}, onChange }) {
+export default function NailSizePicker({
+  sizeMode,
+  standardSize,
+  measurements = {},
+  errors = {},
+  onChange,
+  prefilled = false,
+}) {
   return (
     <div className="space-y-3">
       <p className="text-sm font-semibold text-[#1C2B48]">Nail Size</p>
+      {prefilled ? (
+        <p className="rounded border border-[#1E8A5A]/30 bg-[#E6F6EE] px-3 py-2 text-xs text-[#1E8A5A]">
+          ✓ Pre-filled with the size from your last order — change it below if needed.
+        </p>
+      ) : null}
       <div className="grid gap-2 sm:grid-cols-2">
         <ModeOption
           active={sizeMode === "standard"}

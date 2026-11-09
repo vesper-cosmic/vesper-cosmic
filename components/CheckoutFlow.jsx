@@ -6,6 +6,7 @@ import { useProducts } from "@/components/ProductProvider";
 import { useCart } from "@/lib/cartContext";
 import { getReferralCode } from "@/lib/referralClient";
 import NailSizePicker from "@/components/NailSizePicker";
+import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import {
   countries,
   nailShapes,
@@ -50,6 +51,12 @@ export default function CheckoutFlow() {
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
   const [referralCode, setReferralCode] = useState("");
+  const [savedSizing, setSavedSizing] = useState(null);
+
+  // Nail sizing from the customer's last order (member record or this browser).
+  useEffect(() => {
+    setSavedSizing(getSavedNailSizing(member));
+  }, [member]);
 
   // Prefill the referral code remembered from a friend's ?ref= link.
   useEffect(() => {
@@ -173,6 +180,8 @@ export default function CheckoutFlow() {
       }
 
       sessionStorage.removeItem("vesperCheckoutDraft");
+      const sized = Object.values(itemDetails).find((detail) => detail?.nails?.sizeMode);
+      if (sized) rememberNailSizing(sized.nails);
       // Use the server-computed order (includes shippingFee, subtotal and
       // total) so the review page shows the correct shipping charge and the
       // confirmation request matches the stored order exactly.
@@ -235,6 +244,7 @@ export default function CheckoutFlow() {
           details={itemDetails[item.id] || {}}
           errors={errors[`item_${index}`] || {}}
           onChange={updateItemDetails}
+          savedSizing={savedSizing}
         />
       ))}
 
@@ -335,7 +345,7 @@ export default function CheckoutFlow() {
   );
 }
 
-function ItemFormSection({ item, index, details, errors, onChange }) {
+function ItemFormSection({ item, index, details, errors, onChange, savedSizing }) {
   const product = item.product;
   if (!product) return null;
 
@@ -395,6 +405,7 @@ function ItemFormSection({ item, index, details, errors, onChange }) {
             details={details}
             errors={errors}
             onChange={onChange}
+            savedSizing={savedSizing}
           />
         ) : null}
       </div>
@@ -492,8 +503,22 @@ function BirthFields({ itemId, product, details, errors, onChange }) {
   );
 }
 
-function NailFields({ itemId, details, errors, onChange }) {
+function NailFields({ itemId, details, errors, onChange, savedSizing }) {
   const nails = details.nails || {};
+
+  // Pre-fill the size from the customer's last order (only if not chosen yet).
+  useEffect(() => {
+    if (!nails.sizeMode && savedSizing?.sizeMode) {
+      onChange(itemId, "nails", {
+        ...nails,
+        sizeMode: savedSizing.sizeMode,
+        standardSize: savedSizing.standardSize || "",
+        measurements: savedSizing.measurements || {},
+        sizePrefilled: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedSizing]);
   function update(key, value) {
     onChange(itemId, "nails", { ...nails, [key]: value });
   }
@@ -508,7 +533,10 @@ function NailFields({ itemId, details, errors, onChange }) {
         standardSize={nails.standardSize}
         measurements={nails.measurements || {}}
         errors={errors}
-        onChange={(patch) => onChange(itemId, "nails", { ...nails, mixedSet: false, ...patch })}
+        prefilled={Boolean(nails.sizePrefilled)}
+        onChange={(patch) =>
+          onChange(itemId, "nails", { ...nails, mixedSet: false, sizePrefilled: false, ...patch })
+        }
       />
       <div className="grid gap-4 sm:grid-cols-3">
         <Field label="Nail Shape" error={errors.nailShape}>
