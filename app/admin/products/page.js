@@ -48,6 +48,7 @@ function emptyForm() {
     badge: "",
     images: [],
     inventory: "",
+    referralCommission: "",
     published: true,
     isNew: false,
   };
@@ -198,6 +199,7 @@ export default function AdminProductsPage() {
       badge: product.badge || "",
       images: Array.isArray(product.images) ? product.images.map(String) : [],
       inventory: product.inventory ?? "",
+      referralCommission: product.referralCommission ? String(product.referralCommission) : "",
       published: product.published !== false,
       isNew: Boolean(product.isNew),
     });
@@ -244,6 +246,7 @@ export default function AdminProductsPage() {
       price: Number(form.price),
       originalPrice: form.originalPrice ? Number(form.originalPrice) : null,
       inventory: form.inventory === "" ? null : Number(form.inventory),
+      referralCommission: form.referralCommission === "" ? 0 : Number(form.referralCommission),
       availableIntentions: form.availableIntentions
         .split(",")
         .map((item) => item.trim())
@@ -721,6 +724,21 @@ export default function AdminProductsPage() {
               />
             </Field>
 
+            <Field label="分潤金額 USD（每件，可選，留空表示沒有分潤）">
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.referralCommission}
+                onChange={(e) => updateField("referralCommission", e.target.value)}
+                placeholder="e.g. 5"
+                className={inputClass()}
+              />
+              <p className="mt-1 text-[11px] leading-4 text-[#8B99A8]">
+                顧客 A 透過顧客 B 的推薦連結（或推薦碼）購買這個商品時，B 每件可以拿到的分潤。
+              </p>
+            </Field>
+
             <button
               type="submit"
               disabled={submitting || !configured}
@@ -1091,6 +1109,10 @@ function ProductRow({
             <MiniInfo
               label="庫存"
               value={product.inventory == null ? "不限" : product.inventory}
+            />
+            <MiniInfo
+              label="分潤（每件）"
+              value={product.referralCommission > 0 ? `$${Number(product.referralCommission).toFixed(2)}` : "—"}
             />
             <MiniInfo label="原始價格" value={product.originalPrice ? `$${product.originalPrice}` : "—"} />
           </dl>
