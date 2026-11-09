@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { getReferralCode } from "@/lib/referralClient";
+import NailSizePicker from "@/components/NailSizePicker";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
@@ -17,6 +18,7 @@ import {
   nailLengths,
   nailShapes,
   nailSizeKeys,
+  validateNailSizing,
   singleIntentionOptions,
   stylePreferences,
 } from "@/lib/formOptions";
@@ -37,6 +39,8 @@ const baseForm = {
   address: emptyAddress(),
   nailMeasurements: emptyNailMeasurements(),
   mixedSet: false,
+  sizeMode: "",
+  standardSize: "",
   nailShape: "",
   nailLength: "",
   stylePreference: "",
@@ -149,13 +153,14 @@ export default function OrderIntakeForm({ product }) {
     }
 
     if (product.requiresNailDetails) {
-      if (!form.mixedSet) {
-        nailSizeKeys.forEach(([key, label]) => {
-          if (!form.nailMeasurements[key]) {
-            nextErrors[key] = `${label} width is required, or choose Mixed Set.`;
-          }
-        });
-      }
+      Object.assign(
+        nextErrors,
+        validateNailSizing({
+          sizeMode: form.sizeMode,
+          standardSize: form.standardSize,
+          measurements: form.nailMeasurements,
+        })
+      );
       if (!form.nailShape) nextErrors.nailShape = "Select a nail shape.";
       if (!form.nailLength) nextErrors.nailLength = "Select a nail length.";
       if (!form.stylePreference) nextErrors.stylePreference = "Select a style preference.";
@@ -426,56 +431,20 @@ function NailDetailsFields({
       <p className="rounded border border-[#8EB1D1]/35 bg-[#1C2B48] p-4 text-sm leading-6 text-[#E8ECEF]">
         {intro}
       </p>
-      <div className="rounded-lg border border-[#8EB1D1]/25 bg-[#C4D8E5] p-4">
-        <div className="grid gap-4 md:grid-cols-[1fr_180px] md:items-center">
-          <p className="text-sm leading-6 text-[#35506B]">
-            Measure the widest part of each nail in millimeters using a ruler.
-            If you're between sizes, size up. Tip: A credit card is 85mm wide —
-            use it as a reference.
-          </p>
-          <div className="rounded border border-[#8EB1D1]/35 p-3 text-center">
-            <div className="mx-auto h-20 w-32 rounded-md border border-[#8EB1D1] bg-[#E8ECEF]" />
-            <p className="mt-2 text-xs text-[#5B7893]">85mm reference card</p>
-          </div>
-        </div>
-      </div>
-
-      <NailMeasurementRow
-        title="Left Hand"
-        keys={nailSizeKeys.slice(0, 5)}
-        values={form.nailMeasurements}
+      <NailSizePicker
+        sizeMode={form.sizeMode}
+        standardSize={form.standardSize}
+        measurements={form.nailMeasurements}
         errors={errors}
-        disabled={form.mixedSet}
-        onChange={updateNailMeasurement}
+        onChange={(patch) =>
+          setForm((current) => ({
+            ...current,
+            ...(patch.measurements ? { nailMeasurements: patch.measurements } : {}),
+            ...(patch.sizeMode ? { sizeMode: patch.sizeMode } : {}),
+            ...(patch.standardSize ? { standardSize: patch.standardSize } : {}),
+          }))
+        }
       />
-      <NailMeasurementRow
-        title="Right Hand"
-        keys={nailSizeKeys.slice(5)}
-        values={form.nailMeasurements}
-        errors={errors}
-        disabled={form.mixedSet}
-        onChange={updateNailMeasurement}
-      />
-      <p className="text-xs leading-5 text-[#5B7893]">
-        Not sure? Select 'Mixed Set' below and I'll include the most common
-        sizes so you can find your best fit.
-      </p>
-      <label className="flex items-start gap-3 rounded border border-[#8EB1D1]/25 p-3 text-sm text-[#35506B]">
-        <input
-          type="checkbox"
-          checked={form.mixedSet}
-          onChange={(event) =>
-            setForm((current) => ({ ...current, mixedSet: event.target.checked }))
-          }
-          className="mt-1"
-        />
-        <span>
-          Send me a Mixed Set instead
-          <span className="block text-xs text-[#5B7893]">
-            includes sizes 10–18mm, one of each
-          </span>
-        </span>
-      </label>
 
       <RadioGroup
         label="Nail Shape"

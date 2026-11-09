@@ -39,6 +39,11 @@ export default function ShopProductCard({ product, onClick }) {
         <h3 className="text-lg font-semibold leading-tight text-[#1C2B48] sm:text-2xl">
           {product.name}
         </h3>
+        {product.nailSize ? (
+          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
+            Ready-made · Size {product.nailSize}
+          </p>
+        ) : null}
 
         {/* 主要功效 — 卡片上只顯示一句主要功效，其餘詳細資訊在點擊後顯示 */}
         <p className="mt-2 text-sm leading-6 text-[#35506B] line-clamp-2">

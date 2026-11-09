@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cartContext";
 import { isProductSoldOut } from "@/lib/productData";
+import { NailSizeChart } from "@/components/NailSizePicker";
 
 export default function ProductDetailModal({ product, onClose }) {
   const { addItem } = useCart();
@@ -115,6 +116,17 @@ export default function ProductDetailModal({ product, onClose }) {
             <p className="text-sm leading-6 text-[#35506B]">
               {product.description}
             </p>
+
+            {product.nailSize ? (
+              <div className="space-y-2 rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-3">
+                <p className="text-sm text-[#1C2B48]">
+                  <span className="font-semibold">Size {product.nailSize}</span> — this set is
+                  ready-made in one fixed size, so no measurements are needed. Check the chart
+                  below to make sure it fits.
+                </p>
+                <NailSizeChart highlight={product.nailSize} />
+              </div>
+            ) : null}
 
             {product.includes ? (
               <div className="rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-3">

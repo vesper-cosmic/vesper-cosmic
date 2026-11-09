@@ -246,6 +246,7 @@ export const products = [
 // items with `children` are parent categories with sub-categories.
 export const productCategories = [
   { id: "nails", title: "Nails", categoryId: "nails" },
+  { id: "ready-made-nails", title: "Ready-Made Nails", categoryId: "ready-made-nails" },
   { id: "energy-bottles", title: "Energy Bottles", categoryId: "energy-bottles" },
   {
     id: "sachets",

@@ -5,12 +5,12 @@ import Link from "next/link";
 import { useProducts } from "@/components/ProductProvider";
 import { useCart } from "@/lib/cartContext";
 import { getReferralCode } from "@/lib/referralClient";
+import NailSizePicker from "@/components/NailSizePicker";
 import {
   countries,
   nailShapes,
   nailLengths,
   stylePreferences,
-  nailSizeKeys,
   emptyAddress,
   baziIntentions,
   digitalCuriosityAreas,
@@ -357,6 +357,11 @@ function ItemFormSection({ item, index, details, errors, onChange }) {
           <p className="text-sm text-[#5B7893]">
             ${item.price} {item.currency} each
           </p>
+          {product.nailSize ? (
+            <p className="mt-0.5 text-sm font-semibold text-[#1C2B48]">
+              Ready-made · Size {product.nailSize}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -498,37 +503,13 @@ function NailFields({ itemId, details, errors, onChange }) {
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
         Nail Details
       </p>
-      <label className="flex items-start gap-2 text-sm text-[#35506B]">
-        <input
-          type="checkbox"
-          checked={Boolean(nails.mixedSet)}
-          onChange={(event) => update("mixedSet", event.target.checked)}
-          className="mt-1"
-        />
-        <span>I prefer a mixed set (sizes 10–18mm) — skip nail measurements</span>
-      </label>
-      {!nails.mixedSet ? (
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
-          {nailSizeKeys.map(([key, label]) => (
-            <Field key={key} label={label} error={errors[key]}>
-              <input
-                type="number"
-                min="10"
-                max="18"
-                value={nails.measurements?.[key] || ""}
-                onChange={(event) =>
-                  update("measurements", {
-                    ...(nails.measurements || {}),
-                    [key]: event.target.value,
-                  })
-                }
-                placeholder="mm"
-                className="w-full rounded border border-[#8EB1D1]/40 bg-white px-2 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
-              />
-            </Field>
-          ))}
-        </div>
-      ) : null}
+      <NailSizePicker
+        sizeMode={nails.sizeMode}
+        standardSize={nails.standardSize}
+        measurements={nails.measurements || {}}
+        errors={errors}
+        onChange={(patch) => onChange(itemId, "nails", { ...nails, mixedSet: false, ...patch })}
+      />
       <div className="grid gap-4 sm:grid-cols-3">
         <Field label="Nail Shape" error={errors.nailShape}>
           <select

@@ -14,6 +14,7 @@ const FORM_TYPE_OPTIONS = [
 
 const commonCategories = [
   { id: "nails", label: "Nails" },
+  { id: "ready-made-nails", label: "Ready-Made Nails（現成尺寸）" },
   { id: "custom-nails", label: "Nails — Custom" },
   { id: "energy-bottles", label: "Energy Bottles" },
   { id: "custom-energy-bottles", label: "Energy Bottles — Custom" },
@@ -44,6 +45,7 @@ function emptyForm() {
     shippingTier: "LIGHT",
     requiresNailDetails: false,
     nailIntro: "",
+    nailSize: "",
     includes: "",
     badge: "",
     images: [],
@@ -195,6 +197,7 @@ export default function AdminProductsPage() {
       shippingTier: product.shippingTier || "LIGHT",
       requiresNailDetails: Boolean(product.requiresNailDetails),
       nailIntro: product.nailIntro || "",
+      nailSize: product.nailSize || "",
       includes: product.includes || "",
       badge: product.badge || "",
       images: Array.isArray(product.images) ? product.images.map(String) : [],
@@ -452,7 +455,14 @@ export default function AdminProductsPage() {
                   onChange={(e) => {
                     const selected = commonCategories.find((c) => c.id === e.target.value);
                     updateField("category", e.target.value);
-                    if (selected) updateField("categoryLabel", selected.label);
+                    if (selected) {
+                      updateField("categoryLabel", selected.label.replace(/（.*）$/, ""));
+                    }
+                    // Ready-made nails have a fixed size: no measurements at checkout.
+                    if (e.target.value === "ready-made-nails") {
+                      updateField("requiresNailDetails", false);
+                      updateField("requiresShipping", true);
+                    }
                   }}
                   className={inputClass(!!formErrors.category)}
                 >
@@ -616,17 +626,40 @@ export default function AdminProductsPage() {
                 onChange={() => toggleCheckbox("requiresShipping")}
                 label="需要寄送（實體商品）"
               />
-              <CheckboxPill
-                checked={form.requiresNailDetails}
-                onChange={() => toggleCheckbox("requiresNailDetails")}
-                label="需要指甲尺寸"
-              />
+              {form.category !== "ready-made-nails" ? (
+                <CheckboxPill
+                  checked={form.requiresNailDetails}
+                  onChange={() => toggleCheckbox("requiresNailDetails")}
+                  label="需要指甲尺寸（顧客可選 XS–L 或自填甲寬）"
+                />
+              ) : null}
               <CheckboxPill
                 checked={form.isNew}
                 onChange={() => toggleCheckbox("isNew")}
                 label="標示為新品"
               />
             </CheckboxGrid>
+
+            {form.category === "ready-made-nails" ? (
+              <Field label="尺寸 * Size（現成穿戴甲，顧客下單不需填指甲尺寸）" error={formErrors.nailSize}>
+                <div className="flex flex-wrap gap-2">
+                  {["XS", "S", "M", "L"].map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => updateField("nailSize", size)}
+                      className={`min-w-[3.5rem] rounded border px-4 py-2 text-sm font-bold transition ${
+                        form.nailSize === size
+                          ? "border-[#1C2B48] bg-[#1C2B48] text-white"
+                          : "border-[#8EB1D1]/50 bg-white text-[#1C2B48] hover:bg-[#C4D8E5]"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+            ) : null}
 
             {form.requiresShipping ? (
               <Field label="運送等級 Shipping Tier">
@@ -1102,6 +1135,7 @@ function ProductRow({
               label="需要指甲尺寸"
               value={product.requiresNailDetails ? "✅ 是" : "❌ 否"}
             />
+            {product.nailSize ? <MiniInfo label="現成尺寸" value={product.nailSize} /> : null}
             <MiniInfo
               label="意圖類型"
               value={product.intentionType === "bazi" ? "BaZi" : "Single"}
