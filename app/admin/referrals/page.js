@@ -168,21 +168,9 @@ export default function AdminReferralsPage() {
                   </div>
 
                   <div className="mt-3 rounded bg-[#F3F6F8] p-3 text-sm text-[#35506B]">
-                    {payout.method === "paypal" ? (
-                      <p>
-                        PayPal：<span className="font-mono">{payout.paypalEmail}</span>
-                      </p>
-                    ) : (
-                      <div className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
-                        <p>戶名：{payout.accountName || "—"}</p>
-                        <p>銀行：{payout.bankName || "—"}</p>
-                        <p>
-                          帳號：<span className="font-mono">{payout.accountNumber || "—"}</span>
-                        </p>
-                        <p>SWIFT：{payout.swiftCode || "—"}</p>
-                        <p>國家：{payout.country || "—"}</p>
-                      </div>
-                    )}
+                    <p>
+                      PayPal：<span className="font-mono">{payout.paypalEmail || "—"}</span>
+                    </p>
                   </div>
 
                   {entry.status === "processing" ? (

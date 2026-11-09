@@ -13,15 +13,7 @@ const formatDate = (value) =>
       })
     : "—";
 
-const EMPTY_PAYOUT = {
-  method: "paypal",
-  paypalEmail: "",
-  accountName: "",
-  bankName: "",
-  accountNumber: "",
-  swiftCode: "",
-  country: "",
-};
+const EMPTY_PAYOUT = { paypalEmail: "" };
 
 /**
  * Account page: referral link, commission balances, history and withdrawals.
@@ -178,7 +170,10 @@ function Tile({ label, value, tone }) {
 function WithdrawPanel({ data, onDone }) {
   const canWithdraw = data.balances.available >= data.minimumWithdrawal;
   const [open, setOpen] = useState(false);
-  const [payout, setPayout] = useState(() => ({ ...EMPTY_PAYOUT, ...(data.payoutInfo || {}) }));
+  const [payout, setPayout] = useState(() => ({
+    ...EMPTY_PAYOUT,
+    paypalEmail: data.payoutInfo?.paypalEmail || "",
+  }));
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -244,47 +239,18 @@ function WithdrawPanel({ data, onDone }) {
             Withdraw {money(data.balances.available)} USD
           </p>
 
-          <div className="flex gap-4 text-sm text-[#35506B]">
-            {[
-              ["paypal", "PayPal"],
-              ["bank", "Bank transfer"],
-            ].map(([value, label]) => (
-              <label key={value} className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="payout-method"
-                  value={value}
-                  checked={payout.method === value}
-                  onChange={update("method")}
-                />
-                {label}
-              </label>
-            ))}
-          </div>
-
-          {payout.method === "paypal" ? (
-            <PayoutField label="PayPal Email" error={errors.paypalEmail}>
-              <input type="email" value={payout.paypalEmail} onChange={update("paypalEmail")} className={INPUT} />
-            </PayoutField>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
-              <PayoutField label="Account Holder Name" error={errors.accountName}>
-                <input value={payout.accountName} onChange={update("accountName")} className={INPUT} />
-              </PayoutField>
-              <PayoutField label="Bank Name" error={errors.bankName}>
-                <input value={payout.bankName} onChange={update("bankName")} className={INPUT} />
-              </PayoutField>
-              <PayoutField label="Account Number / IBAN" error={errors.accountNumber}>
-                <input value={payout.accountNumber} onChange={update("accountNumber")} className={INPUT} />
-              </PayoutField>
-              <PayoutField label="SWIFT / BIC (international)" error={errors.swiftCode}>
-                <input value={payout.swiftCode} onChange={update("swiftCode")} className={INPUT} />
-              </PayoutField>
-              <PayoutField label="Country" error={errors.country}>
-                <input value={payout.country} onChange={update("country")} className={INPUT} />
-              </PayoutField>
-            </div>
-          )}
+          <PayoutField label="PayPal Email" error={errors.paypalEmail}>
+            <input
+              type="email"
+              value={payout.paypalEmail}
+              onChange={update("paypalEmail")}
+              placeholder="you@example.com"
+              className={INPUT}
+            />
+          </PayoutField>
+          <p className="text-xs text-[#5B7893]">
+            Payouts are sent via PayPal only. Make sure this email matches your PayPal account.
+          </p>
 
           <div className="flex gap-2">
             <button
@@ -376,9 +342,7 @@ function Withdrawals({ withdrawals = [] }) {
           return (
             <li key={entry.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
               <div className="min-w-0">
-                <p className="text-[#1C2B48]">
-                  {entry.method === "bank" ? "Bank transfer" : "PayPal"}
-                </p>
+                <p className="text-[#1C2B48]">PayPal</p>
                 <p className="text-xs text-[#5B7893]">
                   Requested {formatDate(entry.requestedAt)}
                   {entry.paidAt ? ` · Paid ${formatDate(entry.paidAt)}` : ""}
@@ -435,7 +399,7 @@ function HowItWorks({ data }) {
       <h3 className="mt-5 font-semibold text-[#3D342D]">✅ Withdrawals</h3>
       <ul className="mt-1">
         <li>✓ Withdraw once your available balance reaches {money(minimumWithdrawal)} USD</li>
-        <li>✓ Paid to your PayPal or bank account within 5 business days</li>
+        <li>✓ Paid to your PayPal account within 5 business days</li>
       </ul>
     </section>
   );

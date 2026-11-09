@@ -10,7 +10,7 @@ const OWNER_EMAIL = "vesper.cosmic.blueprint@gmail.com";
 /**
  * POST /api/member/referral/withdraw
  * Request a payout of the member's whole available commission balance.
- * Body: { payoutInfo: { method: "paypal" | "bank", ... } }
+ * Body: { payoutInfo: { paypalEmail } } — payouts are PayPal only.
  */
 export async function POST(request) {
   const rateLimited = rateLimitResponse(request);
@@ -43,17 +43,6 @@ export async function POST(request) {
   }
 
   const { withdrawal, member } = result;
-  const payoutLines =
-    payoutInfo.method === "paypal"
-      ? [`方式: PayPal`, `PayPal: ${payoutInfo.paypalEmail}`]
-      : [
-          `方式: 銀行轉帳`,
-          `戶名: ${payoutInfo.accountName}`,
-          `銀行: ${payoutInfo.bankName}`,
-          `帳號: ${payoutInfo.accountNumber}`,
-          `SWIFT: ${payoutInfo.swiftCode || "—"}`,
-          `國家: ${payoutInfo.country}`,
-        ];
 
   await safeSendEmail({
     to: OWNER_EMAIL,
@@ -65,7 +54,7 @@ export async function POST(request) {
       `申請編號: ${withdrawal.id}`,
       `會員: ${member.name || ""} <${member.email}>`,
       `金額: $${withdrawal.amount.toFixed(2)} USD`,
-      ...payoutLines,
+      `PayPal: ${payoutInfo.paypalEmail}`,
     ].join("\n"),
   }).catch((error) => console.error("Withdrawal email failed:", error));
 
