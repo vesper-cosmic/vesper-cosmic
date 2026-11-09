@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import OrderIntakeForm from "@/components/forms/OrderIntakeForm";
+import CheckoutGate from "@/components/CheckoutGate";
 import { getProductBySlug } from "@/lib/productServer";
 import { isProductPublished } from "@/lib/productData";
 
@@ -30,7 +31,9 @@ export default async function ProductOrderPage({ params }) {
   return (
     <main className="min-h-screen bg-transparent px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
-        <OrderIntakeForm product={product} />
+        <CheckoutGate>
+          <OrderIntakeForm product={product} />
+        </CheckoutGate>
       </div>
     </main>
   );

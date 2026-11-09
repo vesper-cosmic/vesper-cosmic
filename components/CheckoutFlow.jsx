@@ -6,6 +6,7 @@ import { useProducts } from "@/components/ProductProvider";
 import { useCart } from "@/lib/cartContext";
 import { getReferralCode } from "@/lib/referralClient";
 import NailSizePicker from "@/components/NailSizePicker";
+import CheckoutGate from "@/components/CheckoutGate";
 import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import {
   countries,
@@ -225,6 +226,7 @@ export default function CheckoutFlow() {
   }
 
   return (
+    <CheckoutGate>
     <form onSubmit={handleSubmit} className="space-y-6">
       <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5">
         <p className="text-sm uppercase tracking-[0.24em] text-[#8EB1D1]">
@@ -342,6 +344,7 @@ export default function CheckoutFlow() {
         for reflection and entertainment and are not professional advice.
       </p>
     </form>
+    </CheckoutGate>
   );
 }
 
