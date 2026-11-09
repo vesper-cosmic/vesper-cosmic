@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getReferralCode } from "@/lib/referralClient";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
@@ -193,7 +194,7 @@ export default function OrderIntakeForm({ product }) {
     const response = await fetch("/api/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderDraft),
+      body: JSON.stringify({ ...orderDraft, referralCode: getReferralCode() || null }),
     });
     setIsSubmitting(false);
 

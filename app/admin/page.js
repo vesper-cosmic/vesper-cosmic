@@ -108,22 +108,13 @@ export default function AdminPage() {
       setOrders((prev) =>
         prev.map((order) =>
           order.orderId === orderId
-            ? {
-                ...order,
-                paymentStatus: PAYMENT_PAID,
-                referralStatus: data?.referral?.credited ? "✅ 已入帳" : order.referralStatus,
-              }
+            ? { ...order, paymentStatus: PAYMENT_PAID }
             : order
         )
       );
       setSaveMessage((prev) => ({
         ...prev,
-        [orderId]: {
-          type: "success",
-          text: data?.referral?.credited
-            ? `已標記為已付款，並入帳推薦回饋 ${Number(data.referral.amount).toFixed(2)} 給 ${data.referral.referrerEmail}`
-            : "已標記為已付款",
-        },
+        [orderId]: { type: "success", text: "已標記為已付款" },
       }));
     } catch {
       setSaveMessage((prev) => ({
@@ -196,6 +187,12 @@ export default function AdminPage() {
               className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#A7C7E7]"
             >
               產品管理 →
+            </Link>
+            <Link
+              href="/admin/referrals"
+              className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+            >
+              分潤提現 →
             </Link>
             <Link
               href="/shop"
@@ -312,8 +309,8 @@ function OrderCard({ order, draft, onChange, onSave, onMarkPaid, saving, message
           <p className="mt-1 text-xs text-[#5B7893]">付款: {order.paymentStatus || "—"}</p>
           {order.referrerEmail && order.referralReward > 0 ? (
             <p className="mt-1 text-xs text-[#5B7893]">
-              推薦回饋 ${Number(order.referralReward).toFixed(2)} → {order.referrerEmail}
-              （{order.referralStatus || "⏳ 未入帳"}）
+              推薦分潤 ${Number(order.referralReward).toFixed(2)} → {order.referrerEmail}
+              （已付款且出貨滿 8 天後可提現）
             </p>
           ) : null}
           {order.paymentStatus && order.paymentStatus !== PAYMENT_PAID ? (

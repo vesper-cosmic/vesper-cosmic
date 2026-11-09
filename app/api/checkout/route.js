@@ -37,7 +37,12 @@ export async function POST(request) {
 
   let referral = null;
   try {
-    referral = await getOrderReferral(order.memberEmail, order.items);
+    referral = await getOrderReferral({
+      memberEmail: order.memberEmail,
+      customerEmail: order.email,
+      referralCode: payload.referralCode,
+      items: order.items,
+    });
   } catch (error) {
     console.error("Referral lookup failed:", error);
   }

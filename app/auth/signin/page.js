@@ -38,7 +38,7 @@ function SignInContent() {
 
   async function handleGoogle() {
     // A referral link lands back on the home page with ?ref=, where
-    // useReferral applies the code once the user is signed in.
+    // ReferralTracker remembers the code and links it once signed in.
     const target = referralCode
       ? `/?ref=${encodeURIComponent(referralCode)}`
       : callbackUrl;

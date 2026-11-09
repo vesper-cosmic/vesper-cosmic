@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
-import { getReferralHistory } from "@/lib/referral";
+import { getReferralSummary } from "@/lib/referral";
 import {
   findOrCreateMember,
   findMemberByReferralCode,
@@ -33,16 +33,20 @@ export async function GET() {
   }
 
   const member = result.member;
-  const history = await getReferralHistory(member.email);
-  if (history?.skipped) console.error("Referral history failed:", history.reason);
+  const summary = await getReferralSummary(member);
+  if (summary?.skipped) {
+    console.error("Referral summary failed:", summary.reason);
+    return NextResponse.json(
+      { error: "Could not load your earnings right now.", referral: null },
+      { status: 200 }
+    );
+  }
 
+  const { skipped, ...earnings } = summary;
   return NextResponse.json({
     referral: {
       referralCode: member.referralCode,
-      referredByEmail: member.referredByEmail,
-      totalReferralReward: member.totalReferralReward,
-      pendingReferralReward: history?.pendingTotal || 0,
-      history: history?.entries || [],
+      ...earnings,
     },
   });
 }

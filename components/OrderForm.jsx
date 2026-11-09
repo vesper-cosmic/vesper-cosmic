@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { getReferralCode } from "@/lib/referralClient";
 import { useRouter, useSearchParams } from "next/navigation";
 import { staticProducts } from "@/lib/productData";
 import { useProducts } from "@/components/ProductProvider";
@@ -102,7 +103,7 @@ export default function OrderForm() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, referralCode: getReferralCode() || null }),
     });
 
     setIsSubmitting(false);

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useProducts } from "@/components/ProductProvider";
 import { useCart } from "@/lib/cartContext";
+import { getReferralCode } from "@/lib/referralClient";
 import {
   countries,
   nailShapes,
@@ -48,6 +49,12 @@ export default function CheckoutFlow() {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
+  const [referralCode, setReferralCode] = useState("");
+
+  // Prefill the referral code remembered from a friend's ?ref= link.
+  useEffect(() => {
+    setReferralCode((current) => current || getReferralCode());
+  }, []);
 
   // Persist draft so a page refresh / back button never loses the form
   useEffect(() => {
@@ -143,6 +150,7 @@ export default function CheckoutFlow() {
       })),
       memberEmail: isSignedIn ? userEmail : null,
       saveAddressToMember: form.saveAddressToMember && isSignedIn,
+      referralCode: referralCode.trim() || null,
     };
 
     setSubmitting(true);
@@ -248,6 +256,16 @@ export default function CheckoutFlow() {
               value={form.email}
               onChange={(event) => updateField("email", event.target.value)}
               className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            />
+          </Field>
+          <Field label="Referral Code (optional)">
+            <input
+              type="text"
+              value={referralCode}
+              onChange={(event) => setReferralCode(event.target.value.toUpperCase())}
+              placeholder="e.g. USER-AB12C"
+              maxLength={32}
+              className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 font-mono text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
             />
           </Field>
 
