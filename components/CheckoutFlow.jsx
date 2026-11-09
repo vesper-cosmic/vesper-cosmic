@@ -324,6 +324,13 @@ export default function CheckoutFlow() {
       >
         {submitting ? "Submitting…" : "Continue to Review & Pay"}
       </button>
+      <p className="text-center text-xs leading-5 text-[#5B7893]">
+        By placing your order you agree to our{" "}
+        <Link href="/terms" target="_blank" className="underline">Terms of Service</Link> and{" "}
+        <Link href="/returns" target="_blank" className="underline">Return &amp; Refund Policy</Link>.
+        Custom and personalized items are final sale. Astrology readings and crystal products are
+        for reflection and entertainment and are not professional advice.
+      </p>
     </form>
   );
 }

@@ -1,143 +1,183 @@
+import LegalDoc, { A, B } from "@/components/legal/LegalDoc";
+import { LEGAL } from "@/lib/legal";
+
 export const metadata = {
   title: "Privacy Policy | VESPER COSMOS",
   description:
-    "Privacy Policy for VESPER COSMOS. Learn how we collect, use, and safeguard your personal data, including astrological details for custom BaZi and Zi Wei Dou Shu reports.",
+    "How VESPER COSMOS collects, uses, shares and protects personal information, and the privacy rights available to you, including California residents.",
 };
 
-const infoItems = [
-  {
-    title: "Personal & Contact Details",
-    text: "Name, email address, shipping address, and phone number when placing an order.",
-  },
-  {
-    title: "Astrological & Personalization Data",
-    text: "Birth date, birth time, birth location, and gender provided for custom BaZi/Zi Wei Dou Shu reports and tailored energy products.",
-  },
-  {
-    title: "Payment Information",
-    text: "Processed securely through encrypted third-party payment gateway (PayPal). We do not store your credit card details on our servers.",
-  },
+const CATEGORIES = [
+  ["Identifiers", "Name, email address, shipping address, Google account email used to sign in, member referral code.", "From you and from Google sign-in"],
+  ["Commercial information", "Orders, products purchased, amounts, payment status (not card numbers), saved cart, member level and spending totals.", "From you and our order records"],
+  ["Personalization details", "Birth date, birth time, birth city, daylight-saving information, biological gender, intentions, nail sizes and style preferences you choose to give for custom items.", "From you"],
+  ["Referral Program information", "Who referred you or whom you referred (shown to referrers only as a first initial), commissions earned, payout requests and the PayPal email you give for payouts.", "From you and our records"],
+  ["Communications and preferences", "Messages you send us, newsletter preference, and records of which version of our terms you accepted and when.", "From you"],
+  ["Technical information", "Basic server logs (such as IP address and browser type) kept by our hosting provider for security and troubleshooting.", "Automatically"],
 ];
 
-const usageItems = [
-  "To fulfill, handcraft, and ship your physical and digital orders.",
-  "To perform accurate Eastern astrological analysis for your customized items.",
-  "To communicate order updates, tracking information, and customer care responses.",
+const sections = [
+  {
+    title: "Information We Collect",
+    paragraphs: [
+      "We collect only what we need to run the shop, make your custom items and operate member features:",
+    ],
+    after: [
+      <div key="table" className="overflow-x-auto rounded-lg border border-[#8EB1D1]/25 bg-white/60">
+        <table className="w-full min-w-[560px] text-left text-sm">
+          <thead className="bg-[#E8ECEF] text-xs uppercase tracking-[0.08em] text-[#5B7893]">
+            <tr>
+              <th className="px-4 py-3">Category</th>
+              <th className="px-4 py-3">Examples</th>
+              <th className="px-4 py-3">Source</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#8EB1D1]/20 text-[#35506B]">
+            {CATEGORIES.map(([category, examples, source]) => (
+              <tr key={category}>
+                <td className="px-4 py-3 align-top font-semibold text-[#1C2B48]">{category}</td>
+                <td className="px-4 py-3 align-top">{examples}</td>
+                <td className="px-4 py-3 align-top">{source}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>,
+      "We do not receive or store your payment card details — payments are handled by PayPal. Birth details are optional and are requested only for products that need them.",
+    ],
+  },
+  {
+    title: "How We Use Information",
+    bullets: [
+      "To process, make, ship and support your orders, including verifying payments.",
+      "To prepare personalized astrology reports and custom products you request.",
+      "To run member features: saved cart and address, order history, member level, Referral Program tracking and commission payouts.",
+      "To send order, shipping and account messages, and — only if you subscribe — our newsletter.",
+      "To keep the site secure, prevent fraud and Referral Program abuse, and comply with legal, tax and accounting obligations.",
+    ],
+  },
+  {
+    title: "How We Share Information",
+    paragraphs: [
+      <>
+        <B>We do not sell your personal information, and we do not share it for cross-context
+        behavioral advertising.</B> We have not done so in the past 12 months. We share personal
+        information only with service providers that help us run the shop, under their terms that
+        restrict how they use it:
+      </>,
+    ],
+    bullets: [
+      "Google — sign-in (we receive your name and email address).",
+      "PayPal — payments and commission payouts.",
+      "Notion — secure database where orders and member records are stored.",
+      "Resend — sending order and account emails.",
+      "Vercel — website hosting.",
+      "Postal and courier services — delivering physical orders (name and shipping address).",
+    ],
+    after: [
+      "We may also disclose information if required by law, to protect our rights or users' safety, or as part of a sale or reorganization of the business. If you join the Referral Program, the friends you refer are not shown your details, and you see only a first initial for their orders.",
+    ],
+  },
+  {
+    title: "Cookies and Browser Storage",
+    paragraphs: [
+      "We do not use advertising or analytics trackers. We use only what the site needs to work:",
+    ],
+    bullets: [
+      "A sign-in session cookie that keeps you logged in.",
+      "Browser storage that remembers your cart and checkout progress on your device.",
+      "Browser storage that remembers a referral code from a friend's link for up to 30 days, so the referral can be credited at checkout.",
+    ],
+    after: [
+      "Because we do not sell or share personal information, there is nothing to opt out of, but we still treat Global Privacy Control (GPC) signals as a request to opt out of sale and sharing.",
+    ],
+  },
+  {
+    title: "How Long We Keep Information",
+    paragraphs: [
+      "We keep order records for as long as needed to fulfil orders, handle returns and meet tax and accounting obligations (generally up to 7 years). Member account information is kept while your account is active. Referral and payout records are kept for as long as needed to pay commissions and meet legal obligations. When information is no longer needed, we delete or anonymize it. You can ask us to delete your information at any time (see below).",
+    ],
+  },
+  {
+    title: "Security",
+    paragraphs: [
+      "We use encrypted connections (HTTPS), sign-in through Google, restricted admin access and reputable service providers to protect your information. No system is perfectly secure; if a breach affecting your personal information occurs, we will notify you as required by law.",
+    ],
+  },
+  {
+    title: "International Transfers",
+    paragraphs: [
+      "We are based in Taiwan and our service providers operate in the United States and other countries. By using the site, your information may be processed outside the state or country where you live, with appropriate safeguards.",
+    ],
+  },
+  {
+    title: "Children's Privacy",
+    paragraphs: [
+      <>
+        Our site is not directed to children under 13, and we do not knowingly collect personal
+        information from them. If you believe a child under 13 has given us personal information,
+        contact us and we will delete it.
+      </>,
+    ],
+  },
+  {
+    title: "Your Choices",
+    bullets: [
+      <>
+        <B>Newsletter:</B> you can subscribe or unsubscribe any time in your{" "}
+        <A href="/account">account</A> under Email Preferences, or by using the unsubscribe link in
+        any newsletter. Order and account emails will still be sent.
+      </>,
+      <>
+        <B>Account details:</B> you can update your address and preferences in your account.
+      </>,
+    ],
+  },
+  {
+    title: "Your Privacy Rights (including California and other U.S. states)",
+    paragraphs: [
+      "Depending on where you live — including California (CCPA/CPRA) and other U.S. states with consumer privacy laws such as Virginia, Colorado, Connecticut, Utah, Texas and Oregon — you may have the right to:",
+    ],
+    bullets: [
+      "Know and access the personal information we have about you, including the categories, sources, purposes and recipients described in this policy.",
+      "Delete personal information we collected from you, subject to legal exceptions (for example, records we must keep for tax purposes).",
+      "Correct inaccurate personal information.",
+      "Receive a copy of your information in a portable format.",
+      "Opt out of the sale or sharing of personal information and of targeted advertising — we do not do either.",
+      "Limit the use of sensitive personal information — we use any such information only to provide the products and services you request.",
+      "Not be discriminated against for exercising any of these rights.",
+    ],
+    after: [
+      <>
+        To make a request, email <A href={`mailto:${LEGAL.contactEmail}`}>{LEGAL.contactEmail}</A>{" "}
+        from the email address linked to your orders or member account, with the subject
+        &quot;Privacy Request&quot;. We will verify your identity by confirming control of that email
+        address and respond within 45 days (we may extend this once by another 45 days where
+        allowed, and will tell you why). You may use an authorized agent; we will ask for proof of
+        their authority and may ask you to verify your identity directly. If we deny your request,
+        you may appeal by replying to our decision with the subject &quot;Privacy Appeal&quot;; we
+        will respond within the time required by your state&apos;s law.
+      </>,
+      "California residents may also request information about disclosures of personal information to third parties for their direct marketing purposes (California \"Shine the Light\" law). We do not make such disclosures.",
+    ],
+  },
+  {
+    title: "Changes to This Policy",
+    paragraphs: [
+      "We will update this policy when our practices change. The effective date above shows the latest version. For material changes we will notify members, for example when they next sign in.",
+    ],
+  },
 ];
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-transparent">
-      <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-        {/* Header */}
-        <header className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#8EB1D1]">
-            Legal · Your Privacy Matters
-          </p>
-          <h1 className="mt-4 text-4xl font-semibold leading-tight text-[#1C2B48] sm:text-5xl">
-            Privacy Policy
-          </h1>
-          <p className="mt-4 text-sm font-medium uppercase tracking-[0.18em] text-[#5B7893]">
-            Last Updated: 2026
-          </p>
-        </header>
-
-        {/* Intro */}
-        <div className="mt-10 space-y-6 text-base leading-8 text-[#35506B] sm:text-lg sm:leading-9">
-          <p>
-            At <strong className="font-semibold text-[#1C2B48]">VESPER COSMOS</strong>,
-            we respect your privacy and are committed to protecting your
-            personal data. This policy outlines how we collect, use, and
-            safeguard your information when you visit our website or purchase
-            our services.
-          </p>
-        </div>
-
-        {/* Information We Collect */}
-        <section className="mt-12">
-          <h2 className="text-2xl font-semibold text-[#1C2B48] sm:text-3xl">
-            Information We Collect
-          </h2>
-          <ol className="mt-6 space-y-4">
-            {infoItems.map((item, index) => (
-              <li
-                key={item.title}
-                className="flex items-start gap-4 rounded-lg border border-[#8EB1D1]/20 bg-white/60 p-5"
-              >
-                <span
-                  aria-hidden="true"
-                  className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#8EB1D1]/15 text-sm font-semibold text-[#1C2B48]"
-                >
-                  {index + 1}
-                </span>
-                <div>
-                  <h3 className="text-base font-semibold text-[#1C2B48] sm:text-lg">
-                    {item.title}
-                  </h3>
-                  <p className="mt-1.5 text-sm leading-7 text-[#35506B] sm:text-base">
-                    {item.text}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        {/* How We Use Your Information */}
-        <section className="mt-12">
-          <h2 className="text-2xl font-semibold text-[#1C2B48] sm:text-3xl">
-            How We Use Your Information
-          </h2>
-          <ul className="mt-6 space-y-4">
-            {usageItems.map((item) => (
-              <li
-                key={item}
-                className="flex items-start gap-3 rounded-lg border border-[#8EB1D1]/20 bg-white/60 p-5"
-              >
-                <span
-                  aria-hidden="true"
-                  className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8EB1D1]"
-                />
-                <p className="text-sm leading-7 text-[#35506B] sm:text-base">
-                  {item}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* Data Protection & Sacred Confidentiality */}
-        <section className="mt-12 rounded-lg border border-[#8EB1D1]/20 bg-[#E8ECEF]/95 p-6">
-          <h2 className="text-2xl font-semibold text-[#1C2B48] sm:text-3xl">
-            Data Protection & Sacred Confidentiality
-          </h2>
-          <p className="mt-4 text-base leading-8 text-[#35506B] sm:text-lg sm:leading-9">
-            Your astrological details and personal information are treated with
-            the highest level of confidentiality and respect. We{" "}
-            <strong className="font-semibold text-[#1C2B48]">never</strong>{" "}
-            sell, rent, or trade your personal data or birth details to third
-            parties.
-          </p>
-        </section>
-
-        {/* Contact Us */}
-        <section className="mt-12">
-          <h2 className="text-2xl font-semibold text-[#1C2B48] sm:text-3xl">
-            Contact Us
-          </h2>
-          <p className="mt-4 text-base leading-8 text-[#35506B] sm:text-lg sm:leading-9">
-            If you have questions regarding our Privacy Policy, please email us
-            at{" "}
-            <a
-              href="mailto:vesper.cosmic.blueprint@gmail.com"
-              className="font-semibold text-[#1C2B48] underline decoration-[#8EB1D1] decoration-2 underline-offset-2 transition hover:text-[#5B7893]"
-            >
-              vesper.cosmic.blueprint@gmail.com
-            </a>
-            .
-          </p>
-        </section>
-      </section>
-    </main>
+    <LegalDoc
+      kicker="Legal · Your Privacy Matters"
+      title="Privacy Policy"
+      intro={[
+        "This Privacy Policy explains how VESPER COSMOS collects, uses, shares and protects your personal information when you visit our website, become a member or buy from us, and the choices and rights you have.",
+      ]}
+      sections={sections}
+    />
   );
 }

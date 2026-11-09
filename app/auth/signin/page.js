@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { Suspense } from "react";
+import { CONSENT_PENDING_KEY, ConsentCheckbox } from "@/components/ConsentGate";
+import { CONSENT_VERSION } from "@/lib/legal";
 
 const ERROR_MESSAGES = {
   OAuthSignin: "Something went wrong. Please try again.",
@@ -36,7 +37,16 @@ function SignInContent() {
     [authError]
   );
 
+  const [agreed, setAgreed] = useState(false);
+
   async function handleGoogle() {
+    if (!agreed) return;
+    // Recorded on the member's record by ConsentGate after sign-in.
+    try {
+      localStorage.setItem(CONSENT_PENDING_KEY, CONSENT_VERSION);
+    } catch {
+      // Storage unavailable: ConsentGate will ask again after sign-in.
+    }
     // A referral link lands back on the home page with ?ref=, where
     // ReferralTracker remembers the code and links it once signed in.
     const target = referralCode
@@ -65,10 +75,13 @@ function SignInContent() {
             </div>
           ) : null}
 
+          <ConsentCheckbox checked={agreed} onChange={setAgreed} />
+
           <button
             type="button"
             onClick={handleGoogle}
-            className="mt-6 flex w-full items-center justify-center gap-3 rounded border border-[#8EB1D1]/40 bg-white px-4 py-2.5 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+            disabled={!agreed}
+            className="mt-5 flex w-full items-center justify-center gap-3 rounded border border-[#8EB1D1]/40 bg-white px-4 py-2.5 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24">
               <path
@@ -91,17 +104,11 @@ function SignInContent() {
             <span>Continue with Google</span>
           </button>
 
-          <p className="mt-4 text-center text-xs text-[#5B7893]">
-            By signing in, you agree to our{" "}
-            <Link href="/terms" className="text-[#8EB1D1] underline">
-              Terms
-            </Link>{" "}
-            and{" "}
-            <Link href="/privacy" className="text-[#8EB1D1] underline">
-              Privacy Policy
-            </Link>
-            .
-          </p>
+          {!agreed ? (
+            <p className="mt-3 text-center text-xs text-[#5B7893]">
+              Please tick the box above to continue.
+            </p>
+          ) : null}
 
           <Link
             href="/shop"

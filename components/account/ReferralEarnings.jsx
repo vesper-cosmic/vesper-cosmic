@@ -98,6 +98,14 @@ function ShareBox({ code }) {
         copied={copied === "link"}
         onCopy={() => copy("link", link)}
       />
+      <p className="rounded border border-[#C77A0A]/30 bg-[#FDF6E3] px-3 py-2 text-xs leading-5 text-[#7A5410] sm:col-span-2">
+        <strong>Required by U.S. law (FTC):</strong> whenever you share your link or code, clearly
+        say that you earn a commission — e.g. &quot;I earn a commission if you buy through my
+        link&quot; or #ad. Don&apos;t make health or guaranteed-result claims.{" "}
+        <a href="/member-agreement" target="_blank" className="underline">
+          Program rules
+        </a>
+      </p>
     </div>
   );
 }
@@ -177,6 +185,7 @@ function WithdrawPanel({ data, onDone }) {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [confirmAdult, setConfirmAdult] = useState(false);
 
   const update = (field) => (event) =>
     setPayout((prev) => ({ ...prev, [field]: event.target.value }));
@@ -191,7 +200,7 @@ function WithdrawPanel({ data, onDone }) {
       const response = await fetch("/api/member/referral/withdraw", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ payoutInfo: payout }),
+        body: JSON.stringify({ payoutInfo: payout, confirmAdult }),
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) {
@@ -252,10 +261,28 @@ function WithdrawPanel({ data, onDone }) {
             Payouts are sent via PayPal only. Make sure this email matches your PayPal account.
           </p>
 
+          <label className="flex items-start gap-2 text-xs leading-5 text-[#35506B]">
+            <input
+              type="checkbox"
+              checked={confirmAdult}
+              onChange={(event) => setConfirmAdult(event.target.checked)}
+              className="mt-0.5"
+            />
+            <span>
+              I confirm I am at least 18 years old, this PayPal account is in my name, and I agree
+              to the{" "}
+              <a href="/member-agreement" target="_blank" className="underline">
+                Member &amp; Referral Program Agreement
+              </a>
+              , including that I am responsible for any taxes on my commissions.
+            </span>
+          </label>
+          {errors.confirmAdult ? <p className="text-xs text-red-500">{errors.confirmAdult}</p> : null}
+
           <div className="flex gap-2">
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !confirmAdult}
               className="flex-1 rounded border border-[#1E8A5A] bg-[#1E8A5A] px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-white transition hover:bg-[#187049] disabled:opacity-50"
             >
               {submitting ? "Submitting…" : "Request Payout"}

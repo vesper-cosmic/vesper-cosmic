@@ -23,6 +23,10 @@ export async function POST(request) {
 
   const body = await request.json().catch(() => ({}));
   const { errors, payoutInfo } = validatePayoutInfo(body.payoutInfo);
+  if (body.confirmAdult !== true) {
+    errors.confirmAdult =
+      "Please confirm you are at least 18 and agree to the Member & Referral Program Agreement.";
+  }
   if (Object.keys(errors).length > 0) {
     return NextResponse.json({ errors }, { status: 422 });
   }

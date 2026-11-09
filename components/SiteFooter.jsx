@@ -25,6 +25,8 @@ const footerNav = [
     links: [
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms of Service", href: "/terms" },
+      { label: "Member & Referral Agreement", href: "/member-agreement" },
+      { label: "Your Privacy Rights", href: "/privacy#section-10" },
     ],
   },
 ];
