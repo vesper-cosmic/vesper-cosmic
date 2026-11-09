@@ -40,7 +40,9 @@ export async function PATCH(request) {
   }
 
   try {
-    const result = await setWithdrawalStatus(memberEmail, withdrawalId, status);
+    const result = await setWithdrawalStatus(memberEmail, withdrawalId, status, {
+      notifyMember: body.notifyMember !== false,
+    });
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status || 400 });
     }

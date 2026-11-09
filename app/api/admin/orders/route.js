@@ -77,7 +77,12 @@ export async function PATCH(request) {
 
     // Tell the customer once, when the order first becomes paid.
     let email = null;
-    if (paymentStatus === PAYMENT_PAID && before && before.paymentStatus !== PAYMENT_PAID) {
+    if (
+      payload.notifyCustomer !== false &&
+      paymentStatus === PAYMENT_PAID &&
+      before &&
+      before.paymentStatus !== PAYMENT_PAID
+    ) {
       email = await sendPaymentConfirmedEmail(before);
     }
     return NextResponse.json({ ok: true, orderId, paymentStatus, email });
@@ -116,7 +121,7 @@ export async function PATCH(request) {
 
   // Shipping email: when the order first ships, or a new tracking number is added.
   let email = null;
-  if (status === SHIPPED && before) {
+  if (payload.notifyCustomer !== false && status === SHIPPED && before) {
     const firstShipment = normalizedStatus(before.productionStatus) !== SHIPPED;
     const newTracking = trackingNumber && trackingNumber !== before.trackingNumber;
     if (firstShipment || newTracking) {

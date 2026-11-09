@@ -54,7 +54,12 @@ export default function AdminPage() {
       const response = await fetch("/api/admin/orders", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, status, trackingNumber }),
+        body: JSON.stringify({
+          orderId,
+          status,
+          trackingNumber,
+          notifyCustomer: draft.notify !== false,
+        }),
       });
       const data = await response.json();
 
@@ -95,7 +100,11 @@ export default function AdminPage() {
       const response = await fetch("/api/admin/orders", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, paymentStatus: PAYMENT_PAID }),
+        body: JSON.stringify({
+          orderId,
+          paymentStatus: PAYMENT_PAID,
+          notifyCustomer: drafts[orderId]?.notify !== false,
+        }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
@@ -381,6 +390,17 @@ function OrderCard({ order, draft, onChange, onSave, onMarkPaid, saving, message
           </p>
         </div>
       </div>
+
+      <label className="mt-3 flex items-center gap-2 text-xs text-[#35506B]">
+        <input
+          type="checkbox"
+          checked={draft.notify !== false}
+          onChange={(e) => onChange({ notify: e.target.checked })}
+        />
+        <span>
+          寄信通知顧客（標記已付款 → 付款確認信；改成「🚚 貨品已寄出」或更新追蹤碼 → 出貨通知）
+        </span>
+      </label>
 
       <div className="mt-3 flex items-center justify-between gap-3">
         <div className="text-xs">

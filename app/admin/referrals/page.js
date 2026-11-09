@@ -21,6 +21,7 @@ export default function AdminReferralsPage() {
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState("");
   const [filter, setFilter] = useState("processing");
+  const [silent, setSilent] = useState({}); // withdrawal id → true = don't email
 
   const load = useCallback(async () => {
     try {
@@ -57,7 +58,12 @@ export default function AdminReferralsPage() {
       const response = await fetch("/api/admin/referrals", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberEmail: entry.memberEmail, withdrawalId: entry.id, status }),
+        body: JSON.stringify({
+          memberEmail: entry.memberEmail,
+          withdrawalId: entry.id,
+          status,
+          notifyMember: !silent[entry.id],
+        }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
@@ -174,7 +180,17 @@ export default function AdminReferralsPage() {
                   </div>
 
                   {entry.status === "processing" ? (
-                    <div className="mt-3 flex justify-end gap-2">
+                    <div className="mt-3 flex flex-wrap items-center justify-end gap-2">
+                      <label className="mr-auto flex items-center gap-2 text-xs text-[#35506B]">
+                        <input
+                          type="checkbox"
+                          checked={!silent[entry.id]}
+                          onChange={(e) =>
+                            setSilent((prev) => ({ ...prev, [entry.id]: !e.target.checked }))
+                          }
+                        />
+                        標記已撥款時寄信通知會員
+                      </label>
                       <button
                         type="button"
                         disabled={busyId === entry.id}
