@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
-import { getReferralSummary } from "@/lib/referral";
+import { getReferralSummary, syncMemberBalances } from "@/lib/referral";
 import {
   findOrCreateMember,
   findMemberByReferralCode,
@@ -41,6 +41,8 @@ export async function GET() {
       { status: 200 }
     );
   }
+
+  await syncMemberBalances(result.pageId, member, summary);
 
   const { skipped, ...earnings } = summary;
   return NextResponse.json({

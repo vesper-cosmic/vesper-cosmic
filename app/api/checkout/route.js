@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
-import { getOrderReferral } from "@/lib/referral";
+import { getOrderReferral, syncReferrerBalances } from "@/lib/referral";
 import { rateLimitResponse } from "@/lib/rateLimit";
 import {
   createMultiNotionOrder,
@@ -53,6 +53,10 @@ export async function POST(request) {
   } catch (error) {
     notionResult = { error: error.message };
     console.error("Notion multi order creation failed:", error);
+  }
+
+  if (referral && !notionResult?.error) {
+    await syncReferrerBalances(referral.referrerEmail);
   }
 
   try {

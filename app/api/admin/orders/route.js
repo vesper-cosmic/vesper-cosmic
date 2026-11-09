@@ -7,6 +7,7 @@ import {
   updateNotionOrderStatus,
 } from "@/lib/orderServer";
 import { PAYMENT_STATUSES } from "@/lib/orderStatus";
+import { syncOrderReferrer } from "@/lib/referral";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -58,6 +59,7 @@ export async function PATCH(request) {
       return NextResponse.json({ error: "Payment status update failed.", ok: false }, { status: 500 });
     }
 
+    await syncOrderReferrer(orderId);
     return NextResponse.json({ ok: true, orderId, paymentStatus });
   }
 
@@ -88,6 +90,8 @@ export async function PATCH(request) {
       { status: 400 }
     );
   }
+
+  await syncOrderReferrer(orderId);
 
   return NextResponse.json({
     ok: true,
