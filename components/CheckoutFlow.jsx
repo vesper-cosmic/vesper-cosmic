@@ -7,6 +7,7 @@ import { useCart } from "@/lib/cartContext";
 import { getReferralCode } from "@/lib/referralClient";
 import NailSizePicker from "@/components/NailSizePicker";
 import CheckoutGate from "@/components/CheckoutGate";
+import CheckoutNotices from "@/components/CheckoutNotices";
 import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import {
   countries,
@@ -108,6 +109,11 @@ export default function CheckoutFlow() {
   );
 
   const hasShippingItems = enrichedItems.some((item) => item.product?.requiresShipping);
+  // Custom / personalized items (made from birth details or nail sizes) are final sale.
+  const hasCustomItems = enrichedItems.some(
+    (item) => item.product?.requiresBirthData || item.product?.requiresNailDetails
+  );
+  const [ackFinalSale, setAckFinalSale] = useState(false);
 
   function updateField(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -159,6 +165,7 @@ export default function CheckoutFlow() {
       memberEmail: isSignedIn ? userEmail : null,
       saveAddressToMember: form.saveAddressToMember && isSignedIn,
       referralCode: referralCode.trim() || null,
+      acknowledgedFinalSale: hasCustomItems ? ackFinalSale : undefined,
     };
 
     setSubmitting(true);
@@ -329,20 +336,20 @@ export default function CheckoutFlow() {
         </p>
       ) : null}
 
+      <CheckoutNotices
+        hasCustomItems={hasCustomItems}
+        hasShippingItems={hasShippingItems}
+        ackFinalSale={ackFinalSale}
+        onAckChange={setAckFinalSale}
+      />
+
       <button
         type="submit"
-        disabled={submitting}
+        disabled={submitting || (hasCustomItems && !ackFinalSale)}
         className="w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:opacity-60"
       >
         {submitting ? "Submitting…" : "Continue to Review & Pay"}
       </button>
-      <p className="text-center text-xs leading-5 text-[#5B7893]">
-        By placing your order you agree to our{" "}
-        <Link href="/terms" target="_blank" className="underline">Terms of Service</Link> and{" "}
-        <Link href="/returns" target="_blank" className="underline">Return &amp; Refund Policy</Link>.
-        Custom and personalized items are final sale. Astrology readings and crystal products are
-        for reflection and entertainment and are not professional advice.
-      </p>
     </form>
     </CheckoutGate>
   );

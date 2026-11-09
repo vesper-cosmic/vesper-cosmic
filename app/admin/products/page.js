@@ -507,6 +507,9 @@ export default function AdminProductsPage() {
                   placeholder="留空表示無折扣"
                   className={inputClass()}
                 />
+                <p className="mt-1 text-[11px] leading-4 text-[#8B99A8]">
+                  只能填「真的用這個價格賣過一段時間」的原價。美國 FTC 和台灣公平交易法都禁止虛構原價。
+                </p>
               </Field>
               <Field label="幣別 Currency">
                 <input

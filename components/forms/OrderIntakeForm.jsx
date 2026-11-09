@@ -5,6 +5,7 @@ import { getReferralCode } from "@/lib/referralClient";
 import { useCart } from "@/lib/cartContext";
 import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import NailSizePicker from "@/components/NailSizePicker";
+import CheckoutNotices from "@/components/CheckoutNotices";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
@@ -55,6 +56,8 @@ export default function OrderIntakeForm({ product }) {
   const router = useRouter();
   const { data: session } = useSession();
   const { member } = useCart();
+  const isCustomProduct = Boolean(product.requiresBirthData || product.requiresNailDetails);
+  const [ackFinalSale, setAckFinalSale] = useState(false);
   const [form, setForm] = useState(baseForm);
 
   // Pre-fill nail size from the customer's last order (if not chosen yet).
@@ -220,7 +223,11 @@ export default function OrderIntakeForm({ product }) {
     const response = await fetch("/api/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...orderDraft, referralCode: getReferralCode() || null }),
+      body: JSON.stringify({
+        ...orderDraft,
+        referralCode: getReferralCode() || null,
+        acknowledgedFinalSale: isCustomProduct ? ackFinalSale : undefined,
+      }),
     });
     setIsSubmitting(false);
 
@@ -319,9 +326,16 @@ export default function OrderIntakeForm({ product }) {
         order. Your order is not confirmed until PayPal payment is completed.
       </p>
 
+      <CheckoutNotices
+        hasCustomItems={isCustomProduct}
+        hasShippingItems={Boolean(product.requiresShipping)}
+        ackFinalSale={ackFinalSale}
+        onAckChange={setAckFinalSale}
+      />
+
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={isSubmitting || (isCustomProduct && !ackFinalSale)}
         className="mist-button w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? "Preparing Checkout..." : "Continue to Review & Pay"}

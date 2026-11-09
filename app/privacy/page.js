@@ -162,6 +162,43 @@ const sections = [
     ],
   },
   {
+    title: "Notice Under Taiwan's Personal Data Protection Act",
+    paragraphs: [
+      "As we are based in Taiwan, the following notice is given under Article 8 of Taiwan's Personal Data Protection Act (個人資料保護法):",
+    ],
+    bullets: [
+      <>
+        <B>Collector:</B> {LEGAL.operatorDescription}.
+      </>,
+      <>
+        <B>Purposes:</B> online retail and fulfilment of orders, customer and member management and
+        services, marketing (only with your consent), referral program administration, and
+        compliance with tax, accounting and other legal obligations.
+      </>,
+      <>
+        <B>Categories:</B> identification data (such as name, email, address), personal details you
+        choose to give for custom items (such as birth date, time and place, gender, nail sizes),
+        transaction and payment-status records, and PayPal payout email for referral members.
+      </>,
+      <>
+        <B>Period:</B> for as long as needed for the purposes above or as required by law (see
+        &quot;How Long We Keep Information&quot;). <B>Area:</B> Taiwan and the countries where our
+        service providers operate (including the United States). <B>Recipients:</B> us and the
+        service providers listed above. <B>Method:</B> automated and manual processing.
+      </>,
+      <>
+        <B>Your rights</B> (Article 3): to ask to view or obtain a copy of your data, supplement or
+        correct it, stop its collection, processing or use, and have it deleted. Email{" "}
+        <A href={`mailto:${LEGAL.contactEmail}`}>{LEGAL.contactEmail}</A>.
+      </>,
+      <>
+        <B>If you do not provide data:</B> you can browse freely, but we may be unable to process an
+        order (for example without a shipping address) or make a personalized item (without birth
+        details or sizes).
+      </>,
+    ],
+  },
+  {
     title: "Changes to This Policy",
     paragraphs: [
       "We will update this policy when our practices change. The effective date above shows the latest version. For material changes we will notify members, for example when they next sign in.",

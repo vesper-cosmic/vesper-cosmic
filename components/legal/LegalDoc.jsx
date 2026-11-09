@@ -72,6 +72,24 @@ export default function LegalDoc({ kicker, title, intro = [], sections = [], sho
           <h2 className="text-xl font-semibold text-[#1C2B48]">Contact Us</h2>
           <p className="mt-3 leading-7">
             {LEGAL.operatorDescription}
+            {LEGAL.representative ? (
+              <>
+                <br />
+                Representative: {LEGAL.representative}
+              </>
+            ) : null}
+            {LEGAL.taiwanBusinessId ? (
+              <>
+                <br />
+                Taiwan Business ID: {LEGAL.taiwanBusinessId}
+              </>
+            ) : null}
+            {LEGAL.phone ? (
+              <>
+                <br />
+                Phone: {LEGAL.phone}
+              </>
+            ) : null}
             <br />
             Email:{" "}
             <a href={`mailto:${LEGAL.contactEmail}`} className="text-[#5B7893] underline">

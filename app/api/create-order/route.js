@@ -32,6 +32,19 @@ export async function POST(request) {
     return NextResponse.json({ errors }, { status: 422 });
   }
 
+  // Custom / personalized items are final sale: the customer must say they understand.
+  if ((order.requiresBirthData || order.requiresNailDetails) && payload.acknowledgedFinalSale !== true) {
+    return NextResponse.json(
+      {
+        errors: {
+          submit:
+            "Please confirm you understand that custom and personalized items are final sale.",
+        },
+      },
+      { status: 422 }
+    );
+  }
+
   // The member link comes from the session, never from the request body.
   const session = await getServerSession(authOptions);
   order.memberEmail = session?.user?.email?.toLowerCase() || null;

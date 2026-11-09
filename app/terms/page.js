@@ -51,7 +51,31 @@ const sections = [
       <>
         Returns and refunds are governed by our <A href="/returns">Return &amp; Refund Policy</A>.
         Custom and personalized items are final sale except where they arrive damaged or defective,
-        or where applicable law gives you additional rights.
+        or where applicable law gives you additional rights. Customers in Taiwan have a 7-day right
+        of withdrawal for distance purchases, subject to the statutory exceptions described there.
+      </>,
+      <>
+        We ship from Taiwan. Import duties, tariffs, taxes and carrier customs-handling fees charged
+        by your country are your responsibility. In the United States, duty-free &quot;de
+        minimis&quot; entry has been suspended, so U.S. orders may incur duties or fees on delivery.
+        See <A href="/shipping">Shipping &amp; Delivery</A>.
+      </>,
+      <>
+        Any &quot;compare at&quot; or crossed-out price shows a price at which the item was actually
+        offered for a reasonable period before the sale.
+      </>,
+    ],
+  },
+  {
+    title: "Business Information",
+    paragraphs: [
+      <>
+        Seller: {LEGAL.businessName}
+        {LEGAL.representative ? `, represented by ${LEGAL.representative}` : ""}
+        {LEGAL.taiwanBusinessId ? ` (Taiwan Business ID ${LEGAL.taiwanBusinessId})` : ""}, based in
+        Taiwan. Contact: <A href={`mailto:${LEGAL.contactEmail}`}>{LEGAL.contactEmail}</A>
+        {LEGAL.phone ? `, ${LEGAL.phone}` : ""}
+        {LEGAL.mailingAddress ? `. Address: ${LEGAL.mailingAddress}` : ""}.
       </>,
     ],
   },

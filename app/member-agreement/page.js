@@ -111,6 +111,7 @@ const sections = [
   {
     title: "Relationship",
     paragraphs: [
+      "The Referral Program is free to join and single-level: you earn only on purchases by customers you refer directly, never on purchases by people they refer, and you are never required to buy anything or pay any fee. It is not a multi-level marketing program.",
       "You take part as an independent individual. Nothing in this Agreement makes you an employee, agent, partner or representative of VESPER COSMOS, and you may not make promises on our behalf.",
     ],
   },

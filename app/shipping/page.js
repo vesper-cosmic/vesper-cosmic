@@ -174,6 +174,17 @@ export default function ShippingPage() {
             responsibility of the customer. VESPER COSMOS is not responsible for
             delays caused by local customs clearance processes.
           </p>
+          <p className="mt-4 rounded-lg border border-[#C77A0A]/30 bg-[#FDF6E3] p-4 text-sm leading-7 text-[#7A5410] sm:text-base">
+            <strong>United States customers:</strong> the U.S. has suspended duty-free
+            &quot;de minimis&quot; entry for low-value packages, so orders shipped to the U.S.
+            may be charged import duties, tariffs and a carrier handling fee on delivery. These
+            are set by U.S. Customs and the carrier, not by us, and are not included in our
+            prices or shipping fees.
+          </p>
+          <p className="mt-4 text-base leading-8 text-[#35506B] sm:text-lg sm:leading-9">
+            If we cannot ship your order within the processing time stated above, we will email
+            you with a new estimate and you may cancel for a full refund.
+          </p>
         </section>
       </section>
     </main>

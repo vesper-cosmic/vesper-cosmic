@@ -161,6 +161,17 @@ export default function ProductDetailModal({ product, onClose }) {
               {product.fulfillmentTime}
             </p>
 
+            {product.requiresShipping ? (
+              <p className="flex gap-2 rounded border border-[#C77A0A]/30 bg-[#FDF6E3] px-3 py-2 text-xs leading-5 text-[#7A5410]">
+                <span aria-hidden="true">⚠️</span>
+                <span>
+                  <strong>Safety:</strong> Not a toy. Contains small parts that can be a choking
+                  hazard — keep away from children under 3 and pets. Do not swallow crystals or
+                  place them in drinks.
+                </span>
+              </p>
+            ) : null}
+
             {/* Quantity selector */}
             <div className="flex items-center gap-3">
               <span className="text-sm font-semibold text-[#1C2B48]">

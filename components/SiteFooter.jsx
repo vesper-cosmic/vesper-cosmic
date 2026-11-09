@@ -27,6 +27,7 @@ const footerNav = [
       { label: "Terms of Service", href: "/terms" },
       { label: "Member & Referral Agreement", href: "/member-agreement" },
       { label: "Your Privacy Rights", href: "/privacy#section-10" },
+      { label: "Accessibility", href: "/accessibility" },
     ],
   },
 ];
