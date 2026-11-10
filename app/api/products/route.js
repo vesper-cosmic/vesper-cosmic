@@ -13,7 +13,6 @@ export async function GET() {
         ? []
         : result.products.map(({ referralCommission, ...product }) => product),
       source: result.skipped ? "static" : "notion",
-      debug: globalThis.__productDebug, // TEMP
     },
     {
       headers: {
