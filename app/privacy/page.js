@@ -43,7 +43,7 @@ const sections = [
           </tbody>
         </table>
       </div>,
-      "We do not receive or store your payment card details — payments are handled by PayPal. Birth details are optional and are requested only for products that need them.",
+      "We do not receive or store your payment card details — payments are handled by PayPal. Birth details are optional and are requested only for products that need them. If you tick “Save my birth details for my next order” at checkout, we keep them on your account (or, if you are not signed in, only in your own browser) to fill in your next order; you can delete them any time from your account page or by unticking the box on your next order.",
     ],
   },
   {

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getReferralCode } from "@/lib/referralClient";
 import { useCart } from "@/lib/cartContext";
 import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
+import { applyBirthDataChoice, getSavedBirthData } from "@/lib/birthDataClient";
 import NailSizePicker from "@/components/NailSizePicker";
 import CheckoutNotices from "@/components/CheckoutNotices";
 import { useRouter } from "next/navigation";
@@ -55,7 +56,7 @@ const baseForm = {
 export default function OrderIntakeForm({ product }) {
   const router = useRouter();
   const { data: session } = useSession();
-  const { member } = useCart();
+  const { member, isSignedIn, saveDefaultBirthData } = useCart();
   const isCustomProduct = Boolean(product.requiresBirthData || product.requiresNailDetails);
   const [ackFinalSale, setAckFinalSale] = useState(false);
   const [form, setForm] = useState(baseForm);
@@ -79,6 +80,18 @@ export default function OrderIntakeForm({ product }) {
   }, [member, product.requiresNailDetails]);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Birth details the customer chose to keep last time (opt-in).
+  const [savedBirth, setSavedBirth] = useState(null);
+  const [keepBirth, setKeepBirth] = useState(false);
+  useEffect(() => {
+    if (!product.requiresBirthData) return;
+    const saved = getSavedBirthData(member);
+    setSavedBirth(saved);
+    if (!saved) return;
+    setKeepBirth(true);
+    setForm((current) => (current.birthDate ? current : { ...current, ...saved }));
+  }, [member, product.requiresBirthData]);
 
   function updateField(event) {
     const { name, value } = event.target;
@@ -238,6 +251,15 @@ export default function OrderIntakeForm({ product }) {
     }
 
     const payload = await response.json();
+    if (product.requiresBirthData) {
+      await applyBirthDataChoice({
+        keep: keepBirth,
+        birth: form,
+        hadSaved: Boolean(savedBirth),
+        isSignedIn,
+        saveDefaultBirthData,
+      });
+    }
     if (product.requiresNailDetails && form.sizeMode) {
       rememberNailSizing({
         sizeMode: form.sizeMode,
@@ -292,6 +314,8 @@ export default function OrderIntakeForm({ product }) {
           product={product}
           errors={errors}
           updateFortuneCheckbox={updateFortuneCheckbox}
+          savedBirth={savedBirth}
+          birthChoice={{ keep: keepBirth, setKeep: setKeepBirth, isSignedIn, hadSaved: Boolean(savedBirth) }}
         />
       ) : null}
 
@@ -364,7 +388,7 @@ function SingleIntentionFields({ form, product, errors, updateFortuneCheckbox })
   );
 }
 
-function BirthDataFields({ form, product, errors, updateField, updateFortuneCheckbox }) {
+function BirthDataFields({ form, product, errors, updateField, updateFortuneCheckbox, savedBirth, birthChoice }) {
   const isDigitalOnly = product.formType === "C";
   const fieldName = isDigitalOnly ? "digitalCuriosityAreas" : "baziIntentions";
   const fieldLabel = isDigitalOnly
@@ -374,6 +398,11 @@ function BirthDataFields({ form, product, errors, updateField, updateFortuneChec
 
   return (
     <FormPanel title="Birth Data">
+      {savedBirth?.birthDate && form.birthDate === savedBirth.birthDate ? (
+        <p className="rounded border border-[#8EB1D1]/30 bg-white/70 px-3 py-2 text-xs text-[#35506B]">
+          Filled in with the birth details you saved last time — please check they are still correct.
+        </p>
+      ) : null}
       <Field label="Date of Birth" error={errors.birthDate}>
         <input name="birthDate" type="date" value={form.birthDate} onChange={updateField} required className={inputClass} />
       </Field>
@@ -417,6 +446,27 @@ function BirthDataFields({ form, product, errors, updateField, updateFortuneChec
         <Field label="Any specific intentions for this piece?">
           <textarea name="specificIntentions" value={form.specificIntentions} onChange={updateField} className={`${inputClass} min-h-28`} />
         </Field>
+      ) : null}
+      {birthChoice ? (
+        <label className="flex items-start gap-2 rounded border border-[#8EB1D1]/30 bg-white/70 p-3 text-sm text-[#1C2B48]">
+          <input
+            type="checkbox"
+            checked={birthChoice.keep}
+            onChange={(event) => birthChoice.setKeep(event.target.checked)}
+            className="mt-1"
+          />
+          <span>
+            Save my birth details for my next order
+            <span className="block text-xs text-[#5B7893]">
+              {birthChoice.isSignedIn
+                ? "Saved to your account so you don’t have to enter them again. You can remove them any time in your account."
+                : "Saved in this browser only. Don’t tick this on a shared or public device."}
+              {birthChoice.hadSaved && !birthChoice.keep
+                ? " Unticked: your saved details will be deleted when you place this order."
+                : ""}
+            </span>
+          </span>
+        </label>
       ) : null}
     </FormPanel>
   );

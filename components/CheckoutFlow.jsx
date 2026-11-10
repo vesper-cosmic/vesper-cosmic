@@ -9,6 +9,7 @@ import NailSizePicker from "@/components/NailSizePicker";
 import CheckoutGate from "@/components/CheckoutGate";
 import CheckoutNotices from "@/components/CheckoutNotices";
 import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
+import { applyBirthDataChoice, getSavedBirthData } from "@/lib/birthDataClient";
 import {
   countries,
   nailShapes,
@@ -31,6 +32,7 @@ export default function CheckoutFlow() {
     userEmail,
     member,
     saveDefaultAddress,
+    saveDefaultBirthData,
   } = useCart();
 
   const [form, setForm] = useState(() => {
@@ -58,6 +60,15 @@ export default function CheckoutFlow() {
   // Nail sizing from the customer's last order (member record or this browser).
   useEffect(() => {
     setSavedSizing(getSavedNailSizing(member));
+  }, [member]);
+
+  // Birth details the customer chose to keep last time (opt-in).
+  const [savedBirth, setSavedBirth] = useState(null);
+  const [keepBirth, setKeepBirth] = useState(false);
+  useEffect(() => {
+    const saved = getSavedBirthData(member);
+    setSavedBirth(saved);
+    if (saved) setKeepBirth(true);
   }, [member]);
 
   // Prefill the referral code remembered from a friend's ?ref= link.
@@ -109,6 +120,8 @@ export default function CheckoutFlow() {
   );
 
   const hasShippingItems = enrichedItems.some((item) => item.product?.requiresShipping);
+  // The "save my birth details" choice is shown once, on the first BaZi item.
+  const firstBirthItemId = enrichedItems.find((item) => item.product?.requiresBirthData)?.id || null;
   // Custom / personalized items (made from birth details or nail sizes) are final sale.
   const hasCustomItems = enrichedItems.some(
     (item) => item.product?.requiresBirthData || item.product?.requiresNailDetails
@@ -190,6 +203,15 @@ export default function CheckoutFlow() {
       sessionStorage.removeItem("vesperCheckoutDraft");
       const sized = Object.values(itemDetails).find((detail) => detail?.nails?.sizeMode);
       if (sized) rememberNailSizing(sized.nails);
+      if (firstBirthItemId) {
+        await applyBirthDataChoice({
+          keep: keepBirth,
+          birth: itemDetails[firstBirthItemId]?.birth,
+          hadSaved: Boolean(savedBirth),
+          isSignedIn,
+          saveDefaultBirthData,
+        });
+      }
       // Use the server-computed order (includes shippingFee, subtotal and
       // total) so the review page shows the correct shipping charge and the
       // confirmation request matches the stored order exactly.
@@ -254,6 +276,12 @@ export default function CheckoutFlow() {
           errors={errors[`item_${index}`] || {}}
           onChange={updateItemDetails}
           savedSizing={savedSizing}
+          savedBirth={savedBirth}
+          birthChoice={
+            item.id === firstBirthItemId
+              ? { keep: keepBirth, setKeep: setKeepBirth, isSignedIn, hadSaved: Boolean(savedBirth) }
+              : null
+          }
         />
       ))}
 
@@ -355,7 +383,7 @@ export default function CheckoutFlow() {
   );
 }
 
-function ItemFormSection({ item, index, details, errors, onChange, savedSizing }) {
+function ItemFormSection({ item, index, details, errors, onChange, savedSizing, savedBirth, birthChoice }) {
   const product = item.product;
   if (!product) return null;
 
@@ -406,6 +434,8 @@ function ItemFormSection({ item, index, details, errors, onChange, savedSizing }
             details={details}
             errors={errors}
             onChange={onChange}
+            savedBirth={savedBirth}
+            birthChoice={birthChoice}
           />
         ) : null}
 
@@ -423,17 +453,30 @@ function ItemFormSection({ item, index, details, errors, onChange, savedSizing }
   );
 }
 
-function BirthFields({ itemId, product, details, errors, onChange }) {
+function BirthFields({ itemId, product, details, errors, onChange, savedBirth, birthChoice }) {
   const birth = details.birth || {};
   function update(key, value) {
     onChange(itemId, "birth", { ...birth, [key]: value });
   }
+
+  // Pre-fill saved birth details (only if nothing has been entered yet).
+  useEffect(() => {
+    if (savedBirth?.birthDate && !birth.birthDate) {
+      onChange(itemId, "birth", { ...birth, ...savedBirth });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedBirth]);
 
   return (
     <div className="rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-4 space-y-4">
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
         Birth Information (for your BaZi chart)
       </p>
+      {savedBirth?.birthDate && birth.birthDate === savedBirth.birthDate ? (
+        <p className="rounded border border-[#8EB1D1]/30 bg-white/70 px-3 py-2 text-xs text-[#35506B]">
+          Filled in with the birth details you saved last time — please check they are still correct.
+        </p>
+      ) : null}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Date of Birth" error={errors.birthDate}>
           <input
@@ -509,6 +552,25 @@ function BirthFields({ itemId, product, details, errors, onChange }) {
           }
         />
       )}
+      {birthChoice ? (
+        <label className="flex items-start gap-2 rounded border border-[#8EB1D1]/30 bg-white/70 p-3 text-sm text-[#1C2B48]">
+          <input
+            type="checkbox"
+            checked={birthChoice.keep}
+            onChange={(event) => birthChoice.setKeep(event.target.checked)}
+            className="mt-1"
+          />
+          <span>
+            Save my birth details for my next order
+            <span className="block text-xs text-[#5B7893]">
+              {birthChoice.isSignedIn
+                ? "Saved to your account so you don’t have to enter them again. You can remove them any time in your account."
+                : "Saved in this browser only. Don’t tick this on a shared or public device."}
+              {birthChoice.hadSaved && !birthChoice.keep ? " Unticked: your saved details will be deleted when you place this order." : ""}
+            </span>
+          </span>
+        </label>
+      ) : null}
     </div>
   );
 }

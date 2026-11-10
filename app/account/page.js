@@ -8,6 +8,7 @@ import { countries, emptyAddress } from "@/lib/formOptions";
 import { customerStatusLabel } from "@/lib/orderStatus";
 import ReferralEarnings from "@/components/account/ReferralEarnings";
 import EmailPreferences from "@/components/account/EmailPreferences";
+import SavedBirthDetails from "@/components/account/SavedBirthDetails";
 
 // Member levels are stored in Chinese in Notion; show them in English.
 const MEMBER_LEVEL_EN = {
@@ -246,6 +247,8 @@ export default function AccountPage() {
         <ReferralEarnings />
 
         <EmailPreferences />
+
+        <SavedBirthDetails />
 
         <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
           <div className="flex items-center justify-between">
