@@ -7,6 +7,7 @@ import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import { applyBirthDataChoice, getSavedBirthData } from "@/lib/birthDataClient";
 import NailSizePicker from "@/components/NailSizePicker";
 import CheckoutNotices from "@/components/CheckoutNotices";
+import NameFields, { joinName, nameErrors } from "@/components/NameFields";
 import { BirthDateSelect, BirthTimeSelect } from "@/components/BirthDateTimeInputs";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -30,6 +31,8 @@ import {
 import NailShapeIcon from "@/components/forms/NailShapeIcon";
 
 const baseForm = {
+  firstName: "",
+  lastName: "",
   fullName: "",
   email: "",
   birthDate: "",
@@ -152,7 +155,7 @@ export default function OrderIntakeForm({ product }) {
     const nextErrors = {};
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!form.fullName.trim()) nextErrors.fullName = "Full name is required.";
+    Object.assign(nextErrors, nameErrors(form.firstName, form.lastName));
     if (!emailPattern.test(form.email)) nextErrors.email = "Enter a valid email.";
 
     if (product.intentionType === "single" && form.readyIntentions.length === 0) {
@@ -301,9 +304,17 @@ export default function OrderIntakeForm({ product }) {
       </section>
 
       <FormPanel title="Basic Information">
-        <Field label="Full Name" error={errors.fullName}>
-          <input name="fullName" value={form.fullName} onChange={updateField} required className={inputClass} />
-        </Field>
+        <NameFields
+          idPrefix="contact"
+          firstName={form.firstName}
+          lastName={form.lastName}
+          onChange={(firstName, lastName) =>
+            setForm((current) => ({ ...current, firstName, lastName, fullName: joinName(firstName, lastName) }))
+          }
+          firstError={errors.firstName || errors.fullName}
+          lastError={errors.lastName}
+          className={inputClass}
+        />
         <Field label="Email Address" error={errors.email}>
           <input name="email" type="email" value={form.email} onChange={updateField} required className={inputClass} />
         </Field>

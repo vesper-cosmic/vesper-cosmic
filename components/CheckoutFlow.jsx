@@ -8,6 +8,7 @@ import { getReferralCode } from "@/lib/referralClient";
 import NailSizePicker from "@/components/NailSizePicker";
 import CheckoutGate from "@/components/CheckoutGate";
 import CheckoutNotices from "@/components/CheckoutNotices";
+import NameFields, { joinName, nameErrors, splitName } from "@/components/NameFields";
 import { BirthDateSelect, BirthTimeSelect } from "@/components/BirthDateTimeInputs";
 import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import { applyBirthDataChoice, getSavedBirthData } from "@/lib/birthDataClient";
@@ -39,9 +40,16 @@ export default function CheckoutFlow() {
   const [form, setForm] = useState(() => {
     const draft = readDraft();
     if (draft?.form) {
-      return { ...emptyAddress(), ...draft.form, shipping: { ...emptyAddress(), ...(draft.form.shipping || {}) } };
+      const shipping = { ...emptyAddress(), ...(draft.form.shipping || {}) };
+      // Drafts saved before names were split into first / last.
+      if (shipping.fullName && shipping.firstName === undefined) Object.assign(shipping, splitName(shipping.fullName));
+      const restored = { ...emptyAddress(), ...draft.form, shipping };
+      if (restored.fullName && restored.firstName === undefined) Object.assign(restored, splitName(restored.fullName));
+      return restored;
     }
     return {
+      firstName: "",
+      lastName: "",
       fullName: "",
       email: "",
       shipping: emptyAddress(),
@@ -94,10 +102,14 @@ export default function CheckoutFlow() {
         const address = member.defaultAddress;
         const hasAddress =
           address.addressLine1 || address.city || address.postalCode;
+        const receiver = address.fullName ? splitName(address.fullName) : null;
+        const contact = !prev.fullName && receiver ? { ...receiver, fullName: address.fullName } : {};
         return {
           ...prev,
+          ...contact,
           shipping: hasAddress
             ? {
+                ...(receiver ? { ...receiver, fullName: address.fullName } : {}),
                 addressLine1: address.addressLine1 || "",
                 addressLine2: address.addressLine2 || "",
                 city: address.city || "",
@@ -133,6 +145,17 @@ export default function CheckoutFlow() {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
+  function updateName(firstName, lastName) {
+    setForm((prev) => ({ ...prev, firstName, lastName, fullName: joinName(firstName, lastName) }));
+  }
+
+  function updateReceiverName(firstName, lastName) {
+    setForm((prev) => ({
+      ...prev,
+      shipping: { ...prev.shipping, firstName, lastName, fullName: joinName(firstName, lastName) },
+    }));
+  }
+
   function updateShipping(field, value) {
     setForm((prev) => ({
       ...prev,
@@ -166,6 +189,18 @@ export default function CheckoutFlow() {
     event.preventDefault();
     setSubmitError("");
     setErrors({});
+
+    const missingNames = {
+      ...nameErrors(form.firstName, form.lastName),
+      ...(hasShippingItems
+        ? nameErrors(form.shipping.firstName, form.shipping.lastName, "receiver")
+        : {}),
+    };
+    if (Object.keys(missingNames).length) {
+      setErrors(missingNames);
+      setSubmitError("Please enter both a first and last name.");
+      return;
+    }
 
     const payload = {
       fullName: form.fullName,
@@ -290,14 +325,14 @@ export default function CheckoutFlow() {
       <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5">
         <h2 className="text-2xl font-semibold text-[#1C2B48]">Contact & Delivery</h2>
         <div className="mt-5 space-y-4">
-          <Field label="Full Name" error={errors.fullName}>
-            <input
-              type="text"
-              value={form.fullName}
-              onChange={(event) => updateField("fullName", event.target.value)}
-              className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
-            />
-          </Field>
+          <NameFields
+            idPrefix="contact"
+            firstName={form.firstName}
+            lastName={form.lastName}
+            onChange={updateName}
+            firstError={errors.firstName || errors.fullName}
+            lastError={errors.lastName}
+          />
           <Field label="Email" error={errors.email}>
             <input
               type="email"
@@ -333,6 +368,8 @@ export default function CheckoutFlow() {
                 shipping={form.shipping}
                 errors={errors}
                 onChange={updateShipping}
+                onNameChange={updateReceiverName}
+                contactName={{ firstName: form.firstName, lastName: form.lastName }}
               />
             </>
           ) : null}
@@ -711,18 +748,33 @@ function toggleInList(list, option, checked) {
   return list.filter((item) => item !== option);
 }
 
-function ShippingForm({ shipping, errors, onChange }) {
+function ShippingForm({ shipping, errors, onChange, onNameChange, contactName }) {
+  const canCopy =
+    (contactName?.firstName || contactName?.lastName) &&
+    !shipping.firstName &&
+    !shipping.lastName;
   return (
     <div className="space-y-4">
+      <NameFields
+        idPrefix="ship"
+        firstLabel="Receiver First Name"
+        lastLabel="Receiver Last Name"
+        firstName={shipping.firstName}
+        lastName={shipping.lastName}
+        onChange={onNameChange}
+        firstError={errors.receiverFirstName || errors.addressFullName}
+        lastError={errors.receiverLastName}
+      />
+      {canCopy ? (
+        <button
+          type="button"
+          onClick={() => onNameChange(contactName.firstName || "", contactName.lastName || "")}
+          className="-mt-2 text-xs font-semibold text-[#35506B] underline underline-offset-2 hover:text-[#1C2B48]"
+        >
+          Same as my name
+        </button>
+      ) : null}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Receiver Name" error={errors.addressFullName}>
-          <input
-            type="text"
-            value={shipping.fullName || ""}
-            onChange={(event) => onChange("fullName", event.target.value)}
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
-          />
-        </Field>
         <Field label="Country" error={errors.country}>
           <select
             value={shipping.country}
