@@ -8,6 +8,7 @@ import { getReferralCode } from "@/lib/referralClient";
 import NailSizePicker from "@/components/NailSizePicker";
 import CheckoutGate from "@/components/CheckoutGate";
 import CheckoutNotices from "@/components/CheckoutNotices";
+import { BirthDateSelect, BirthTimeSelect } from "@/components/BirthDateTimeInputs";
 import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import { applyBirthDataChoice, getSavedBirthData } from "@/lib/birthDataClient";
 import {
@@ -479,19 +480,16 @@ function BirthFields({ itemId, product, details, errors, onChange, savedBirth, b
       ) : null}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Date of Birth" error={errors.birthDate}>
-          <input
-            type="date"
+          <BirthDateSelect
             value={birth.birthDate || ""}
-            onChange={(event) => update("birthDate", event.target.value)}
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            onChange={(value) => update("birthDate", value)}
+            idPrefix={"birth-" + itemId}
           />
         </Field>
         <Field label="Exact Birth Time" error={errors.birthTime}>
-          <input
-            type="time"
+          <BirthTimeSelect
             value={birth.birthTime || ""}
-            onChange={(event) => update("birthTime", event.target.value)}
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            onChange={(value) => update("birthTime", value)}
           />
         </Field>
         <Field label="Biological Gender" error={errors.biologicalGender}>

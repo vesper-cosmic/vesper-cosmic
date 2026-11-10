@@ -7,6 +7,7 @@ import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import { applyBirthDataChoice, getSavedBirthData } from "@/lib/birthDataClient";
 import NailSizePicker from "@/components/NailSizePicker";
 import CheckoutNotices from "@/components/CheckoutNotices";
+import { BirthDateSelect, BirthTimeSelect } from "@/components/BirthDateTimeInputs";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
@@ -404,10 +405,16 @@ function BirthDataFields({ form, product, errors, updateField, updateFortuneChec
         </p>
       ) : null}
       <Field label="Date of Birth" error={errors.birthDate}>
-        <input name="birthDate" type="date" value={form.birthDate} onChange={updateField} required className={inputClass} />
+        <BirthDateSelect
+          value={form.birthDate}
+          onChange={(value) => updateField({ target: { name: "birthDate", value } })}
+        />
       </Field>
       <Field label="Exact Birth Time" error={errors.birthTime}>
-        <input name="birthTime" type="time" value={form.birthTime} onChange={updateField} required className={inputClass} />
+        <BirthTimeSelect
+          value={form.birthTime}
+          onChange={(value) => updateField({ target: { name: "birthTime", value } })}
+        />
       </Field>
       <RadioGroup
         label="Biological Gender"
