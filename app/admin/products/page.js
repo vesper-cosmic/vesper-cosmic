@@ -71,6 +71,8 @@ export default function AdminProductsPage() {
 
   // Form state
   const [form, setForm] = useState(emptyForm());
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [formErrors, setFormErrors] = useState({});
   const [formMessage, setFormMessage] = useState({ type: "", text: "" });
@@ -229,6 +231,29 @@ export default function AdminProductsPage() {
       next[index] = value;
       return { ...prev, images: next };
     });
+  }
+
+  async function uploadImages(fileList) {
+    const files = Array.from(fileList || []);
+    if (files.length === 0) return;
+    setUploading(true);
+    setUploadError("");
+    try {
+      for (const file of files) {
+        const body = new FormData();
+        body.append("file", file);
+        const response = await fetch("/api/admin/upload", { method: "POST", body });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.url) {
+          throw new Error(data.error || `${file.name} 上傳失敗`);
+        }
+        setForm((prev) => ({ ...prev, images: [...prev.images, data.url] }));
+      }
+    } catch (error) {
+      setUploadError(error.message || "上傳失敗");
+    } finally {
+      setUploading(false);
+    }
   }
 
   function removeImageField(index) {
@@ -704,7 +729,7 @@ export default function AdminProductsPage() {
               <div className="space-y-2">
                 {form.images.length === 0 ? (
                   <p className="rounded border border-dashed border-[#8EB1D1]/40 bg-white/40 px-3 py-5 text-center text-sm text-[#5B7893]">
-                    尚未新增圖片。點擊下方「＋ 新增圖片」貼上圖片網址。
+                    尚未新增圖片。點擊下方「⬆ 上傳圖片」選擇檔案，或貼上圖片網址。
                   </p>
                 ) : null}
                 {form.images.map((imageUrl, index) => (
@@ -739,13 +764,36 @@ export default function AdminProductsPage() {
                     </button>
                   </div>
                 ))}
-                <button
-                  type="button"
-                  onClick={addImageField}
-                  className="rounded border border-[#8EB1D1]/40 px-3 py-1.5 text-xs font-semibold text-[#35506B] transition hover:bg-[#C4D8E5]"
-                >
-                  ＋ 新增圖片
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <label
+                    className={`cursor-pointer rounded border border-[#8EB1D1] bg-[#8EB1D1] px-3 py-1.5 text-xs font-semibold text-[#1C2B48] transition hover:bg-[#A7C7E7] ${
+                      uploading ? "pointer-events-none opacity-50" : ""
+                    }`}
+                  >
+                    {uploading ? "上傳中…" : "⬆ 上傳圖片"}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                      multiple
+                      className="hidden"
+                      disabled={uploading}
+                      onChange={(e) => {
+                        uploadImages(e.target.files);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={addImageField}
+                    className="rounded border border-[#8EB1D1]/40 px-3 py-1.5 text-xs font-semibold text-[#35506B] transition hover:bg-[#C4D8E5]"
+                  >
+                    ＋ 新增圖片網址
+                  </button>
+                </div>
+                {uploadError ? (
+                  <p className="text-xs text-[#C0392B]">{uploadError}</p>
+                ) : null}
               </div>
             </Field>
 
