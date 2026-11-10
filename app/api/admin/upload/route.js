@@ -20,11 +20,13 @@ export async function POST(request) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 403 });
   }
 
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  // Auth comes from BLOB_READ_WRITE_TOKEN, or from BLOB_STORE_ID plus the
+  // OIDC token Vercel injects into functions.
+  if (!process.env.BLOB_READ_WRITE_TOKEN && !process.env.BLOB_STORE_ID) {
     return NextResponse.json(
       {
         error:
-          "尚未設定圖片儲存空間：請在 Vercel → Storage 建立 Blob 並連結到專案（BLOB_READ_WRITE_TOKEN）。",
+          "尚未設定圖片儲存空間：請在 Vercel → Storage 建立 Blob 並連結到專案（BLOB_STORE_ID 或 BLOB_READ_WRITE_TOKEN）。",
       },
       { status: 500 }
     );
