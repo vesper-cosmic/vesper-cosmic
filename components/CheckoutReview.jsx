@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useProducts } from "@/components/ProductProvider";
 import { useCart } from "@/lib/cartContext";
+import PayPalCheckoutButtons from "@/components/PayPalCheckoutButtons";
 
 export default function CheckoutReview() {
   const { getProductById } = useProducts();
@@ -13,13 +14,26 @@ export default function CheckoutReview() {
   const [confirming, setConfirming] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [confirmError, setConfirmError] = useState(null);
+  // undefined = still checking, null = PayPal Checkout not set up (use PayPal.me)
+  const [paypalClientId, setPaypalClientId] = useState(undefined);
 
   useEffect(() => {
     const stored = sessionStorage.getItem("vesperCheckoutOrder");
     if (stored) {
       setCheckout(JSON.parse(stored));
     }
+    fetch("/api/paypal/config")
+      .then((response) => response.json())
+      .then((data) => setPaypalClientId(data?.clientId || null))
+      .catch(() => setPaypalClientId(null));
   }, []);
+
+  function handlePaid() {
+    setConfirmed(true);
+    clearCart();
+    sessionStorage.setItem("vesperLastOrder", JSON.stringify({ ...checkout, paid: true }));
+    window.location.href = "/thank-you";
+  }
 
   if (!checkout?.orderId || !checkout?.order?.items?.length) {
     return (
@@ -191,7 +205,22 @@ export default function CheckoutReview() {
           Your order will only be confirmed after PayPal payment is completed.
           Unpaid submissions will not be processed.
         </p>
-        {!confirmed ? (
+        {confirmed ? null : paypalClientId === undefined ? (
+          <p className="py-4 text-sm text-[#5B7893]">Loading payment options…</p>
+        ) : paypalClientId ? (
+          <>
+            <PayPalCheckoutButtons
+              clientId={paypalClientId}
+              checkout={checkout}
+              onPaid={handlePaid}
+            />
+            <p className="mt-3 text-xs leading-5 text-[#5B7893]">
+              Pay securely with PayPal or a debit/credit card. Your payment is confirmed
+              instantly and you&apos;ll come straight back here.
+            </p>
+          </>
+        ) : null}
+        {confirmed || paypalClientId ? null : paypalClientId === null ? (
           <>
             <button
               type="button"
@@ -227,11 +256,12 @@ export default function CheckoutReview() {
               </>
             ) : null}
           </>
-        ) : (
+        ) : null}
+        {confirmed ? (
           <p className="py-4 text-sm text-[#35506B]">
             Order confirmed. Redirecting…
           </p>
-        )}
+        ) : null}
       </section>
     </div>
   );

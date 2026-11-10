@@ -84,8 +84,9 @@ export default function ThankYouMessage() {
           Your order has been received
         </h1>
         <p className="mt-4 text-base leading-7 text-[#35506B]">
-          Thank you, {fullName}. Your PayPal payment has been submitted. I'll be
-          in touch within 24 hours to confirm your order details.
+          {order.paid
+            ? `Thank you, ${fullName}. We've received your PayPal payment and your order is confirmed. A confirmation email is on its way.`
+            : `Thank you, ${fullName}. Your PayPal payment has been submitted. I'll be in touch within 24 hours to confirm your order details.`}
         </p>
         <div className="mt-6 rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-4 text-left">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">

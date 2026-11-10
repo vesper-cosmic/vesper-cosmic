@@ -386,6 +386,11 @@ function OrderCard({ order, onUpdated }) {
           {order.trackingNumber ? (
             <p className="mt-1 font-mono text-[11px] text-[#5B7893]">追蹤碼：{order.trackingNumber}</p>
           ) : null}
+          {order.paypalCaptureId ? (
+            <p className="mt-1 font-mono text-[11px] text-[#2E8B57]">
+              PayPal 已自動確認收款：{order.paypalCaptureId}
+            </p>
+          ) : null}
           {order.referrerEmail && order.referralReward > 0 ? (
             <p className="mt-1 text-[11px] text-[#5B7893]">
               推薦分潤 ${Number(order.referralReward).toFixed(2)} → {order.referrerEmail}

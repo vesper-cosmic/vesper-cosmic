@@ -22,7 +22,7 @@ export async function GET() {
 
   // Hide internal bookkeeping (referrer, commission, Notion ids).
   const orders = (result.orders || []).map(
-    ({ referrerEmail, referralReward, referralStatus, pageId, ...order }) => order
+    ({ referrerEmail, referralReward, referralStatus, pageId, paypalCaptureId, ...order }) => order
   );
   return NextResponse.json({ orders });
 }
