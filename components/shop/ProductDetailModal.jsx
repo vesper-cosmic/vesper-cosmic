@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cartContext";
-import { isProductSoldOut } from "@/lib/productData";
+import { isProductSoldOut, PRODUCT_DISCLAIMER } from "@/lib/productData";
 import { NailSizeChart } from "@/components/NailSizePicker";
 
 export default function ProductDetailModal({ product, onClose }) {
@@ -171,6 +171,10 @@ export default function ProductDetailModal({ product, onClose }) {
                 </span>
               </p>
             ) : null}
+
+            <p className="rounded border border-[#8EB1D1]/25 bg-white/50 px-3 py-2 text-xs leading-5 text-[#5B7893]">
+              <strong>Disclaimer:</strong> {PRODUCT_DISCLAIMER}
+            </p>
 
             {/* Quantity selector */}
             <div className="flex items-center gap-3">

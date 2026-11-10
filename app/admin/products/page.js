@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { INCLUDES_PRESETS, defaultIncludesForCategory } from "@/lib/productData";
 
 const PAGE_SIZE = 10;
 
@@ -480,6 +481,10 @@ export default function AdminProductsPage() {
                   onChange={(e) => {
                     const selected = commonCategories.find((c) => c.id === e.target.value);
                     updateField("category", e.target.value);
+                    // Pre-fill the standard contents when the field is still empty.
+                    if (!form.includes.trim()) {
+                      updateField("includes", defaultIncludesForCategory(e.target.value));
+                    }
                     if (selected) {
                       updateField("categoryLabel", selected.label.replace(/（.*）$/, ""));
                     }
@@ -716,6 +721,33 @@ export default function AdminProductsPage() {
             ) : null}
 
             <Field label="內容物 Includes">
+              <div className="mb-2 flex flex-wrap gap-x-4 gap-y-1">
+                {INCLUDES_PRESETS.map((preset) => {
+                  const checked = form.includes.includes(preset.text);
+                  return (
+                    <label key={preset.id} className="flex items-center gap-1.5 text-xs text-[#35506B]">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() =>
+                          updateField(
+                            "includes",
+                            checked
+                              ? form.includes
+                                  .replace(preset.text, "")
+                                  .replace(/^[\s;]+|[\s;]+$/g, "")
+                                  .replace(/;\s*;/g, ";")
+                              : form.includes.trim()
+                                ? `${form.includes.trim()}; ${preset.text}`
+                                : preset.text
+                          )
+                        }
+                      />
+                      {preset.label}
+                    </label>
+                  );
+                })}
+              </div>
               <input
                 type="text"
                 value={form.includes}
