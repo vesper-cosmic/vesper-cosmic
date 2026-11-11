@@ -15,7 +15,7 @@ const initialState = {
   birthDateTime: "",
   birthLocation: "",
   intentions: [],
-  purchasedProductId: staticProducts[0].id,
+  purchasedProductId: staticProducts[0]?.id || "",
   shippingAddress: "",
   postalCode: "",
 };
@@ -24,7 +24,7 @@ export default function OrderForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { products, getProductById } = useProducts();
-  const defaultProductId = searchParams.get("product") || products[0]?.id || staticProducts[0].id;
+  const defaultProductId = searchParams.get("product") || products[0]?.id || staticProducts[0]?.id || "";
   const [form, setForm] = useState({
     ...initialState,
     purchasedProductId: defaultProductId,
