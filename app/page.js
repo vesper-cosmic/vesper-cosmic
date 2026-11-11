@@ -2,7 +2,7 @@
 
 import { useState, useMemo, Suspense } from "react";
 import Link from "next/link";
-import { staticCategories, groupCategoryIds } from "@/lib/productData";
+import { staticCategories, groupCategoryIds, categoryCountsFor, categoryMemberIds } from "@/lib/productData";
 import { useProducts } from "@/components/ProductProvider";
 import ShopProductCard from "@/components/shop/ShopProductCard";
 import ProductDetailModal from "@/components/shop/ProductDetailModal";
@@ -34,13 +34,7 @@ function HomePageContent() {
   }
 
   // Count products per product.category id
-  const categoryCounts = useMemo(() => {
-    const counts = {};
-    products.forEach((p) => {
-      counts[p.category] = (counts[p.category] || 0) + 1;
-    });
-    return counts;
-  }, [products]);
+  const categoryCounts = useMemo(() => categoryCountsFor(products), [products]);
 
   function toggleGroup(item) {
     // Parent category with children → show all products in its sub-categories
@@ -84,7 +78,7 @@ function HomePageContent() {
     }
 
     return visibleAllProducts.filter(
-      (product) => product.category === selectedFilter.id
+      (product) => categoryMemberIds(selectedFilter.id).has(product.category)
     );
   }, [selectedFilter, visibleAllProducts]);
 

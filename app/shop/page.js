@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { staticCategories, staticSingleIntentions, groupCategoryIds } from "@/lib/productData";
+import { staticCategories, staticSingleIntentions, groupCategoryIds, categoryCountsFor, categoryMemberIds } from "@/lib/productData";
 import { useProducts } from "@/components/ProductProvider";
 import ShopProductCard from "@/components/shop/ShopProductCard";
 import ProductDetailModal from "@/components/shop/ProductDetailModal";
@@ -48,13 +48,7 @@ function ShopPageContent() {
   }
 
   // Count products per product.category id
-  const categoryCounts = useMemo(() => {
-    const counts = {};
-    products.forEach((p) => {
-      counts[p.category] = (counts[p.category] || 0) + 1;
-    });
-    return counts;
-  }, [products]);
+  const categoryCounts = useMemo(() => categoryCountsFor(products), [products]);
 
   function toggleGroup(item) {
     // Parent category with children → show all products in its sub-categories
@@ -95,7 +89,7 @@ function ShopPageContent() {
       return products.filter((product) => categoryIds.has(product.category));
     }
 
-    return products.filter((product) => product.category === selectedFilter.id);
+    return products.filter((product) => categoryMemberIds(selectedFilter.id).has(product.category));
   }, [selectedFilter, products]);
 
   const emptyMessage =

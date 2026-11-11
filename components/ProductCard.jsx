@@ -1,3 +1,4 @@
+import { productBadges } from "@/lib/productData";
 export default function ProductCard({ product, featured = false }) {
   return (
     <article
@@ -11,10 +12,14 @@ export default function ProductCard({ product, featured = false }) {
           alt={product.name}
           className="h-full w-full object-cover"
         />
-        {product.badge ? (
-          <span className="absolute left-3 top-3 rounded bg-[#1C2B48]/85 px-2 py-1 text-xs font-medium text-[#E8ECEF]">
-            {product.badge}
-          </span>
+        {productBadges(product).length ? (
+          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+            {productBadges(product).map((badge) => (
+              <span key={badge} className="rounded bg-[#1C2B48]/85 px-2 py-1 text-xs font-medium text-[#E8ECEF]">
+                {badge}
+              </span>
+            ))}
+          </div>
         ) : null}
       </div>
 

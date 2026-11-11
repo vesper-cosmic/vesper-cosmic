@@ -1,4 +1,4 @@
-import { isProductSoldOut } from "@/lib/productData";
+import { isProductSoldOut, productBadges } from "@/lib/productData";
 
 export default function ShopProductCard({ product, onClick }) {
   const soldOut = isProductSoldOut(product);
@@ -28,10 +28,14 @@ export default function ShopProductCard({ product, onClick }) {
             Sold Out
           </span>
         ) : null}
-        {product.badge ? (
-          <span className="absolute left-3 top-3 rounded-full border border-[#8EB1D1] bg-[#1C2B48]/85 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#E8ECEF]">
-            {product.badge}
-          </span>
+        {productBadges(product).length ? (
+          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+            {productBadges(product).map((badge) => (
+              <span key={badge} className="rounded-full border border-[#8EB1D1] bg-[#1C2B48]/85 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#E8ECEF]">
+                {badge}
+              </span>
+            ))}
+          </div>
         ) : null}
       </div>
 

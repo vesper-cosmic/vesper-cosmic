@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cartContext";
-import { isProductSoldOut, PRODUCT_DISCLAIMER } from "@/lib/productData";
+import { isProductSoldOut, PRODUCT_DISCLAIMER, productBadges } from "@/lib/productData";
 import { NailSizeChart } from "@/components/NailSizePicker";
 
 export default function ProductDetailModal({ product, onClose }) {
@@ -66,10 +66,14 @@ export default function ProductDetailModal({ product, onClose }) {
               alt={product.name}
               className="h-full w-full object-cover"
             />
-            {product.badge ? (
-              <span className="absolute left-3 top-3 rounded-full border border-[#8EB1D1] bg-[#1C2B48]/85 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#E8ECEF]">
-                {product.badge}
-              </span>
+            {productBadges(product).length ? (
+              <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+                {productBadges(product).map((badge) => (
+                  <span key={badge} className="rounded-full border border-[#8EB1D1] bg-[#1C2B48]/85 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#E8ECEF]">
+                    {badge}
+                  </span>
+                ))}
+              </div>
             ) : null}
           </div>
           {product.images.length > 1 ? (

@@ -649,18 +649,31 @@ export default function AdminProductsPage() {
               </Field>
             </div>
 
-            <Field label="標籤 Badge（可選，單選；再點一次取消）">
+            <Field label="標籤 Badge（可選，可複選）">
               <div className="flex flex-wrap gap-2">
-                {[...BADGE_OPTIONS, ...(form.badge && !BADGE_OPTIONS.includes(form.badge) ? [form.badge] : [])].map(
-                  (option) => (
-                    <CheckboxPill
-                      key={option}
-                      checked={form.badge === option}
-                      onChange={() => updateField("badge", form.badge === option ? "" : option)}
-                      label={option}
-                    />
-                  )
-                )}
+                {(() => {
+                  const selected = intentionList(form.badge);
+                  return [...BADGE_OPTIONS, ...selected.filter((b) => !BADGE_OPTIONS.includes(b))].map(
+                    (option) => (
+                      <CheckboxPill
+                        key={option}
+                        checked={selected.includes(option)}
+                        onChange={() => {
+                          const next = selected.includes(option)
+                            ? selected.filter((b) => b !== option)
+                            : [...selected, option];
+                          next.sort((a, b) => {
+                            const ia = BADGE_OPTIONS.indexOf(a);
+                            const ib = BADGE_OPTIONS.indexOf(b);
+                            return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+                          });
+                          updateField("badge", next.join(", "));
+                        }}
+                        label={option}
+                      />
+                    )
+                  );
+                })()}
               </div>
             </Field>
 
@@ -1198,11 +1211,11 @@ function ProductRow({
                 New
               </span>
             ) : null}
-            {product.badge ? (
-              <span className="rounded-full border border-[#8EB1D1]/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#5B7893]">
-                {product.badge}
+            {intentionList(product.badge).map((badge) => (
+              <span key={badge} className="rounded-full border border-[#8EB1D1]/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#5B7893]">
+                {badge}
               </span>
-            ) : null}
+            ))}
           </div>
           <p className="mt-1 font-semibold text-[#1C2B48]">{product.name}</p>
           <p className="text-xs text-[#5B7893]">

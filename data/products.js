@@ -3,7 +3,13 @@
 export const products = [];
 
 export const productCategories = [
-  { id: "nails", title: "Nails", categoryId: "nails" },
+  // "includes": this entry also lists products from these categories.
+  {
+    id: "nails",
+    title: "Nails",
+    categoryId: "nails",
+    includes: ["nails", "ready-made-nails", "custom-nails"],
+  },
   { id: "ready-made-nails", title: "Ready-Made Nails", categoryId: "ready-made-nails" },
   { id: "energy-bottles", title: "Energy Bottles", categoryId: "energy-bottles" },
   {
