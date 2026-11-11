@@ -71,11 +71,17 @@ export async function POST(request) {
 
   // Remember the member's nail sizing for their next custom nail order.
   if (order.memberEmail && order.sizeMode && !notionResult?.error) {
-    await saveMemberNailSizing(order.memberEmail, {
-      sizeMode: order.sizeMode,
-      standardSize: order.standardSize,
-      measurements: order.nailMeasurements,
-    }).catch((error) => console.error("Saving nail sizing failed:", error));
+    const keep = payload.saveNailSizing !== false;
+    await saveMemberNailSizing(
+      order.memberEmail,
+      keep
+        ? {
+            sizeMode: order.sizeMode,
+            standardSize: order.standardSize,
+            measurements: order.nailMeasurements,
+          }
+        : null
+    ).catch((error) => console.error("Saving nail sizing failed:", error));
   }
 
   if (referral && !notionResult?.error) {

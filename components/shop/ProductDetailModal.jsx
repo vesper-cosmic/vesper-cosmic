@@ -113,7 +113,7 @@ export default function ProductDetailModal({ product, onClose }) {
               {product.name}
             </h2>
 
-            <p className="text-sm leading-6 text-[#35506B]">
+            <p className="whitespace-pre-line text-sm leading-6 text-[#35506B]">
               {product.description}
             </p>
 

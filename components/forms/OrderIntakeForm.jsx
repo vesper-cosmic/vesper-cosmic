@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getReferralCode } from "@/lib/referralClient";
 import { useCart } from "@/lib/cartContext";
-import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
+import { forgetNailSizing, getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import { applyBirthDataChoice, getSavedBirthData } from "@/lib/birthDataClient";
 import NailSizePicker from "@/components/NailSizePicker";
 import CheckoutNotices from "@/components/CheckoutNotices";
@@ -65,11 +65,16 @@ export default function OrderIntakeForm({ product }) {
   const [ackFinalSale, setAckFinalSale] = useState(false);
   const [form, setForm] = useState(baseForm);
 
+  // Nail size is not sensitive, so keeping it for next time is on by default.
+  const [keepNails, setKeepNails] = useState(true);
+  const [hadSavedNails, setHadSavedNails] = useState(false);
+
   // Pre-fill nail size from the customer's last order (if not chosen yet).
   useEffect(() => {
     if (!product.requiresNailDetails) return;
     const saved = getSavedNailSizing(member);
     if (!saved?.sizeMode) return;
+    setHadSavedNails(true);
     setForm((current) =>
       current.sizeMode
         ? current
@@ -244,6 +249,7 @@ export default function OrderIntakeForm({ product }) {
         ...orderDraft,
         referralCode: getReferralCode() || null,
         acknowledgedFinalSale: isCustomProduct ? ackFinalSale : undefined,
+        saveNailSizing: keepNails,
       }),
     });
     setIsSubmitting(false);
@@ -264,7 +270,9 @@ export default function OrderIntakeForm({ product }) {
         saveDefaultBirthData,
       });
     }
-    if (product.requiresNailDetails && form.sizeMode) {
+    if (product.requiresNailDetails && form.sizeMode && !keepNails) {
+      forgetNailSizing();
+    } else if (product.requiresNailDetails && form.sizeMode) {
       rememberNailSizing({
         sizeMode: form.sizeMode,
         standardSize: form.standardSize,
@@ -350,6 +358,7 @@ export default function OrderIntakeForm({ product }) {
           updatePhoto={updatePhoto}
           setForm={setForm}
           intro={product.nailIntro}
+          nailChoice={{ keep: keepNails, setKeep: setKeepNails, isSignedIn, hadSaved: hadSavedNails }}
         />
       ) : null}
 
@@ -535,6 +544,7 @@ function NailDetailsFields({
   updatePhoto,
   setForm,
   intro,
+  nailChoice,
 }) {
   return (
     <FormPanel title="Press-On Nail Details">
@@ -557,6 +567,27 @@ function NailDetailsFields({
           }))
         }
       />
+      {nailChoice ? (
+        <label className="flex items-start gap-2 rounded border border-[#8EB1D1]/30 bg-white/70 p-3 text-sm text-[#1C2B48]">
+          <input
+            type="checkbox"
+            checked={nailChoice.keep}
+            onChange={(event) => nailChoice.setKeep(event.target.checked)}
+            className="mt-1"
+          />
+          <span>
+            Save my nail size for my next order
+            <span className="block text-xs text-[#5B7893]">
+              {nailChoice.isSignedIn
+                ? "Saved to your account and filled in automatically next time."
+                : "Saved in this browser and filled in automatically next time."}
+              {nailChoice.hadSaved && !nailChoice.keep
+                ? " Unticked: your saved size will be deleted when you place this order."
+                : ""}
+            </span>
+          </span>
+        </label>
+      ) : null}
 
       <RadioGroup
         label="Nail Shape"

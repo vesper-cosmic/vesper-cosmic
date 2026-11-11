@@ -4,6 +4,34 @@ import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { INCLUDES_PRESETS, defaultIncludesForCategory } from "@/lib/productData";
+import { fortuneAreas } from "@/lib/formOptions";
+
+// Badge choices (one per product). "" = no badge.
+const BADGE_OPTIONS = ["Custom", "New", "Best Seller", "Limited Edition", "Sale"];
+
+// Fields pre-filled when a NEW product is put in one of these categories.
+// Price comes from your latest product in the same category when there is one.
+const CATEGORY_PRESETS = {
+  "custom-nails": {
+    price: "128",
+    formType: "B",
+    fulfillmentMode: "Made to Order",
+    fulfillmentTime: "Made to order — ships within 7–10 business days",
+    intentionType: "bazi",
+    requiresBirthData: true,
+    requiresShipping: true,
+    requiresNailDetails: true,
+    shippingTier: "LIGHT",
+    badge: "Custom",
+  },
+};
+
+function intentionList(value) {
+  return String(value || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
 
 const PAGE_SIZE = 10;
 
@@ -493,6 +521,18 @@ export default function AdminProductsPage() {
                       updateField("requiresNailDetails", false);
                       updateField("requiresShipping", true);
                     }
+                    // New product: pre-fill the category's usual settings (all editable).
+                    const preset = CATEGORY_PRESETS[e.target.value];
+                    if (preset && !editingId) {
+                      const latest = products.find(
+                        (p) => p.category === e.target.value && Number(p.price) > 0
+                      );
+                      setForm((prev) => ({
+                        ...prev,
+                        ...preset,
+                        price: latest ? String(latest.price) : preset.price,
+                      }));
+                    }
                   }}
                   className={inputClass(!!formErrors.category)}
                 >
@@ -580,8 +620,8 @@ export default function AdminProductsPage() {
               <textarea
                 value={form.description}
                 onChange={(e) => updateField("description", e.target.value)}
-                rows="3"
-                placeholder="About this product…"
+                rows="8"
+                placeholder="About this product…（按 Enter 換行，商品頁會照樣換行）"
                 className={inputClass(!!formErrors.description)}
               />
             </Field>
@@ -607,16 +647,22 @@ export default function AdminProductsPage() {
                   <option>Digital Delivery</option>
                 </select>
               </Field>
-              <Field label="標籤 Badge（可選）">
-                <input
-                  type="text"
-                  value={form.badge}
-                  onChange={(e) => updateField("badge", e.target.value)}
-                  placeholder="e.g. Custom / New"
-                  className={inputClass()}
-                />
-              </Field>
             </div>
+
+            <Field label="標籤 Badge（可選，單選；再點一次取消）">
+              <div className="flex flex-wrap gap-2">
+                {[...BADGE_OPTIONS, ...(form.badge && !BADGE_OPTIONS.includes(form.badge) ? [form.badge] : [])].map(
+                  (option) => (
+                    <CheckboxPill
+                      key={option}
+                      checked={form.badge === option}
+                      onChange={() => updateField("badge", form.badge === option ? "" : option)}
+                      label={option}
+                    />
+                  )
+                )}
+              </div>
+            </Field>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="意圖類型 Intention Type">
@@ -629,19 +675,40 @@ export default function AdminProductsPage() {
                   <option value="bazi">BaZi — 依八字自動客製</option>
                 </select>
               </Field>
-              <Field
-                label="可用意圖 Available Intentions（逗號分隔）"
-                error={formErrors.availableIntentions}
-              >
-                <input
-                  type="text"
-                  value={form.availableIntentions}
-                  onChange={(e) => updateField("availableIntentions", e.target.value)}
-                  placeholder="Health, Career, Love, Wealth"
-                  className={inputClass(!!formErrors.availableIntentions)}
-                />
-              </Field>
             </div>
+
+            <Field
+              label="可用意圖 Available Intentions（勾選顧客可以選的項目）"
+              error={formErrors.availableIntentions}
+            >
+              <div className="flex flex-wrap gap-2">
+                {[
+                  ...fortuneAreas,
+                  ...intentionList(form.availableIntentions).filter((item) => !fortuneAreas.includes(item)),
+                ].map((option) => {
+                  const selected = intentionList(form.availableIntentions);
+                  return (
+                    <CheckboxPill
+                      key={option}
+                      checked={selected.includes(option)}
+                      onChange={() => {
+                        const next = selected.includes(option)
+                          ? selected.filter((item) => item !== option)
+                          : [...selected, option];
+                        // Keep the standard order.
+                        next.sort((a, b) => {
+                          const ia = fortuneAreas.indexOf(a);
+                          const ib = fortuneAreas.indexOf(b);
+                          return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+                        });
+                        updateField("availableIntentions", next.join(", "));
+                      }}
+                      label={option}
+                    />
+                  );
+                })}
+              </div>
+            </Field>
 
             <CheckboxGrid>
               <CheckboxPill
@@ -1197,7 +1264,7 @@ function ProductRow({
       {expanded ? (
         <div className="mt-4 rounded bg-[#EAF2F8] p-4 text-sm text-[#35506B]">
           {product.description ? (
-            <p className="leading-6">{product.description}</p>
+            <p className="whitespace-pre-line leading-6">{product.description}</p>
           ) : (
             <p className="text-[#8EB1D1]">無描述 / No description.</p>
           )}

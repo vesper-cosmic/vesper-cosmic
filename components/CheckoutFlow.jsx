@@ -10,7 +10,7 @@ import CheckoutGate from "@/components/CheckoutGate";
 import CheckoutNotices from "@/components/CheckoutNotices";
 import NameFields, { joinName, nameErrors, splitName } from "@/components/NameFields";
 import { BirthDateSelect, BirthTimeSelect } from "@/components/BirthDateTimeInputs";
-import { getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
+import { forgetNailSizing, getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import { applyBirthDataChoice, getSavedBirthData } from "@/lib/birthDataClient";
 import {
   countries,
@@ -65,6 +65,8 @@ export default function CheckoutFlow() {
   const [submitError, setSubmitError] = useState("");
   const [referralCode, setReferralCode] = useState("");
   const [savedSizing, setSavedSizing] = useState(null);
+  // Nail size is not sensitive, so keeping it for next time is on by default.
+  const [keepNails, setKeepNails] = useState(true);
 
   // Nail sizing from the customer's last order (member record or this browser).
   useEffect(() => {
@@ -135,6 +137,7 @@ export default function CheckoutFlow() {
   const hasShippingItems = enrichedItems.some((item) => item.product?.requiresShipping);
   // The "save my birth details" choice is shown once, on the first BaZi item.
   const firstBirthItemId = enrichedItems.find((item) => item.product?.requiresBirthData)?.id || null;
+  const firstNailItemId = enrichedItems.find((item) => item.product?.requiresNailDetails)?.id || null;
   // Custom / personalized items (made from birth details or nail sizes) are final sale.
   const hasCustomItems = enrichedItems.some(
     (item) => item.product?.requiresBirthData || item.product?.requiresNailDetails
@@ -215,6 +218,7 @@ export default function CheckoutFlow() {
       saveAddressToMember: form.saveAddressToMember && isSignedIn,
       referralCode: referralCode.trim() || null,
       acknowledgedFinalSale: hasCustomItems ? ackFinalSale : undefined,
+      saveNailSizing: keepNails,
     };
 
     setSubmitting(true);
@@ -238,7 +242,8 @@ export default function CheckoutFlow() {
 
       sessionStorage.removeItem("vesperCheckoutDraft");
       const sized = Object.values(itemDetails).find((detail) => detail?.nails?.sizeMode);
-      if (sized) rememberNailSizing(sized.nails);
+      if (sized && keepNails) rememberNailSizing(sized.nails);
+      else if (sized && !keepNails) forgetNailSizing();
       if (firstBirthItemId) {
         await applyBirthDataChoice({
           keep: keepBirth,
@@ -312,6 +317,11 @@ export default function CheckoutFlow() {
           errors={errors[`item_${index}`] || {}}
           onChange={updateItemDetails}
           savedSizing={savedSizing}
+          nailChoice={
+            item.id === firstNailItemId
+              ? { keep: keepNails, setKeep: setKeepNails, isSignedIn, hadSaved: Boolean(savedSizing) }
+              : null
+          }
           savedBirth={savedBirth}
           birthChoice={
             item.id === firstBirthItemId
@@ -421,7 +431,7 @@ export default function CheckoutFlow() {
   );
 }
 
-function ItemFormSection({ item, index, details, errors, onChange, savedSizing, savedBirth, birthChoice }) {
+function ItemFormSection({ item, index, details, errors, onChange, savedSizing, nailChoice, savedBirth, birthChoice }) {
   const product = item.product;
   if (!product) return null;
 
@@ -484,6 +494,7 @@ function ItemFormSection({ item, index, details, errors, onChange, savedSizing, 
             errors={errors}
             onChange={onChange}
             savedSizing={savedSizing}
+            nailChoice={nailChoice}
           />
         ) : null}
       </div>
@@ -610,7 +621,7 @@ function BirthFields({ itemId, product, details, errors, onChange, savedBirth, b
   );
 }
 
-function NailFields({ itemId, details, errors, onChange, savedSizing }) {
+function NailFields({ itemId, details, errors, onChange, savedSizing, nailChoice }) {
   const nails = details.nails || {};
 
   // Pre-fill the size from the customer's last order (only if not chosen yet).
@@ -645,6 +656,25 @@ function NailFields({ itemId, details, errors, onChange, savedSizing }) {
           onChange(itemId, "nails", { ...nails, mixedSet: false, sizePrefilled: false, ...patch })
         }
       />
+      {nailChoice ? (
+      <label className="flex items-start gap-2 rounded border border-[#8EB1D1]/30 bg-white/70 p-3 text-sm text-[#1C2B48]">
+        <input
+          type="checkbox"
+          checked={nailChoice.keep}
+          onChange={(event) => nailChoice.setKeep(event.target.checked)}
+          className="mt-1"
+        />
+        <span>
+          Save my nail size for my next order
+          <span className="block text-xs text-[#5B7893]">
+            {nailChoice.isSignedIn
+              ? "Saved to your account and filled in automatically next time."
+              : "Saved in this browser and filled in automatically next time."}
+            {nailChoice.hadSaved && !nailChoice.keep ? " Unticked: your saved size will be deleted when you place this order." : ""}
+          </span>
+        </span>
+      </label>
+      ) : null}
       <div className="grid gap-4 sm:grid-cols-3">
         <Field label="Nail Shape" error={errors.nailShape}>
           <select

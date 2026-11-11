@@ -72,7 +72,8 @@ export async function POST(request) {
   // Remember the member's nail sizing for their next custom nail order.
   const sizedItem = order.items.find((item) => item.nails?.sizeMode);
   if (order.memberEmail && sizedItem && !notionResult?.error) {
-    await saveMemberNailSizing(order.memberEmail, sizedItem.nails).catch((error) =>
+    const keep = payload.saveNailSizing !== false;
+    await saveMemberNailSizing(order.memberEmail, keep ? sizedItem.nails : null).catch((error) =>
       console.error("Saving nail sizing failed:", error)
     );
   }
