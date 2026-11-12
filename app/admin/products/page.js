@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { INCLUDES_PRESETS, defaultIncludesForCategory } from "@/lib/productData";
+import {
+  INCLUDES_PRESETS,
+  defaultIncludesForCategory,
+  findDangerousGoodsTerms,
+} from "@/lib/productData";
 import { fortuneAreas } from "@/lib/formOptions";
 
 // Badge choices (one per product). "" = no badge.
@@ -624,6 +628,7 @@ export default function AdminProductsPage() {
                 placeholder="About this product…（按 Enter 換行，商品頁會照樣換行）"
                 className={inputClass(!!formErrors.description)}
               />
+              <DangerousGoodsWarning text={form.description} />
             </Field>
 
             <div className="grid gap-4 sm:grid-cols-3">
@@ -832,9 +837,10 @@ export default function AdminProductsPage() {
                 type="text"
                 value={form.includes}
                 onChange={(e) => updateField("includes", e.target.value)}
-                placeholder="10 press-on nails, nail glue, mini file…"
+                placeholder="10 press-on nails, mini nail file…"
                 className={inputClass()}
               />
+              <DangerousGoodsWarning text={form.includes} />
             </Field>
 
             <Field label="產品圖片 Product Images" error={formErrors.images}>
@@ -1038,6 +1044,18 @@ function CheckboxGrid({ children }) {
     <div className="flex flex-wrap gap-2 rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-3">
       {children}
     </div>
+  );
+}
+
+// Non-blocking: the product can still be saved.
+function DangerousGoodsWarning({ text }) {
+  const terms = findDangerousGoodsTerms(text);
+  if (terms.length === 0) return null;
+  return (
+    <p role="alert" className="mt-1.5 rounded border border-[#C77A0A]/40 bg-[#FDF6E3] px-3 py-2 text-xs leading-5 text-[#7A5410]">
+      ⚠️ Possible dangerous goods — not allowed in international air mail. Remove from kit.
+      （偵測到：{terms.join("、")}）
+    </p>
   );
 }
 
