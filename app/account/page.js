@@ -72,6 +72,7 @@ export default function AccountPage() {
       stateProvince: formData.get("stateProvince"),
       postalCode: formData.get("postalCode"),
       country: formData.get("country"),
+      phone: formData.get("phone"),
     };
 
     const result = await saveDefaultAddress(address);
@@ -216,6 +217,16 @@ export default function AccountPage() {
                   name="postalCode"
                   defaultValue={defaultAddress.postalCode || ""}
                   required
+                  className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+                />
+              </Field>
+              <Field label="Phone">
+                <input
+                  type="tel"
+                  name="phone"
+                  autoComplete="tel"
+                  defaultValue={defaultAddress.phone || ""}
+                  placeholder="e.g. +1 512 555 0100"
                   className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
                 />
               </Field>

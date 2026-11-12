@@ -102,6 +102,13 @@ export default function OrderIntakeForm({ product }) {
     setForm((current) => (current.birthDate ? current : { ...current, ...saved }));
   }, [member, product.requiresBirthData]);
 
+  // Pre-fill the phone saved on the member's default address.
+  useEffect(() => {
+    const phone = member?.defaultAddress?.phone;
+    if (!phone) return;
+    setForm((current) => (current.address.phone ? current : { ...current, address: { ...current.address, phone } }));
+  }, [member]);
+
   function updateField(event) {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
@@ -196,6 +203,9 @@ export default function OrderIntakeForm({ product }) {
       if (!form.address.stateProvince.trim()) nextErrors.stateProvince = "State or province is required.";
       if (!form.address.postalCode.trim()) nextErrors.postalCode = "Postal code is required.";
       if (!form.address.country) nextErrors.country = "Country is required.";
+      if (!/^\+?[0-9 ()\-.]{7,20}$/.test(String(form.address.phone || "").trim())) {
+        nextErrors.addressPhone = "Enter the receiver's phone number (needed by the carrier and US customs).";
+      }
     }
 
     if (product.requiresNailDetails) {
@@ -672,6 +682,9 @@ function NailMeasurementRow({ title, keys, values, errors, disabled, onChange })
 function ShippingFields({ form, errors, updateAddress }) {
   return (
     <FormPanel title="Shipping Address">
+      <Field label="Receiver Phone" error={errors.addressPhone} hint="Required by the carrier and US customs to deliver your parcel.">
+        <input name="phone" type="tel" autoComplete="shipping tel" value={form.address.phone || ""} onChange={updateAddress} required className={inputClass} placeholder="e.g. +1 512 555 0100" />
+      </Field>
       <Field label="Address Line 1" error={errors.addressLine1}>
         <input name="addressLine1" value={form.address.addressLine1} onChange={updateAddress} required className={inputClass} />
       </Field>

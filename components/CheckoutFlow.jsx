@@ -112,6 +112,7 @@ export default function CheckoutFlow() {
           shipping: hasAddress
             ? {
                 ...(receiver ? { ...receiver, fullName: address.fullName } : {}),
+                phone: address.phone || "",
                 addressLine1: address.addressLine1 || "",
                 addressLine2: address.addressLine2 || "",
                 city: address.city || "",
@@ -804,6 +805,19 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
           Same as my name
         </button>
       ) : null}
+      <Field label="Receiver Phone" error={errors.addressPhone}>
+        <input
+          type="tel"
+          autoComplete="shipping tel"
+          value={shipping.phone || ""}
+          onChange={(event) => onChange("phone", event.target.value)}
+          placeholder="e.g. +1 512 555 0100"
+          className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+        />
+        <p className="mt-1 text-[11px] text-[#5B7893]">
+          Required by the carrier and US customs to deliver your parcel.
+        </p>
+      </Field>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Country" error={errors.country}>
           <select
