@@ -370,6 +370,14 @@ function OrderCard({ order, onUpdated }) {
             <p className="font-mono text-sm font-bold text-[#1C2B48]">{order.orderId}</p>
             <StatusBadge status={current} />
           </div>
+          <div className="mt-1.5 flex flex-wrap gap-1.5 text-[11px] font-semibold">
+            <Link href={`/admin/orders/${encodeURIComponent(order.orderId)}`} className="rounded border border-[#8EB1D1]/50 bg-white px-2 py-0.5 text-[#35506B] hover:bg-[#C4D8E5]">
+              Commercial Invoice / Packing Slip (PDF)
+            </Link>
+            <Link href={`/admin/orders/${encodeURIComponent(order.orderId)}/ezpost`} className="rounded border border-[#8EB1D1]/50 bg-white px-2 py-0.5 text-[#35506B] hover:bg-[#C4D8E5]">
+              EZPost Helper
+            </Link>
+          </div>
           <p className="mt-1 text-sm font-semibold text-[#35506B]">{order.fullName}</p>
           <p className="truncate text-xs text-[#5B7893]">{order.email}</p>
         </div>
