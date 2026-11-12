@@ -53,7 +53,7 @@ export default function ThankYouMessage() {
           Your order has been received
         </h1>
         <p className="mt-4 text-base leading-7 text-[#35506B]">
-          Thank you. I'll be in touch within 24 hours to confirm your order
+          Thank you. I’ll be in touch within 24 hours to confirm your order
           details.
         </p>
       </MessageShell>
@@ -105,7 +105,7 @@ export default function ThankYouMessage() {
         </div>
         {hasShipping ? (
           <p className="mt-4 text-base leading-7 text-[#35506B]">
-            Your handcrafted items will be prepared and shipped. You'll receive
+            Your handcrafted items will be prepared and shipped. You’ll receive
             a tracking number by email once each item ships.
           </p>
         ) : (
@@ -138,7 +138,7 @@ export default function ThankYouMessage() {
         Your order has been received
       </h1>
       <p className="mt-4 text-base leading-7 text-[#35506B]">
-        Thank you, {order.fullName}. Your PayPal payment has been submitted. I'll
+        Thank you, {order.fullName}. Your PayPal payment has been submitted. I’ll
         be in touch within 24 hours to confirm your order details.
       </p>
       {isDigitalOnly ? (
@@ -148,7 +148,7 @@ export default function ThankYouMessage() {
         </p>
       ) : (
         <p className="mt-4 text-base leading-7 text-[#35506B]">
-          Your handcrafted item timeline: {order.fulfillmentTime}. You'll
+          Your handcrafted item timeline: {order.fulfillmentTime}. You’ll
           receive a tracking number by email once it ships.
         </p>
       )}

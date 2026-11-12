@@ -319,7 +319,7 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
         </div>
       ) : displayStatus === "🚚 貨品已寄出" ? null : (
         <StatusRow label="Tracking Number">
-          Not shipped yet — you'll receive an email once it ships.
+          Not shipped yet — you’ll receive an email once it ships.
         </StatusRow>
       )}
 

@@ -7,3 +7,6 @@ out
 .DS_Store
 *.heic
 .env*
+
+# Dummy values only — safe to commit.
+!.env.example

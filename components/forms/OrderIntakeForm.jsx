@@ -630,7 +630,7 @@ function NailDetailsFields({
         error={errors.stylePreference}
       />
       <p className="text-sm leading-6 text-[#5B7893]">
-        I'll use these as a reference — the final design will be guided by your
+        I’ll use these as a reference — the final design will be guided by your
         BaZi element and intentions.
       </p>
       <Field

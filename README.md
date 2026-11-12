@@ -121,3 +121,33 @@ For future tracking updates, use `PATCH /api/order` with:
   "carrier": "USPS"
 }
 ```
+
+## Customs documents (commercial invoice, packing slip, EZPost helper)
+
+Admin-only tools for shipping to the US with Chunghwa Post (DDP — we prepay
+duties). From **訂單管理**, each order card links to:
+
+- **/admin/orders/[orderId]** — customs checks, **Commercial Invoice (PDF)**,
+  **Packing Slip (PDF)**, and the shipping record (service, gross weight,
+  postage, duties & fees, EZPost label no., tracking) saved to Notion.
+- **/admin/orders/[orderId]/ezpost** — every EZPost field in order with Copy
+  buttons, "Copy all as text", and a landed-cost estimate (EZPost is
+  authoritative).
+
+PDFs are generated on the server (`@react-pdf/renderer`, Node runtime), so they
+work from any device that can sign in to the admin. They contain customer
+details: admin only, `Cache-Control: no-store`, never stored.
+
+Per-product customs data (customs description, HTSUS, unit weight, origin,
+value override, bundle components) is edited in **產品管理 → 海關資料** and
+stored inside the product JSON. Suggested HTSUS codes are unverified — check
+them at https://hts.usitc.gov.
+
+Env vars (see `.env.example`): `SELLER_BUSINESS_NAME`, `SELLER_CONTACT_NAME`,
+`SELLER_ADDRESS_LINE1`, `SELLER_ADDRESS_LINE2`, `SELLER_CITY`,
+`SELLER_POSTAL_CODE`, `SELLER_COUNTRY`, `SELLER_PHONE`, `SELLER_EMAIL`,
+`SELLER_TAX_ID` (optional), `DEFAULT_PACKAGING_WEIGHT_ENVELOPE_G` (30),
+`DEFAULT_PACKAGING_WEIGHT_BOX_G` (150), `CUSTOMS_DEFAULT_DUTY_RATE` (0.10),
+`CUSTOMS_ENTRY_FEE_USD` (2).
+
+Tests: `npm test` (vitest).
