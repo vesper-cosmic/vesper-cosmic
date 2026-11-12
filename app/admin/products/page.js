@@ -9,6 +9,12 @@ import {
   findDangerousGoodsTerms,
 } from "@/lib/productData";
 import { fortuneAreas } from "@/lib/formOptions";
+import { formatHtsus, isValidHtsus, stripHtsus } from "@/lib/customs/htsus";
+import {
+  CUSTOMS_DESCRIPTION_MAX,
+  CUSTOMS_SUGGESTIONS,
+  findBlocklistedWords,
+} from "@/lib/customs/keywords";
 
 // Badge choices (one per product). "" = no badge.
 const BADGE_OPTIONS = ["Custom", "New", "Best Seller", "Limited Edition", "Sale"];
@@ -84,6 +90,12 @@ function emptyForm() {
     images: [],
     inventory: "",
     referralCommission: "",
+    customsDescription: "",
+    customsHtsus: "",
+    customsWeightG: "",
+    customsOrigin: "Taiwan",
+    customsValueOverride: "",
+    bundleComponents: [],
     published: true,
     isNew: false,
   };
@@ -238,6 +250,14 @@ export default function AdminProductsPage() {
       images: Array.isArray(product.images) ? product.images.map(String) : [],
       inventory: product.inventory ?? "",
       referralCommission: product.referralCommission ? String(product.referralCommission) : "",
+      customsDescription: product.customs?.description || "",
+      customsHtsus: product.customs?.htsus ? formatHtsus(product.customs.htsus) : "",
+      customsWeightG: product.customs?.unitWeightG ?? "",
+      customsOrigin: product.customs?.origin || "Taiwan",
+      customsValueOverride: product.customs?.valueOverrideUSD ?? "",
+      bundleComponents: Array.isArray(product.customs?.bundleComponents)
+        ? product.customs.bundleComponents
+        : [],
       published: product.published !== false,
       isNew: Boolean(product.isNew),
     });
@@ -298,6 +318,11 @@ export default function AdminProductsPage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    if (form.customsHtsus.trim() && !isValidHtsus(form.customsHtsus)) {
+      setFormErrors({ customsHtsus: "HTSUS 稅則號數必須剛好 10 碼數字" });
+      setFormMessage({ type: "error", text: "請修正海關資料的 HTSUS 稅則號數。" });
+      return;
+    }
     setSubmitting(true);
     setFormMessage({ type: "", text: "" });
     setFormErrors({});
@@ -308,6 +333,14 @@ export default function AdminProductsPage() {
       originalPrice: form.originalPrice ? Number(form.originalPrice) : null,
       inventory: form.inventory === "" ? null : Number(form.inventory),
       referralCommission: form.referralCommission === "" ? 0 : Number(form.referralCommission),
+      customs: {
+        description: form.customsDescription,
+        htsus: stripHtsus(form.customsHtsus),
+        unitWeightG: form.customsWeightG === "" ? null : Number(form.customsWeightG),
+        origin: form.customsOrigin || "Taiwan",
+        valueOverrideUSD: form.customsValueOverride === "" ? null : Number(form.customsValueOverride),
+        bundleComponents: form.bundleComponents,
+      },
       availableIntentions: form.availableIntentions
         .split(",")
         .map((item) => item.trim())
@@ -843,6 +876,13 @@ export default function AdminProductsPage() {
               <DangerousGoodsWarning text={form.includes} />
             </Field>
 
+            <CustomsSection
+              form={form}
+              errors={formErrors}
+              updateField={updateField}
+              products={products.filter((p) => p.id !== editingId)}
+            />
+
             <Field label="產品圖片 Product Images" error={formErrors.images}>
               <div className="space-y-2">
                 {form.images.length === 0 ? (
@@ -1044,6 +1084,180 @@ function CheckboxGrid({ children }) {
     <div className="flex flex-wrap gap-2 rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-3">
       {children}
     </div>
+  );
+}
+
+// Customs data for EZPost and the commercial invoice (admin only; never shown to shoppers).
+function CustomsSection({ form, errors, updateField, products }) {
+  const physical = form.requiresShipping;
+  const suggestion = CUSTOMS_SUGGESTIONS[form.category];
+  const blocked = findBlocklistedWords(form.customsDescription);
+  const htsusDigits = stripHtsus(form.customsHtsus);
+  const htsusError =
+    errors.customsHtsus || (form.customsHtsus.trim() && !isValidHtsus(form.customsHtsus) ? "必須剛好 10 碼數字" : "");
+  const box = "w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]";
+
+  function setComponent(index, patch) {
+    const next = form.bundleComponents.map((c, i) => (i === index ? { ...c, ...patch } : c));
+    updateField("bundleComponents", next);
+  }
+
+  return (
+    <section className="space-y-3 rounded border border-[#8EB1D1]/40 bg-[#F3F6F8] p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-sm font-bold text-[#1C2B48]">海關資料 Customs（寄件、EZPost、商業發票用）</h3>
+        {suggestion && physical ? (
+          <button
+            type="button"
+            onClick={() => {
+              if (suggestion.htsus) updateField("customsHtsus", formatHtsus(suggestion.htsus));
+              if (suggestion.description) updateField("customsDescription", suggestion.description);
+            }}
+            className="rounded border border-[#8EB1D1] bg-white px-2.5 py-1 text-xs font-semibold text-[#35506B] hover:bg-[#C4D8E5]"
+          >
+            套用建議值（未驗證）
+          </button>
+        ) : null}
+      </div>
+
+      {!physical ? (
+        <p className="text-xs text-[#5B7893]">
+          這是不需要寄送的數位商品：不會寄出，也不會申報海關，不用填。
+        </p>
+      ) : (
+        <>
+          {suggestion?.note ? (
+            <p className="text-xs font-semibold text-[#A93226]">此分類 {suggestion.note}：請自行到 hts.usitc.gov 查詢稅則。</p>
+          ) : null}
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-[#5B7893]">
+              海關品名（英文）Customs Description *
+            </label>
+            <input
+              type="text"
+              value={form.customsDescription}
+              onChange={(e) => updateField("customsDescription", e.target.value)}
+              placeholder="e.g. Plastic press-on artificial nails set"
+              className={box}
+            />
+            {!form.customsDescription.trim() ? (
+              <p className="mt-1 text-xs text-[#A93226]">實體商品必填，沒填的話這個商品的訂單無法產生發票。</p>
+            ) : null}
+            {form.customsDescription.length > CUSTOMS_DESCRIPTION_MAX ? (
+              <p className="mt-1 text-xs text-[#7A5410]">超過 {CUSTOMS_DESCRIPTION_MAX} 字，建議縮短。</p>
+            ) : null}
+            {blocked.length ? (
+              <p className="mt-1 text-xs text-[#7A5410]">
+                ⚠️ Use factual material/product terms only.（偵測到：{blocked.join("、")}）
+              </p>
+            ) : null}
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-[#5B7893]">HTSUS 稅則號數（10 碼）</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={form.customsHtsus}
+                onChange={(e) => updateField("customsHtsus", e.target.value)}
+                onBlur={() => isValidHtsus(form.customsHtsus) && updateField("customsHtsus", formatHtsus(form.customsHtsus))}
+                placeholder="3926.40.0000"
+                className={box}
+              />
+              {htsusError ? (
+                <p className="mt-1 text-xs text-[#A93226]">{htsusError}</p>
+              ) : htsusDigits.length === 10 ? (
+                <p className="mt-1 text-[11px] text-[#5B7893]">EZPost 輸入：{htsusDigits}（不含小數點）</p>
+              ) : null}
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-[#5B7893]">單件重量 Unit Weight (g)</label>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                value={form.customsWeightG}
+                onChange={(e) => updateField("customsWeightG", e.target.value)}
+                placeholder="45"
+                className={box}
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-[#5B7893]">原產國 Country of Origin</label>
+              <select
+                value={form.customsOrigin}
+                onChange={(e) => updateField("customsOrigin", e.target.value)}
+                className={box}
+              >
+                <option>Taiwan</option>
+                <option>China</option>
+                <option>Japan</option>
+                <option>United States</option>
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-[#5B7893]">
+                申報價值覆寫 USD（選填，留空＝用售價）
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.customsValueOverride}
+                onChange={(e) => updateField("customsValueOverride", e.target.value)}
+                className={box}
+              />
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-1 text-xs font-semibold text-[#5B7893]">
+              組合內容 Bundle Components（只有組合商品才需要；申報時會拆成各個實體品項）
+            </p>
+            {form.bundleComponents.map((component, index) => (
+              <div key={index} className="mb-2 flex gap-2">
+                <select
+                  value={component.productId}
+                  onChange={(e) => setComponent(index, { productId: e.target.value })}
+                  className={box}
+                >
+                  <option value="">選擇產品…</option>
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                      {p.requiresShipping === false ? "（數位）" : ""}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="number"
+                  min="1"
+                  value={component.quantity}
+                  onChange={(e) => setComponent(index, { quantity: Number(e.target.value) || 1 })}
+                  className="w-20 rounded border border-[#8EB1D1]/40 bg-white px-2 py-2 text-sm"
+                  aria-label="數量"
+                />
+                <button
+                  type="button"
+                  onClick={() => updateField("bundleComponents", form.bundleComponents.filter((_, i) => i !== index))}
+                  className="rounded border border-[#8EB1D1]/40 bg-white px-3 text-sm text-[#A93226]"
+                  aria-label="移除"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => updateField("bundleComponents", [...form.bundleComponents, { productId: "", quantity: 1 }])}
+              className="rounded border border-dashed border-[#8EB1D1] px-3 py-1 text-xs font-semibold text-[#35506B]"
+            >
+              ＋ 新增組合品項
+            </button>
+          </div>
+        </>
+      )}
+    </section>
   );
 }
 
