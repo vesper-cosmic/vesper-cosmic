@@ -22,6 +22,10 @@ import {
   sendShippedEmail,
 } from "@/lib/customerEmails";
 import { syncOrderReferrer } from "@/lib/referral";
+import { loadOrderCustoms } from "@/lib/customs/context";
+import { renderInvoicePdf } from "@/lib/customs/render";
+
+export const runtime = "nodejs";
 
 const SHIPPED_PRODUCTION = "🚚 貨品已寄出";
 
@@ -83,6 +87,19 @@ export async function PATCH(request) {
   return NextResponse.json({ ok: true, orderId, status });
 }
 
+/** The commercial invoice as an email attachment, or [] if the order isn't ready. */
+async function invoiceAttachment(orderId) {
+  try {
+    const result = await loadOrderCustoms(orderId);
+    if (result.status !== 200 || !result.data.validation.ok) return [];
+    const content = await renderInvoicePdf(result.data);
+    return [{ filename: `${result.data.invoiceNumber}.pdf`, content, contentType: "application/pdf" }];
+  } catch (error) {
+    console.error("Invoice attachment failed for", orderId, error.message);
+    return [];
+  }
+}
+
 async function changeOrderStatus(orderId, payload) {
   const orderStatus = String(payload.orderStatus || "").trim();
   const trackingNumber = String(payload.trackingNumber || "").trim().slice(0, 64);
@@ -116,7 +133,16 @@ async function changeOrderStatus(orderId, payload) {
     } else if (orderStatus === OS_SHIPPED) {
       const newTracking = trackingNumber && trackingNumber !== before.trackingNumber;
       if (previous !== OS_SHIPPED || newTracking) {
-        email = await sendShippedEmail(before, trackingNumber, note);
+        const attachments = payload.attachInvoice === true ? await invoiceAttachment(orderId) : [];
+        if (payload.attachInvoice === true && attachments.length === 0) {
+          return NextResponse.json({
+            ok: true,
+            orderId,
+            orderStatus,
+            email: { success: false, error: "Status saved, but the invoice couldn't be created (check the order's customs data). Email not sent." },
+          });
+        }
+        email = await sendShippedEmail(before, trackingNumber, note, { attachments });
       }
     } else if (orderStatus === OS_CANCELLED && previous !== OS_CANCELLED) {
       email = await sendOrderCancelledEmail(before, note);

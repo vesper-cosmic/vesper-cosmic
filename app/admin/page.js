@@ -268,6 +268,7 @@ function OrderCard({ order, onUpdated }) {
   const [trackingNumber, setTrackingNumber] = useState(order.trackingNumber || "");
   const [note, setNote] = useState("");
   const [notify, setNotify] = useState(true);
+  const [attachInvoice, setAttachInvoice] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
 
@@ -300,6 +301,7 @@ function OrderCard({ order, onUpdated }) {
           trackingNumber: target === OS_SHIPPED ? trackingNumber.trim() : "",
           note,
           notifyCustomer: Boolean(ADMIN_STATUS_EMAIL[target]) && notify,
+          attachInvoice: target === OS_SHIPPED && notify && attachInvoice,
         }),
       });
       const data = await response.json().catch(() => ({}));
@@ -498,6 +500,12 @@ function OrderCard({ order, onUpdated }) {
                   <span className="text-[#8B99A8]">不勾選＝只改狀態（例如你已經用其他方式通知過顧客）</span>
                 </span>
               </label>
+              {notify && target === OS_SHIPPED ? (
+                <label className="flex items-center gap-2 text-xs text-[#35506B]">
+                  <input type="checkbox" checked={attachInvoice} onChange={(e) => setAttachInvoice(e.target.checked)} />
+                  Attach commercial invoice PDF（附上商業發票 PDF）
+                </label>
+              ) : null}
               {notify ? (
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-[#5B7893]">
