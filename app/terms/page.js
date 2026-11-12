@@ -40,7 +40,7 @@ const sections = [
   {
     title: "Products, Pricing and Orders",
     bullets: [
-      "All prices are listed in U.S. dollars (USD). Prices, availability and product details may change without notice. Any applicable taxes, duties or import fees charged by your country are your responsibility unless stated otherwise at checkout.",
+      "All prices are listed in U.S. dollars (USD). Prices, availability and product details may change without notice. For U.S. orders we prepay import duties and customs fees. For other destinations, taxes, duties or import fees charged by your country are your responsibility unless stated otherwise at checkout.",
       "Placing an order is an offer to buy. An order is accepted only after we verify your payment. We may refuse or cancel an order — for example if an item is out of stock, a pricing error occurred, or we suspect fraud — and we will refund any payment received for a cancelled order.",
       "Many of our items are handcrafted from natural materials. Natural variations in color, texture and pattern are expected and are not defects.",
       <>
@@ -55,10 +55,10 @@ const sections = [
         of withdrawal for distance purchases, subject to the statutory exceptions described there.
       </>,
       <>
-        We ship from Taiwan. Import duties, tariffs, taxes and carrier customs-handling fees charged
-        by your country are your responsibility. In the United States, duty-free &quot;de
-        minimis&quot; entry has been suspended, so U.S. orders may incur duties or fees on delivery.
-        See <A href="/shipping">Shipping &amp; Delivery</A>.
+        We ship from Taiwan. For orders shipped to the United States we prepay the import duties
+        and customs fees (Delivered Duty Paid), so nothing is due on delivery. For other
+        countries, duties, taxes and carrier customs-handling fees are the recipient&apos;s
+        responsibility. See <A href="/shipping">Shipping &amp; Delivery</A>.
       </>,
       <>
         Any &quot;compare at&quot; or crossed-out price shows a price at which the item was actually

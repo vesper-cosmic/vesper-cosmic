@@ -5,7 +5,7 @@ import Link from "next/link";
 /**
  * Notices shown before an order is placed:
  * - final-sale acknowledgment for custom / personalized items (required);
- * - import duties for shipped orders;
+ * - import duties for shipped orders (prepaid for the U.S.);
  * - terms, returns and privacy notice.
  */
 export default function CheckoutNotices({ hasCustomItems, hasShippingItems, ackFinalSale, onAckChange }) {
@@ -31,8 +31,8 @@ export default function CheckoutNotices({ hasCustomItems, hasShippingItems, ackF
 
       {hasShippingItems ? (
         <p className="text-xs leading-5 text-[#5B7893]">
-          Ships from Taiwan. Import duties, taxes or carrier fees charged by your country (including
-          the U.S.) are not included and may be due on delivery.{" "}
+          Ships from Taiwan. <strong>U.S. orders: duties prepaid — nothing to pay on delivery.</strong>{" "}
+          Other countries may charge local duties or taxes on delivery.{" "}
           <Link href="/shipping" target="_blank" className="underline">
             Details
           </Link>

@@ -168,18 +168,15 @@ export default function ShippingPage() {
           <h2 className="text-2xl font-semibold text-[#1C2B48] sm:text-3xl">
             Customs, Taxes & Import Duties
           </h2>
-          <p className="mt-4 text-base leading-8 text-[#35506B] sm:text-lg sm:leading-9">
-            International shipments may be subject to customs duties, VAT, or
-            import taxes levied by the destination country. These fees are the
-            responsibility of the customer. VESPER COSMOS is not responsible for
-            delays caused by local customs clearance processes.
+          <p className="mt-4 rounded-lg border border-[#2E8B57]/30 bg-[#E9F5EE] p-4 text-sm leading-7 text-[#1F5E3B] sm:text-base">
+            <strong>United States customers — duties prepaid:</strong> we pay the U.S. import
+            duties and customs fees for you when we ship (Delivered Duty Paid), so there is
+            nothing extra to pay on delivery.
           </p>
-          <p className="mt-4 rounded-lg border border-[#C77A0A]/30 bg-[#FDF6E3] p-4 text-sm leading-7 text-[#7A5410] sm:text-base">
-            <strong>United States customers:</strong> the U.S. has suspended duty-free
-            &quot;de minimis&quot; entry for low-value packages, so orders shipped to the U.S.
-            may be charged import duties, tariffs and a carrier handling fee on delivery. These
-            are set by U.S. Customs and the carrier, not by us, and are not included in our
-            prices or shipping fees.
+          <p className="mt-4 text-base leading-8 text-[#35506B] sm:text-lg sm:leading-9">
+            Shipments to other countries may be subject to customs duties, VAT or import taxes
+            set by the destination country; those are the recipient&apos;s responsibility.
+            VESPER COSMOS is not responsible for delays caused by customs clearance.
           </p>
           <p className="mt-4 text-base leading-8 text-[#35506B] sm:text-lg sm:leading-9">
             If we cannot ship your order within the processing time stated above, we will email
