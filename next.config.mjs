@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  experimental: {
+    // Load @react-pdf/renderer with Node's require on the server instead of
+    // bundling it (needed for the admin customs PDFs on Next 14).
+    serverComponentsExternalPackages: ["@react-pdf/renderer"],
+  },
   async headers() {
     return [
       {

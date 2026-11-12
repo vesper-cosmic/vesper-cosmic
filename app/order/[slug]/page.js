@@ -28,11 +28,14 @@ export default async function ProductOrderPage({ params }) {
     notFound();
   }
 
+  // Internal fields stay on the server (this prop is sent to the browser).
+  const { referralCommission, customs, ...publicProduct } = product;
+
   return (
     <main className="min-h-screen bg-transparent px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <CheckoutGate>
-          <OrderIntakeForm product={product} />
+          <OrderIntakeForm product={publicProduct} />
         </CheckoutGate>
       </div>
     </main>
