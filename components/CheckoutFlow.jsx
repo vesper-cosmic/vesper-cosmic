@@ -299,7 +299,7 @@ export default function CheckoutFlow() {
   return (
     <CheckoutGate>
     <form onSubmit={handleSubmit} className="space-y-6">
-      <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5">
+      <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-4 sm:p-5">
         <p className="text-sm uppercase tracking-[0.24em] text-[#8EB1D1]">
           Checkout
         </p>
@@ -333,7 +333,7 @@ export default function CheckoutFlow() {
       ))}
 
       {/* Contact & Shipping */}
-      <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5">
+      <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-4 sm:p-5">
         <h2 className="text-2xl font-semibold text-[#1C2B48]">Contact & Delivery</h2>
         <div className="mt-5 space-y-4">
           <NameFields
@@ -347,6 +347,8 @@ export default function CheckoutFlow() {
           <Field label="Email" error={errors.email}>
             <input
               type="email"
+              autoComplete="email"
+              inputMode="email"
               value={form.email}
               onChange={(event) => updateField("email", event.target.value)}
               className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
@@ -437,7 +439,7 @@ function ItemFormSection({ item, index, details, errors, onChange, savedSizing, 
   if (!product) return null;
 
   return (
-    <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5">
+    <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-4 sm:p-5">
       <div className="flex items-center gap-3">
         <img
           src={item.image}
@@ -518,7 +520,7 @@ function BirthFields({ itemId, product, details, errors, onChange, savedBirth, b
   }, [savedBirth]);
 
   return (
-    <div className="rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-4 space-y-4">
+    <div className="rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-3 space-y-4 sm:p-4">
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
         Birth Information (for your BaZi chart)
       </p>
@@ -643,7 +645,7 @@ function NailFields({ itemId, details, errors, onChange, savedSizing, nailChoice
   }
 
   return (
-    <div className="rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-4 space-y-4">
+    <div className="rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-3 space-y-4 sm:p-4">
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
         Nail Details
       </p>
@@ -822,7 +824,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
         <Field label="Country" error={errors.country}>
           <select
             value={shipping.country}
-            onChange={(event) => onChange("country", event.target.value)}
+            onChange={(event) => onChange("country", event.target.value)} autoComplete="shipping country-name"
             className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           >
             {countries.map((country) => (
@@ -837,7 +839,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
         <input
           type="text"
           value={shipping.addressLine1}
-          onChange={(event) => onChange("addressLine1", event.target.value)}
+          onChange={(event) => onChange("addressLine1", event.target.value)} autoComplete="shipping address-line1"
           className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
         />
       </Field>
@@ -845,7 +847,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
         <input
           type="text"
           value={shipping.addressLine2}
-          onChange={(event) => onChange("addressLine2", event.target.value)}
+          onChange={(event) => onChange("addressLine2", event.target.value)} autoComplete="shipping address-line2"
           className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
         />
       </Field>
@@ -854,7 +856,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
           <input
             type="text"
             value={shipping.city}
-            onChange={(event) => onChange("city", event.target.value)}
+            onChange={(event) => onChange("city", event.target.value)} autoComplete="shipping address-level2"
             className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           />
         </Field>
@@ -862,7 +864,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
           <input
             type="text"
             value={shipping.stateProvince}
-            onChange={(event) => onChange("stateProvince", event.target.value)}
+            onChange={(event) => onChange("stateProvince", event.target.value)} autoComplete="shipping address-level1"
             className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           />
         </Field>
@@ -870,7 +872,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
           <input
             type="text"
             value={shipping.postalCode}
-            onChange={(event) => onChange("postalCode", event.target.value)}
+            onChange={(event) => onChange("postalCode", event.target.value)} autoComplete="shipping postal-code"
             className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           />
         </Field>

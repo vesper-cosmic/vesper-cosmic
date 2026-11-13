@@ -13,7 +13,7 @@ const MONTHS = [
 ];
 
 const selectClass =
-  "w-full rounded border border-[#8EB1D1]/40 bg-white px-2 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]";
+  "w-full min-w-0 rounded border border-[#8EB1D1]/40 bg-white px-2 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]";
 
 const pad = (n) => String(n).padStart(2, "0");
 
@@ -53,8 +53,8 @@ export function BirthDateSelect({ value, onChange, idPrefix = "birth" }) {
   const days = Array.from({ length: daysInMonth(parts.year, parts.month) }, (_, i) => String(i + 1));
 
   return (
-    <div className="grid grid-cols-[1.4fr_0.8fr_1fr] gap-2">
-      <select aria-label="Birth month" id={`${idPrefix}-month`} value={parts.month} onChange={(e) => update("month", e.target.value)} className={selectClass}>
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-[1.4fr_0.8fr_1fr]">
+      <select aria-label="Birth month" id={`${idPrefix}-month`} value={parts.month} onChange={(e) => update("month", e.target.value)} className={`${selectClass} col-span-2 sm:col-span-1`}>
         <option value="">Month</option>
         {MONTHS.map((name, i) => (
           <option key={name} value={String(i + 1)}>{name}</option>
@@ -111,7 +111,7 @@ export function BirthTimeSelect({ value, onChange }) {
   const minutes = Array.from({ length: 60 }, (_, i) => pad(i));
 
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
       <select aria-label="Birth hour" value={parts.hour} onChange={(e) => update("hour", e.target.value)} className={selectClass}>
         <option value="">Hour</option>
         {hours.map((h) => (
@@ -124,7 +124,7 @@ export function BirthTimeSelect({ value, onChange }) {
           <option key={m} value={m}>{m}</option>
         ))}
       </select>
-      <select aria-label="AM or PM" value={parts.period} onChange={(e) => update("period", e.target.value)} className={selectClass}>
+      <select aria-label="AM or PM" value={parts.period} onChange={(e) => update("period", e.target.value)} className={`${selectClass} col-span-2 sm:col-span-1`}>
         <option value="">AM/PM</option>
         <option value="AM">AM</option>
         <option value="PM">PM</option>

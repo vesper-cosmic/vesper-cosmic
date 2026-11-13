@@ -60,7 +60,7 @@ export default function ProductDetailModal({ product, onClose }) {
 
         {/* Left: Images */}
         <div className="flex w-full flex-col sm:w-1/2">
-          <div className="relative aspect-[4/3] w-full overflow-hidden sm:rounded-l-2xl sm:rounded-tr-none">
+          <div className="relative aspect-[4/3] max-h-[42vh] w-full overflow-hidden sm:max-h-none sm:rounded-l-2xl sm:rounded-tr-none">
             <img
               src={activeImage}
               alt={product.name}
@@ -215,15 +215,15 @@ export default function ProductDetailModal({ product, onClose }) {
             </div>
           </div>
 
-          {/* Price & Add to Cart — fixed footer on mobile so the CTA is always visible */}
-          <div className="sticky bottom-0 z-10 border-t border-[#8EB1D1]/20 bg-[#E8ECEF]/95 p-5 backdrop-blur-sm sm:static sm:bg-transparent sm:backdrop-blur-none sm:p-6 [padding-top:max(1.25rem,env(safe-area-inset-top))]">
-            <div className="mb-4 flex items-baseline gap-3">
+          {/* Price & Add to Cart — compact sticky bar on phones so the CTA is always visible */}
+          <div className="sticky bottom-0 z-10 flex items-center gap-3 border-t border-[#8EB1D1]/20 bg-[#E8ECEF]/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:static sm:block sm:bg-transparent sm:p-6 sm:backdrop-blur-none">
+            <div className="flex shrink-0 flex-col items-start sm:mb-4 sm:flex-row sm:items-baseline sm:gap-3">
               {product.originalPrice ? (
-                <p className="text-lg text-[#5B7893] line-through">
+                <p className="text-xs text-[#5B7893] line-through sm:text-lg">
                   ${product.originalPrice} {product.currency}
                 </p>
               ) : null}
-              <p className="text-3xl font-semibold text-[#1C2B48]">
+              <p className="text-xl font-semibold text-[#1C2B48] sm:text-3xl">
                 ${product.price} {product.currency}
               </p>
             </div>
@@ -231,7 +231,7 @@ export default function ProductDetailModal({ product, onClose }) {
               type="button"
               onClick={handleAddToCart}
               disabled={soldOut}
-              className={`w-full rounded border px-5 py-3.5 text-sm font-bold uppercase tracking-[0.16em] transition disabled:cursor-not-allowed disabled:border-[#8EB1D1]/40 disabled:bg-[#C4D8E5] disabled:text-[#5B7893] ${
+              className={`min-w-0 flex-1 rounded border px-4 py-3 text-sm font-bold uppercase tracking-[0.1em] transition sm:w-full sm:px-5 sm:py-3.5 sm:tracking-[0.16em] disabled:cursor-not-allowed disabled:border-[#8EB1D1]/40 disabled:bg-[#C4D8E5] disabled:text-[#5B7893] ${
                 added
                   ? "border-green-500 bg-green-500 text-white"
                   : "border-[#8EB1D1] bg-[#8EB1D1] text-[#1C2B48] hover:bg-[#A7C7E7]"

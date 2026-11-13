@@ -71,12 +71,12 @@ export default function SiteFooter() {
                 <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#1C2B48]">
                   {group.title}
                 </h2>
-                <ul className="mt-4 space-y-2.5">
+                <ul className="mt-3 space-y-0.5 sm:mt-4 sm:space-y-1">
                   {group.links.map((link) => (
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="text-sm text-[#35506B] transition hover:text-[#1C2B48]"
+                        className="inline-block py-1.5 text-sm text-[#35506B] transition hover:text-[#1C2B48] sm:py-1"
                       >
                         {link.label}
                       </Link>
