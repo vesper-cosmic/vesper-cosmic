@@ -69,6 +69,15 @@ export async function POST(request) {
     console.error("Notion order creation failed:", error);
   }
 
+  // Without a saved order the customer could pay for an order we have no record of.
+  if (notionResult?.error || notionResult?.skipped) {
+    console.error("Order not saved; checkout stopped:", order.orderId, notionResult.error || notionResult.reason);
+    return NextResponse.json(
+      { errors: { submit: "We couldn't save your order just now. Please try again in a moment — you have not been charged." } },
+      { status: 503 }
+    );
+  }
+
   // Remember the member's nail sizing for their next custom nail order.
   if (order.memberEmail && order.sizeMode && !notionResult?.error) {
     const keep = payload.saveNailSizing !== false;
