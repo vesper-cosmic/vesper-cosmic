@@ -129,3 +129,52 @@ describe("resolveAdjustment", () => {
     expect(resolveAdjustment({ delta: "abc" }, 10).ok).toBe(false);
   });
 });
+
+import { computeMaterialStats as _stats, resolvePackUsedUp, effectiveUnitsPerPack } from "@/lib/inventory";
+import { decorationAllowance, productUnitCost } from "@/lib/cost";
+
+describe("bulk materials", () => {
+  const bulk = { id: "w", name: "Wax", unit: "包", mode: "散裝", estimatedUnitsPerPack: 50, lowUnits: 20, active: true };
+  const buy = { targetType: "原料", targetId: "w", type: "進貨", quantity: 2, amountTWD: 1000 };
+
+  it("costs a product at pack cost ÷ products per pack and flags low remaining units", () => {
+    const [m] = _stats([bulk], [buy, { targetType: "原料", targetId: "w", type: "耗用", quantity: -1.6, amountTWD: 0 }]);
+    expect(m.avgCostTWD).toBe(500);
+    expect(m.recipeUnitCostTWD).toBe(10);
+    expect(m.remainingUnits).toBe(20);
+    expect(m.low).toBe(false);
+    const [low] = _stats([bulk], [buy, { targetType: "原料", targetId: "w", type: "耗用", quantity: -1.62, amountTWD: 0 }]);
+    expect(low.low).toBe(true);
+  });
+
+  it("uses the average of finished packs once there are any", () => {
+    expect(effectiveUnitsPerPack({ ...bulk, usedPacks: 2, actualUnitsTotal: 80 })).toBe(40);
+    expect(effectiveUnitsPerPack(bulk)).toBe(50);
+  });
+
+  it("finishing a pack leaves the whole unopened packs and updates the average", () => {
+    const plan = resolvePackUsedUp({ ...bulk, usedPacks: 1, actualUnitsTotal: 60 }, 2.37, 40);
+    expect(plan).toMatchObject({ ok: true, nextStock: 2, usedPacks: 2, actualUnitsTotal: 100, unitsPerPack: 50 });
+    expect(plan.delta).toBeCloseTo(-0.37, 4);
+    expect(resolvePackUsedUp(bulk, 3, 40).nextStock).toBe(2);
+    expect(resolvePackUsedUp(bulk, 0, 40).ok).toBe(false);
+    expect(resolvePackUsedUp(bulk, 1, 0).ok).toBe(false);
+  });
+});
+
+describe("decoration allowance", () => {
+  it("defaults to NT$35 for press-on nails, 0 elsewhere, explicit wins, bundles get none", () => {
+    expect(decorationAllowance({ category: "nails" })).toBe(35);
+    expect(decorationAllowance({ category: "energy-bottles" })).toBe(0);
+    expect(decorationAllowance({ category: "nails", cost: { decorationTWD: 0 } })).toBe(0);
+    expect(decorationAllowance({ category: "nails", cost: { decorationTWD: 50 } })).toBe(50);
+    expect(decorationAllowance({ category: "nails", customs: { bundleComponents: [{ productId: "x" }] } })).toBe(0);
+  });
+
+  it("is part of the product's material cost", () => {
+    const p = { id: "a", category: "nails", cost: { recipe: [{ materialId: "m", quantity: 2 }], packagingTWD: 5 } };
+    const r = productUnitCost(p, {}, { m: 10 });
+    expect(r.materialCostTWD).toBe(55);
+    expect(r.unitCostTWD).toBe(60);
+  });
+});

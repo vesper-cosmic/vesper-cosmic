@@ -108,6 +108,7 @@ function emptyForm() {
     costRecipe: [],
     costPackaging: "",
     costLabor: "",
+    costDecoration: "",
     customsValueOverride: "",
     bundleComponents: [],
     published: true,
@@ -365,6 +366,7 @@ export default function AdminProductsPage() {
         : [],
       costPackaging: product.cost?.packagingTWD || "",
       costLabor: product.cost?.laborTWD || "",
+      costDecoration: product.cost?.decorationTWD ?? "",
       customsValueOverride: product.customs?.valueOverrideUSD ?? "",
       bundleComponents: Array.isArray(product.customs?.bundleComponents)
         ? product.customs.bundleComponents
@@ -457,6 +459,7 @@ export default function AdminProductsPage() {
         recipe: (form.costRecipe || []).map((r) => ({ materialId: r.materialId, quantity: Number(r.quantity) || 0 })),
         packagingTWD: form.costPackaging === "" ? 0 : Number(form.costPackaging),
         laborTWD: form.costLabor === "" ? 0 : Number(form.costLabor),
+        decorationTWD: form.costDecoration === "" ? null : Number(form.costDecoration),
       },
       availableIntentions: form.availableIntentions
         .split(",")

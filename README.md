@@ -192,3 +192,16 @@ Several paid orders for the same recipient can go in one parcel.
 - **Exchange rate:** each new order is stamped with the live USD→TWD rate (open.er-api.com) in 匯率 TWD/USD. If it can't be fetched the order uses `FX_FALLBACK_TWD_PER_USD` (default 32) and is marked 備用. The order columns are added to the Notion orders database automatically.
 - **/admin/reports/cost:** per month, per product and per order — revenue (US$ × the order's rate), product cost, PayPal fee, postage, duties and referral commission, in TWD. Only paid, non-cancelled orders count. Orders not shipped yet use an estimated cost (marked *); combined-shipment postage and duties are split by order amount.
 - **PayPal fee:** `PAYPAL_FEE_PERCENT` (default 4.4) + `PAYPAL_FEE_FIXED_USD` (default 0.30) — set these to your account's real rates.
+
+### Bulk consumables and the decoration allowance (散裝耗材與裝飾補貼)
+
+- Each material is **計數型** (counted: nail tips, bottles, corks, pouches, tool kits, boxes — exact quantity, deducted per product) or **散裝耗材** (bulk: ribbon, crystal chips, sealing wax, gel polish, gold foil).
+- A bulk material's stock is in **packs**. Cost per product = pack average cost ÷ products per pack; each product made deducts 1 ÷ products-per-pack of a pack. In a recipe, a bulk line's quantity means "products' worth" (normally 1).
+- **用完一包:** asks how many products the pack really made. The pack-yield estimate then becomes the average over all finished packs (`已用完包數`, `實際累計件數` in the Materials database); until the first one is reported, the typed 每包預估件數 is used. Stock drops to the whole unopened packs left.
+- **Low stock (bulk):** estimated remaining products (packs × products per pack) below the material's 低庫存門檻(件).
+- **裝飾補貼:** a fixed per-product allowance for small decorations (charms, nail stickers, crystal chips, gold foil), counted in the product's material cost. Blank = default NT$35 for press-on nail categories (`DEFAULT_DECORATION_TWD` in `lib/cost.js`), 0 elsewhere; an explicit value (even 0) always wins; bundles take their components' allowances.
+- New Materials columns (added automatically): 追蹤方式, 每包預估件數, 低庫存門檻(件), 已用完包數, 實際累計件數.
+
+#### Design note (not built): charm price tiers
+
+Charms are not tracked individually. If wanted later, group them into tiers — budget / standard / premium — each with one average unit cost (a small "Charm tiers" table). A ready-made design would then list how many charms of each tier it uses (e.g. 4 standard + 1 premium), and its decoration allowance would be computed from those counts instead of the flat NT$35. `decorationAllowance()` in `lib/cost.js` is the single place to change.

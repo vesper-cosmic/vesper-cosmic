@@ -1,6 +1,6 @@
 "use client";
 
-import { productUnitCost } from "@/lib/cost";
+import { DEFAULT_DECORATION_TWD, decorationAllowance, productUnitCost } from "@/lib/cost";
 
 const box =
   "w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]";
@@ -12,7 +12,7 @@ const box =
  */
 export default function CostSection({ form, updateField, materials, products, editingId }) {
   const byId = Object.fromEntries(materials.map((m) => [m.id, m]));
-  const costById = Object.fromEntries(materials.map((m) => [m.id, m.avgCostTWD]));
+  const costById = Object.fromEntries(materials.map((m) => [m.id, m.recipeUnitCostTWD]));
   const productsById = Object.fromEntries((products || []).map((p) => [p.id, p]));
 
   const draft = {
@@ -21,7 +21,9 @@ export default function CostSection({ form, updateField, materials, products, ed
       recipe: (form.costRecipe || []).map((r) => ({ materialId: r.materialId, quantity: Number(r.quantity) || 0 })),
       packagingTWD: Number(form.costPackaging) || 0,
       laborTWD: Number(form.costLabor) || 0,
+      decorationTWD: form.costDecoration === "" || form.costDecoration == null ? null : Number(form.costDecoration),
     },
+    category: form.category,
     customs: { bundleComponents: form.bundleComponents || [] },
   };
   const estimate = productUnitCost(draft, productsById, costById);
@@ -40,7 +42,7 @@ export default function CostSection({ form, updateField, materials, products, ed
 
       {(form.costRecipe || []).map((line, index) => {
         const material = byId[line.materialId];
-        const lineCost = (Number(line.quantity) || 0) * (material?.avgCostTWD || 0);
+        const lineCost = (Number(line.quantity) || 0) * (material?.recipeUnitCostTWD || 0);
         return (
           <div key={index} className="grid gap-2 sm:grid-cols-[1fr_8rem_9rem_auto]">
             <select value={line.materialId} onChange={(e) => setLine(index, { materialId: e.target.value })} className={box}>
@@ -57,7 +59,7 @@ export default function CostSection({ form, updateField, materials, products, ed
               step="any"
               value={line.quantity}
               onChange={(e) => setLine(index, { quantity: e.target.value })}
-              placeholder={`用量${material?.unit ? `（${material.unit}）` : ""}`}
+              placeholder={material?.mode === "散裝" ? "做幾件份（通常 1）" : `用量${material?.unit ? `（${material.unit}）` : ""}`}
               className={box}
             />
             <p className="self-center text-xs text-[#35506B]">
@@ -92,7 +94,19 @@ export default function CostSection({ form, updateField, materials, products, ed
         ＋ 新增原料
       </button>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <label className="text-xs font-semibold text-[#5B7893]">
+          裝飾補貼 NT$（每件；留空 = 預設，穿戴甲 {DEFAULT_DECORATION_TWD}）
+          <input
+            type="number"
+            min="0"
+            step="any"
+            value={form.costDecoration}
+            placeholder={`預設 ${decorationAllowance(draft)}`}
+            onChange={(e) => updateField("costDecoration", e.target.value)}
+            className={`${box} mt-1`}
+          />
+        </label>
         <label className="text-xs font-semibold text-[#5B7893]">
           包材成本 NT$（每件，選填）
           <input
@@ -120,7 +134,7 @@ export default function CostSection({ form, updateField, materials, products, ed
       <p className="text-sm text-[#1C2B48]">
         預估單件成本：<strong>NT${estimate.unitCostTWD.toLocaleString("zh-TW")}</strong>
         <span className="ml-2 text-xs text-[#5B7893]">
-          （原料 {estimate.materialCostTWD} ＋ 包材人工 {estimate.extraTWD}；原料用目前平均單價）
+          （原料與裝飾補貼 {estimate.materialCostTWD} ＋ 包材人工 {estimate.extraTWD}；原料用目前平均單價）
         </span>
       </p>
       {form.bundleComponents?.length ? (

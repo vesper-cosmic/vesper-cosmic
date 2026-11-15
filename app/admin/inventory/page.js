@@ -18,8 +18,9 @@ export default function InventoryPage() {
   const [showInactive, setShowInactive] = useState(false);
   const [editing, setEditing] = useState(null); // material id being edited
   const [adjusting, setAdjusting] = useState(null);
+  const [usingUp, setUsingUp] = useState(null);
   const [message, setMessage] = useState("");
-  const [newMaterial, setNewMaterial] = useState({ name: "", unit: "", safetyStock: "" });
+  const [newMaterial, setNewMaterial] = useState({ name: "", unit: "", safetyStock: "", mode: "計數", estimatedUnitsPerPack: "", lowUnits: "" });
 
   async function load() {
     try {
@@ -109,15 +110,26 @@ export default function InventoryPage() {
               <tr key={m.id} className={`border-t border-[#8EB1D1]/20 ${m.active === false ? "opacity-50" : ""}`}>
                 <td className="py-2 pr-2">
                   {m.name} <span className="text-xs text-[#5B7893]">{m.unit}</span>
+                  {m.mode === "散裝" ? <span className="ml-2 rounded-full bg-[#E8ECEF] px-2 py-0.5 text-[11px] font-semibold text-[#35506B]">散裝</span> : null}
+                  {m.needsEstimate ? <span className="ml-2 rounded-full bg-[#FFF3D6] px-2 py-0.5 text-[11px] font-semibold text-[#7A5410]">請填每包預估件數</span> : null}
                   {m.low ? <span className="ml-2 rounded-full bg-[#FDE8E6] px-2 py-0.5 text-[11px] font-semibold text-[#A93226]">低庫存</span> : null}
                   {m.negative ? <span className="ml-2 rounded-full bg-[#FDE8E6] px-2 py-0.5 text-[11px] font-semibold text-[#A93226]">庫存為負</span> : null}
                 </td>
-                <td className={`py-2 pr-2 text-right font-mono ${m.low ? "font-bold text-[#A93226]" : ""}`}>{m.stock}</td>
-                <td className="py-2 pr-2 text-right font-mono">{m.purchasedQty > 0 ? money(m.avgCostTWD) : "—"}</td>
+                <td className={`py-2 pr-2 text-right font-mono ${m.low ? "font-bold text-[#A93226]" : ""}`}>
+                  {m.stock}
+                  {m.mode === "散裝" ? <span className="block text-[11px] font-normal text-[#5B7893]">約剩 {m.remainingUnits} 件份</span> : null}
+                </td>
+                <td className="py-2 pr-2 text-right font-mono">
+                  {m.purchasedQty > 0 ? money(m.avgCostTWD) : "—"}
+                  {m.mode === "散裝" ? <span className="block text-[11px] font-normal text-[#5B7893]">每件 {money(m.recipeUnitCostTWD)}（每包約 {m.unitsPerPack} 件）</span> : null}
+                </td>
                 <td className="py-2 pr-2 text-right font-mono">{money(m.stockValueTWD)}</td>
-                <td className="py-2 pr-2 text-right font-mono">{m.safetyStock || "—"}</td>
+                <td className="py-2 pr-2 text-right font-mono">{m.mode === "散裝" ? (m.lowUnits ? `${m.lowUnits} 件` : "—") : m.safetyStock || "—"}</td>
                 <td className="whitespace-nowrap py-2 text-right text-xs">
-                  <button type="button" onClick={() => { setAdjusting(adjusting === m.id ? null : m.id); setEditing(null); }} className="mr-2 underline">調整</button>
+                  {m.mode === "散裝" ? (
+                    <button type="button" onClick={() => { setUsingUp(usingUp === m.id ? null : m.id); setAdjusting(null); setEditing(null); }} className="mr-2 font-semibold underline">用完一包</button>
+                  ) : null}
+                  <button type="button" onClick={() => { setAdjusting(adjusting === m.id ? null : m.id); setEditing(null); setUsingUp(null); }} className="mr-2 underline">調整</button>
                   <button type="button" onClick={() => { setEditing(editing === m.id ? null : m.id); setAdjusting(null); }} className="underline">編輯</button>
                 </td>
               </tr>
@@ -132,7 +144,9 @@ export default function InventoryPage() {
       </div>
 
       {rows.map((m) =>
-        editing === m.id ? (
+        usingUp === m.id ? (
+          <UsedUpPanel key={`u-${m.id}`} material={m} onSave={(actualUnits) => send("/api/admin/inventory/used-up", "POST", { materialId: m.id, actualUnits }, "已記錄，下一包的預估件數已更新。").then((ok) => ok && setUsingUp(null))} onClose={() => setUsingUp(null)} />
+        ) : editing === m.id ? (
           <EditPanel key={`e-${m.id}`} material={m} onSave={(fields) => send(`/api/admin/inventory/${m.id}`, "PATCH", fields, "已儲存。").then((ok) => ok && setEditing(null))} onClose={() => setEditing(null)} />
         ) : adjusting === m.id ? (
           <AdjustPanel key={`a-${m.id}`} material={m} onSave={(body) => send("/api/admin/inventory/adjustments", "POST", { materialId: m.id, ...body }, "已調整庫存。").then((ok) => ok && setAdjusting(null))} onClose={() => setAdjusting(null)} />
@@ -142,10 +156,17 @@ export default function InventoryPage() {
       <details className="mt-5 rounded border border-dashed border-[#8EB1D1]/60 p-3">
         <summary className="cursor-pointer text-sm font-semibold text-[#35506B]">＋ 新增原料</summary>
         <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_7rem_8rem_auto]">
+          <select value={newMaterial.mode} onChange={(e) => setNewMaterial((p) => ({ ...p, mode: e.target.value }))} className={`${input} sm:col-span-4`} aria-label="追蹤方式">
+            <option value="計數">計數型（點得出個數：甲片、瓶子、軟木塞、袋子、盒子…）</option>
+            <option value="散裝">散裝耗材（緞帶、水晶碎石、封蠟、凝膠、金箔…；每包估計能做幾件）</option>
+          </select>
           <input type="text" value={newMaterial.name} onChange={(e) => setNewMaterial((p) => ({ ...p, name: e.target.value }))} placeholder="原料名稱" className={input} />
           <input type="text" value={newMaterial.unit} onChange={(e) => setNewMaterial((p) => ({ ...p, unit: e.target.value }))} placeholder="單位" className={input} />
-          <input type="number" min="0" value={newMaterial.safetyStock} onChange={(e) => setNewMaterial((p) => ({ ...p, safetyStock: e.target.value }))} placeholder="安全庫存量" className={input} />
-          <button type="button" onClick={() => send("/api/admin/inventory", "POST", newMaterial, "已新增原料。").then((ok) => ok && setNewMaterial({ name: "", unit: "", safetyStock: "" }))} className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-bold text-[#1C2B48] hover:bg-[#A7C7E7]">
+          <input type="number" min="0" value={newMaterial.safetyStock} onChange={(e) => setNewMaterial((p) => ({ ...p, safetyStock: e.target.value, lowUnits: e.target.value }))} placeholder={newMaterial.mode === "散裝" ? "低庫存門檻（件份）" : "安全庫存量"} className={input} />
+          {newMaterial.mode === "散裝" ? (
+            <input type="number" min="1" step="any" value={newMaterial.estimatedUnitsPerPack} onChange={(e) => setNewMaterial((p) => ({ ...p, estimatedUnitsPerPack: e.target.value }))} placeholder="每包預估可做幾件" className={`${input} sm:col-span-2`} />
+          ) : null}
+          <button type="button" onClick={() => send("/api/admin/inventory", "POST", { ...newMaterial, lowUnits: newMaterial.mode === "散裝" ? newMaterial.safetyStock : "", safetyStock: newMaterial.mode === "散裝" ? "" : newMaterial.safetyStock }, "已新增原料。").then((ok) => ok && setNewMaterial({ name: "", unit: "", safetyStock: "", mode: "計數", estimatedUnitsPerPack: "", lowUnits: "" }))} className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-bold text-[#1C2B48] hover:bg-[#A7C7E7]">
             新增
           </button>
         </div>
@@ -190,7 +211,7 @@ function Stat({ label, value, warn }) {
 }
 
 function EditPanel({ material, onSave, onClose }) {
-  const [form, setForm] = useState({ name: material.name, unit: material.unit, safetyStock: material.safetyStock || "", active: material.active !== false });
+  const [form, setForm] = useState({ name: material.name, unit: material.unit, safetyStock: material.safetyStock || "", active: material.active !== false, mode: material.mode || "計數", estimatedUnitsPerPack: material.estimatedUnitsPerPack || "", lowUnits: material.lowUnits || "" });
   return (
     <div className="mt-3 rounded border border-[#8EB1D1]/40 bg-white p-3">
       <p className="text-xs font-bold text-[#5B7893]">編輯「{material.name}」</p>
@@ -198,6 +219,16 @@ function EditPanel({ material, onSave, onClose }) {
         <input type="text" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} className={input} aria-label="名稱" />
         <input type="text" value={form.unit} onChange={(e) => setForm((p) => ({ ...p, unit: e.target.value }))} className={input} aria-label="單位" />
         <input type="number" min="0" value={form.safetyStock} onChange={(e) => setForm((p) => ({ ...p, safetyStock: e.target.value }))} className={input} aria-label="安全庫存量" placeholder="安全庫存量" />
+        <select value={form.mode} onChange={(e) => setForm((p) => ({ ...p, mode: e.target.value }))} className={input} aria-label="追蹤方式">
+          <option value="計數">計數型</option>
+          <option value="散裝">散裝耗材</option>
+        </select>
+        {form.mode === "散裝" ? (
+          <>
+            <input type="number" min="1" step="any" value={form.estimatedUnitsPerPack} onChange={(e) => setForm((p) => ({ ...p, estimatedUnitsPerPack: e.target.value }))} className={input} aria-label="每包預估件數" placeholder="每包預估可做幾件（有實際紀錄後以平均為準）" />
+            <input type="number" min="0" step="any" value={form.lowUnits} onChange={(e) => setForm((p) => ({ ...p, lowUnits: e.target.value }))} className={input} aria-label="低庫存門檻" placeholder="低庫存門檻（剩幾件份）" />
+          </>
+        ) : null}
         <label className="flex items-center gap-2 text-xs text-[#35506B]">
           <input type="checkbox" checked={form.active} onChange={(e) => setForm((p) => ({ ...p, active: e.target.checked }))} />
           使用中（取消勾選＝停用）
@@ -228,6 +259,23 @@ function AdjustPanel({ material, onSave, onClose }) {
       </div>
       <div className="mt-2 flex gap-2">
         <button type="button" onClick={() => onSave(mode === "counted" ? { counted: value, note } : { delta: value, note })} className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-1.5 text-sm font-bold text-[#1C2B48]">送出</button>
+        <button type="button" onClick={onClose} className="text-sm underline">取消</button>
+      </div>
+    </div>
+  );
+}
+
+function UsedUpPanel({ material, onSave, onClose }) {
+  const [actual, setActual] = useState("");
+  return (
+    <div className="mt-3 rounded border border-[#8EB1D1]/40 bg-white p-3">
+      <p className="text-xs font-bold text-[#5B7893]">「{material.name}」這一包用完了</p>
+      <p className="mt-1 text-xs text-[#35506B]">
+        目前每包預估約 {material.unitsPerPack} 件。請填這包<strong>實際</strong>做了幾件；之後每包的預估會用所有已用完包數的平均。
+      </p>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <input type="number" min="1" step="any" value={actual} onChange={(e) => setActual(e.target.value)} className={`${input} max-w-[12rem]`} placeholder="這包實際做了幾件" />
+        <button type="button" onClick={() => onSave(actual)} className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-1.5 text-sm font-bold text-[#1C2B48]">確認用完</button>
         <button type="button" onClick={onClose} className="text-sm underline">取消</button>
       </div>
     </div>

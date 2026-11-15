@@ -33,7 +33,7 @@ export async function GET(request) {
   const [shipmentsResult, productsResult, inventory] = await Promise.all([listShipments(), getAllProducts(), getInventory()]);
 
   const productsById = Object.fromEntries((productsResult.products || []).map((p) => [p.id, p]));
-  const materialCostById = Object.fromEntries((inventory.materials || []).map((m) => [m.id, m.avgCostTWD]));
+  const materialCostById = Object.fromEntries((inventory.materials || []).map((m) => [m.id, m.recipeUnitCostTWD]));
   const live = await getUsdTwdRate({ timeoutMs: 2000 });
 
   const report = buildCostReport({
