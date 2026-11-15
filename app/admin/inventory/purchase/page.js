@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AdminFrame } from "@/components/admin/useOrderCustoms";
 
 const input =
   "w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]";
+const NONE = "__none__";
 const money = (n) => Number(n || 0).toLocaleString("zh-TW", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 const todayInTaipei = () => new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
 
@@ -21,7 +22,8 @@ export default function PurchasePage() {
   const [problems, setProblems] = useState([]);
   const [done, setDone] = useState("");
   const [filter, setFilter] = useState("");
-  const [newMaterial, setNewMaterial] = useState({ name: "", unit: "" });
+  const [newMaterial, setNewMaterial] = useState({ name: "", unit: "", category: "" });
+  const [cats, setCats] = useState({}); // category → ticked for this purchase
 
   async function load() {
     try {
@@ -47,7 +49,19 @@ export default function PurchasePage() {
     [materials, rows]
   );
   const grandTotal = picked.reduce((sum, m) => sum + (Number(rows[m.id]?.total) || 0), 0);
-  const visible = materials.filter((m) => !filter.trim() || m.name.toLowerCase().includes(filter.trim().toLowerCase()));
+  const categories = useMemo(
+    () => [...new Set(materials.map((m) => m.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, "zh-Hant")),
+    [materials]
+  );
+  const catKey = (m) => m.category || NONE;
+  const ticked = Object.keys(cats).filter((k) => cats[k]);
+  const needle = filter.trim().toLowerCase();
+  // With no category ticked everything shows; otherwise only ticked categories
+  // (plus anything already ticked in the list, so a pick never disappears).
+  const visible = materials
+    .filter((m) => ticked.length === 0 || ticked.includes(catKey(m)) || rows[m.id]?.checked)
+    .filter((m) => !needle || [m.name, m.category].some((t) => String(t || "").toLowerCase().includes(needle)))
+    .sort((a, b) => (a.category || "\uffff").localeCompare(b.category || "\uffff", "zh-Hant") || a.name.localeCompare(b.name, "zh-Hant"));
 
   async function addMaterial() {
     if (!newMaterial.name.trim()) return;
@@ -59,7 +73,7 @@ export default function PurchasePage() {
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) return setProblems([data.error || "新增原料失敗"]);
-    setNewMaterial({ name: "", unit: "" });
+    setNewMaterial({ name: "", unit: "", category: "" });
     await load();
     setRow(data.material.id, { checked: true });
   }
@@ -121,16 +135,40 @@ export default function PurchasePage() {
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-sm font-bold text-[#1C2B48]">原料清單（已勾 {picked.length} 項）</h2>
-        <input type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="搜尋原料" className={`${input} max-w-[14rem]`} />
+        <input type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="搜尋原料（名稱、分類）" className={`${input} max-w-[14rem]`} />
       </div>
+
+      {categories.length ? (
+        <div className="mt-2 rounded border border-[#8EB1D1]/40 bg-white/60 p-3">
+          <p className="text-xs font-semibold text-[#5B7893]">這次買了哪些類別？勾選後只顯示這些類別的原料（都不勾 = 顯示全部）</p>
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5">
+            {[...categories.map((c) => [c, c]), [NONE, "未分類"]].map(([key, label]) => (
+              <label key={key} className="flex cursor-pointer items-center gap-1.5 text-sm text-[#1C2B48]">
+                <input type="checkbox" checked={Boolean(cats[key])} onChange={(e) => setCats((prev) => ({ ...prev, [key]: e.target.checked }))} />
+                {label}
+                <span className="text-xs text-[#5B7893]">({materials.filter((m) => catKey(m) === key).length})</span>
+              </label>
+            ))}
+            {ticked.length ? (
+              <button type="button" onClick={() => setCats({})} className="text-xs underline">
+                清除類別
+              </button>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       {loading ? <p className="mt-3 text-sm text-[#5B7893]">載入中…</p> : null}
       <ul className="mt-2 space-y-2">
-        {visible.map((m) => {
+        {visible.map((m, i) => {
           const row = rows[m.id] || {};
           const unit = row.quantity > 0 && row.total !== "" ? Number(row.total) / Number(row.quantity) : null;
           return (
-            <li key={m.id} className={`rounded border p-3 ${row.checked ? "border-[#8EB1D1] bg-white" : "border-[#8EB1D1]/25 bg-white/50"}`}>
+            <Fragment key={m.id}>
+            {i === 0 || (visible[i - 1].category || "") !== (m.category || "") ? (
+              <li className="pt-2 text-xs font-bold text-[#35506B]">{m.category || "未分類"}</li>
+            ) : null}
+            <li className={`rounded border p-3 ${row.checked ? "border-[#8EB1D1] bg-white" : "border-[#8EB1D1]/25 bg-white/50"}`}>
               <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#1C2B48]">
                 <input type="checkbox" checked={Boolean(row.checked)} onChange={(e) => setRow(m.id, { checked: e.target.checked })} />
                 {m.name}
@@ -152,6 +190,7 @@ export default function PurchasePage() {
                 </div>
               ) : null}
             </li>
+            </Fragment>
           );
         })}
         {!loading && visible.length === 0 ? <li className="text-sm text-[#5B7893]">沒有符合的原料。下方可以新增。</li> : null}
@@ -159,9 +198,11 @@ export default function PurchasePage() {
 
       <details className="mt-3 rounded border border-dashed border-[#8EB1D1]/60 p-3">
         <summary className="cursor-pointer text-sm font-semibold text-[#35506B]">＋ 新增一種原料</summary>
-        <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_8rem_auto]">
+        <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_8rem_9rem_auto]">
           <input type="text" value={newMaterial.name} onChange={(e) => setNewMaterial((p) => ({ ...p, name: e.target.value }))} placeholder="原料名稱，例如 粉水晶碎石" className={input} />
           <input type="text" value={newMaterial.unit} onChange={(e) => setNewMaterial((p) => ({ ...p, unit: e.target.value }))} placeholder="單位（克、個…）" className={input} />
+          <input type="text" list="purchase-categories" value={newMaterial.category} onChange={(e) => setNewMaterial((p) => ({ ...p, category: e.target.value }))} placeholder="分類（選填）" className={input} />
+          <datalist id="purchase-categories">{categories.map((c) => <option key={c} value={c} />)}</datalist>
           <button type="button" onClick={addMaterial} className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-bold text-[#1C2B48] hover:bg-[#A7C7E7]">
             新增並勾選
           </button>
