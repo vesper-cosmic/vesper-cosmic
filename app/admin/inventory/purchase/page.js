@@ -48,7 +48,21 @@ export default function PurchasePage() {
     () => materials.filter((m) => rows[m.id]?.checked),
     [materials, rows]
   );
-  const grandTotal = picked.reduce((sum, m) => sum + (Number(rows[m.id]?.total) || 0), 0);
+  // Either the total or the unit price may be typed; the other is worked out.
+  // `by` remembers which one the user typed last.
+  const rowTotal = (row) => {
+    if (row?.by === "unit") {
+      const t = Number(row.unitPrice) * Number(row.quantity);
+      return row.unitPrice === "" || !Number.isFinite(t) ? "" : String(Math.round(t * 100) / 100);
+    }
+    return row?.total ?? "";
+  };
+  const rowUnit = (row) => {
+    if (row?.by === "unit") return row.unitPrice ?? "";
+    const u = Number(row?.total) / Number(row?.quantity);
+    return row?.total === "" || row?.total == null || !(Number(row?.quantity) > 0) || !Number.isFinite(u) ? "" : String(Math.round(u * 10000) / 10000);
+  };
+  const grandTotal = picked.reduce((sum, m) => sum + (Number(rowTotal(rows[m.id])) || 0), 0);
   const categories = useMemo(
     () => [...new Set(materials.map((m) => m.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, "zh-Hant")),
     [materials]
@@ -90,7 +104,7 @@ export default function PurchasePage() {
           date,
           supplier,
           note,
-          lines: picked.map((m) => ({ materialId: m.id, quantity: rows[m.id].quantity, totalTWD: rows[m.id].total })),
+          lines: picked.map((m) => ({ materialId: m.id, quantity: rows[m.id].quantity, totalTWD: rowTotal(rows[m.id]) })),
         }),
       });
       const data = await response.json().catch(() => ({}));
@@ -113,7 +127,7 @@ export default function PurchasePage() {
         ← 原料庫存
       </Link>
       <h1 className="mt-2 text-2xl font-bold text-[#1C2B48]">進貨登記</h1>
-      <p className="mt-1 text-sm text-[#35506B]">勾選這次買了哪些原料，填「買了多少」和「這一項總共花多少（新台幣）」。系統會自動算單價、更新庫存和平均成本。</p>
+      <p className="mt-1 text-sm text-[#35506B]">勾選這次買了哪些原料，填「買了多少」，再填「這一項總共花多少」或「單價」其中一個（另一個自動算出）。系統會自動算單價、更新庫存和平均成本。</p>
 
       {error ? <p className="mt-3 rounded border border-[#C0392B]/40 bg-[#FDE8E6] p-2 text-sm text-[#7B241C]">{error}</p> : null}
       {done ? <p className="mt-3 rounded border border-[#2E8B57]/30 bg-[#E9F5EE] p-2 text-sm text-[#1F5E3B]">✓ {done}</p> : null}
@@ -162,7 +176,6 @@ export default function PurchasePage() {
       <ul className="mt-2 space-y-2">
         {visible.map((m, i) => {
           const row = rows[m.id] || {};
-          const unit = row.quantity > 0 && row.total !== "" ? Number(row.total) / Number(row.quantity) : null;
           return (
             <Fragment key={m.id}>
             {i === 0 || (visible[i - 1].category || "") !== (m.category || "") ? (
@@ -184,9 +197,12 @@ export default function PurchasePage() {
                   </label>
                   <label className="text-xs text-[#5B7893]">
                     這一項總金額（NT$）
-                    <input type="number" min="0" step="any" value={row.total ?? ""} onChange={(e) => setRow(m.id, { total: e.target.value })} className={`${input} mt-1`} />
+                    <input type="number" min="0" step="any" value={rowTotal(row)} onChange={(e) => setRow(m.id, { by: "total", total: e.target.value })} className={`${input} mt-1`} />
                   </label>
-                  <p className="self-end pb-2 text-xs text-[#35506B]">{unit != null && Number.isFinite(unit) ? `單價約 NT$${money(Math.round(unit * 10000) / 10000)} / ${m.unit || "單位"}` : "單價：—"}</p>
+                  <label className="text-xs text-[#5B7893]">
+                    或：單價（NT$ / {m.unit || "單位"}）
+                    <input type="number" min="0" step="any" value={rowUnit(row)} onChange={(e) => setRow(m.id, { by: "unit", unitPrice: e.target.value })} className={`${input} mt-1`} />
+                  </label>
                 </div>
               ) : null}
             </li>
