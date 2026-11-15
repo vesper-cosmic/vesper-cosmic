@@ -94,6 +94,20 @@ export default function CostReportPage() {
             </p>
           ) : null}
 
+          <h2 className="mt-6 text-sm font-bold text-[#1C2B48]">目前上架商品的毛利（依今日匯率 {data.todayRate?.rate}、目前原料平均成本；不含郵資、關稅、分潤）</h2>
+          <Table
+            head={["商品", "售價 US$", "售價 NT$", "單件成本", "PayPal 費", "毛利", "毛利率"]}
+            rows={(data.catalog || []).map((p) => [
+              <span key="n">{p.name}{!p.hasRecipe ? <span className="ml-1 text-[11px] text-[#7A5410]" title="還沒設定成本配方，成本可能偏低">（未設配方）</span> : null}</span>,
+              p.priceUSD.toFixed(2),
+              money(p.priceTWD),
+              money(p.unitCostTWD),
+              money(p.paypalFeeTWD),
+              <span key="m" className={p.marginTWD < 0 ? "text-[#A93226]" : ""}>{money(p.marginTWD)}</span>,
+              <span key="p" className={p.marginPct < 0 ? "text-[#A93226]" : ""}>{pct(p.marginPct)}</span>,
+            ])}
+          />
+
           <h2 className="mt-6 text-sm font-bold text-[#1C2B48]">每月</h2>
           <Table
             head={["月份", "訂單", "營收", "成本", "毛利"]}

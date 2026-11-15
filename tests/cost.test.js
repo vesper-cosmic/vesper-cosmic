@@ -179,3 +179,17 @@ describe("fx", () => {
     expect(isPlausibleRate(0)).toBe(false);
   });
 });
+
+import { catalogMargins as _catalog } from "@/lib/cost";
+describe("catalogMargins", () => {
+  it("gives price, cost, PayPal fee and margin for each published product", () => {
+    const products = [
+      { id: "a", name: "A", price: 10, category: "energy-bottles", cost: { recipe: [{ materialId: "m", quantity: 2 }] } },
+      { id: "b", name: "B", price: 5, published: false },
+    ];
+    const rows = _catalog(products, {}, { m: 20 }, 30, { percent: 4, fixedUSD: 0.5 });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ priceTWD: 300, unitCostTWD: 40, paypalFeeTWD: 27, marginTWD: 233, hasRecipe: true });
+    expect(rows[0].marginPct).toBe(77.7);
+  });
+});

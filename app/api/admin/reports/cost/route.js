@@ -4,7 +4,7 @@ import { findAllNotionOrders } from "@/lib/orderServer";
 import { getAllProducts } from "@/lib/productServer";
 import { listShipments } from "@/lib/shipmentServer";
 import { getInventory, inventoryConfigured } from "@/lib/inventoryServer";
-import { buildCostReport, monthOf, paypalFeeConfig } from "@/lib/cost";
+import { buildCostReport, catalogMargins, monthOf, paypalFeeConfig } from "@/lib/cost";
 import { fallbackRate, getUsdTwdRate } from "@/lib/fx";
 
 export const runtime = "nodejs";
@@ -55,6 +55,7 @@ export async function GET(request) {
       months,
       feeConfig: paypalFeeConfig(process.env),
       todayRate: live,
+      catalog: catalogMargins(productsResult.products || [], productsById, materialCostById, live?.rate || fallbackRate(), paypalFeeConfig(process.env)),
       inventory: {
         configured: inventoryConfigured(),
         totalValueTWD: inventory.summary?.totalValueTWD ?? 0,
