@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import PresetPlanDialog from "@/components/admin/PresetPlanDialog";
+import CostSection from "@/components/admin/CostSection";
 import {
   applyPreset,
   findPreset,
@@ -104,6 +105,9 @@ function emptyForm() {
     customsWeightG: "",
     customsOrigin: "Taiwan",
     customsPreset: "",
+    costRecipe: [],
+    costPackaging: "",
+    costLabor: "",
     customsValueOverride: "",
     bundleComponents: [],
     published: true,
@@ -146,10 +150,23 @@ export default function AdminProductsPage() {
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkResult, setBulkResult] = useState("");
 
+  // Raw materials (for recipes) with their current average cost
+  const [materials, setMaterials] = useState([]);
+
   useEffect(() => {
     if (authStatus !== "authenticated") return;
     loadProducts();
   }, [authStatus]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    fetch("/api/admin/inventory")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (Array.isArray(data?.materials)) setMaterials(data.materials.filter((m) => m.active !== false));
+      })
+      .catch(() => {});
+  }, [isAdmin]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -343,6 +360,11 @@ export default function AdminProductsPage() {
       customsWeightG: product.customs?.unitWeightG ?? "",
       customsOrigin: product.customs?.origin || "Taiwan",
       customsPreset: product.customs?.preset || "",
+      costRecipe: Array.isArray(product.cost?.recipe)
+        ? product.cost.recipe.map((r) => ({ materialId: r.materialId, quantity: r.quantity }))
+        : [],
+      costPackaging: product.cost?.packagingTWD || "",
+      costLabor: product.cost?.laborTWD || "",
       customsValueOverride: product.customs?.valueOverrideUSD ?? "",
       bundleComponents: Array.isArray(product.customs?.bundleComponents)
         ? product.customs.bundleComponents
@@ -430,6 +452,11 @@ export default function AdminProductsPage() {
         preset: form.customsPreset || "",
         valueOverrideUSD: form.customsValueOverride === "" ? null : Number(form.customsValueOverride),
         bundleComponents: form.bundleComponents,
+      },
+      cost: {
+        recipe: (form.costRecipe || []).map((r) => ({ materialId: r.materialId, quantity: Number(r.quantity) || 0 })),
+        packagingTWD: form.costPackaging === "" ? 0 : Number(form.costPackaging),
+        laborTWD: form.costLabor === "" ? 0 : Number(form.costLabor),
       },
       availableIntentions: form.availableIntentions
         .split(",")
@@ -973,6 +1000,14 @@ export default function AdminProductsPage() {
               products={products.filter((p) => p.id !== editingId)}
               presets={presets}
               onChoosePreset={choosePreset}
+            />
+
+            <CostSection
+              form={form}
+              updateField={updateField}
+              materials={materials}
+              products={products}
+              editingId={editingId}
             />
 
             <Field label="產品圖片 Product Images" error={formErrors.images}>

@@ -23,6 +23,7 @@ vi.mock("@/lib/orderServer", () => ({
 }));
 vi.mock("@/lib/productServer", () => ({ getAllProducts: vi.fn(async () => ({ products: [] })) }));
 vi.mock("@/lib/referral", () => ({ syncOrderReferrer: vi.fn() }));
+vi.mock("@/lib/costServer", () => ({ consumeMaterialsForOrder: vi.fn(async () => ({ done: false })), restoreStockForCancelledOrder: vi.fn() }));
 vi.mock("@/lib/customerEmails", () => ({ sendCombinedShippedEmail: vi.fn() }));
 vi.mock("@/lib/customs/shipmentContext", () => ({ loadShipmentCustoms: vi.fn(async () => ({ status: 404, error: "x" })) }));
 vi.mock("@/lib/customs/render", () => ({ renderInvoicePdf: vi.fn(), renderPackingListPdf: vi.fn() }));

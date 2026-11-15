@@ -98,7 +98,7 @@ export async function POST(request) {
   }
 
   try {
-    await decrementProductInventory([{ productId: order.productId, quantity: 1 }]);
+    await decrementProductInventory([{ productId: order.productId, quantity: 1 }], { orderId: order.orderId });
   } catch (error) {
     console.error("Inventory update failed:", error);
   }

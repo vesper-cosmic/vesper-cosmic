@@ -182,4 +182,13 @@ Several paid orders for the same recipient can go in one parcel.
 - **/admin/inventory/purchase (進貨登記):** tick the materials bought, enter the quantity and the total paid (TWD) for each; one submission records the whole purchase (`VC-PUR-YYYYMMDD-NN`).
 - **/admin/inventory:** stock, average unit cost and stock value per material, low-stock flags (安全庫存量), manual adjustments (stocktake or +/−), purchase history and the movement log.
 - Stock = the sum of stock movements. Average cost = everything ever spent on the material ÷ everything ever bought (weighted across batches); using or adjusting stock never changes the unit cost.
-- All money is TWD. Product recipes, per-order cost and the margin report come next.
+- All money is TWD.
+
+### Cost, margin and the report (成本與毛利)
+
+- **Recipe:** in the product form, 成本配方 lists the raw materials one piece uses (plus optional packaging and labour, TWD). A bundle adds up its components. Recipes and costs are admin-only: they are stripped from the public product API and pages.
+- **When an order ships** (status 🚚 已出貨, or a combined shipment is marked shipped) the recipe's materials are taken out of stock (耗用 movements) and the order's product cost is saved on the order (商品成本 / 成本明細), so later price changes never rewrite past profit. Doing it twice never deducts twice. Stock can go negative if purchases weren't registered; the inventory page flags it.
+- **Cancelling** an order that has not shipped puts its finished-goods stock back (取消回補). Finished-goods stock changes are logged in 庫存異動.
+- **Exchange rate:** each new order is stamped with the live USD→TWD rate (open.er-api.com) in 匯率 TWD/USD. If it can't be fetched the order uses `FX_FALLBACK_TWD_PER_USD` (default 32) and is marked 備用. The order columns are added to the Notion orders database automatically.
+- **/admin/reports/cost:** per month, per product and per order — revenue (US$ × the order's rate), product cost, PayPal fee, postage, duties and referral commission, in TWD. Only paid, non-cancelled orders count. Orders not shipped yet use an estimated cost (marked *); combined-shipment postage and duties are split by order amount.
+- **PayPal fee:** `PAYPAL_FEE_PERCENT` (default 4.4) + `PAYPAL_FEE_FIXED_USD` (default 0.30) — set these to your account's real rates.

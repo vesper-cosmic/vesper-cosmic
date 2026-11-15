@@ -3,6 +3,7 @@ import { adminGuard } from "@/lib/adminAuth";
 import { findNotionOrder, setAdminOrderStatus, updateOrderShippingRecord } from "@/lib/orderServer";
 import { OS_SHIPPED } from "@/lib/orderStatus";
 import { syncOrderReferrer } from "@/lib/referral";
+import { consumeMaterialsForOrder } from "@/lib/costServer";
 import { sendCombinedShippedEmail } from "@/lib/customerEmails";
 import { findShipment, updateShipment } from "@/lib/shipmentServer";
 import { loadShipmentCustoms } from "@/lib/customs/shipmentContext";
@@ -100,10 +101,15 @@ export async function PATCH(request, { params }) {
         if (record?.skipped) failures.push(`${orderId}：${record.reason}`);
         await syncOrderReferrer(orderId);
       }
+      // (Material deduction happens below, only once every order saved.)
       if (failures.length) return json({ error: "部分訂單更新失敗，出貨單尚未標為已出貨，可再按一次重試。", failures }, 502);
 
       const result = await updateShipment(shipment.pageId, { status: SHIPMENT_SHIPPED, trackingNumber, shippedAt });
-      return result.skipped ? json({ error: result.reason }, 503) : json({ ok: true, orders: shipment.orderIds.length });
+      if (result.skipped) return json({ error: result.reason }, 503);
+      // Take the materials out of stock and save each order's cost (never blocks shipping).
+      const stock = [];
+      for (const orderId of shipment.orderIds) stock.push({ orderId, ...(await consumeMaterialsForOrder(orderId)) });
+      return json({ ok: true, orders: shipment.orderIds.length, stock });
     }
 
     case "send-emails": {

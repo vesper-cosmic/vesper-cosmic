@@ -9,6 +9,7 @@ import {
 import {
   ADMIN_ORDER_STATUSES,
   OS_CANCELLED,
+  OS_COMPLETED,
   OS_PAYMENT_NOTICE,
   OS_SHIPPED,
   OS_VERIFIED_NOTICE,
@@ -22,6 +23,7 @@ import {
   sendShippedEmail,
 } from "@/lib/customerEmails";
 import { syncOrderReferrer } from "@/lib/referral";
+import { consumeMaterialsForOrder, restoreStockForCancelledOrder } from "@/lib/costServer";
 import { loadOrderCustoms } from "@/lib/customs/context";
 import { renderInvoicePdf } from "@/lib/customs/render";
 
@@ -125,6 +127,14 @@ async function changeOrderStatus(orderId, payload) {
   const previous = adminOrderStatus(before);
   let email = null;
 
+  // Stock and cost bookkeeping (never blocks the status change).
+  let materials = null;
+  if ((orderStatus === OS_SHIPPED || orderStatus === OS_COMPLETED) && previous !== OS_SHIPPED && previous !== OS_COMPLETED) {
+    materials = await consumeMaterialsForOrder(orderId);
+  } else if (orderStatus === OS_CANCELLED && previous !== OS_CANCELLED) {
+    materials = await restoreStockForCancelledOrder(before);
+  }
+
   if (notify && before?.email) {
     if (orderStatus === OS_PAYMENT_NOTICE) {
       email = await sendPaymentRequestEmail(before, note);
@@ -155,5 +165,6 @@ async function changeOrderStatus(orderId, payload) {
     orderStatus,
     trackingNumber: trackingNumber || null,
     email,
+    stock: materials,
   });
 }
