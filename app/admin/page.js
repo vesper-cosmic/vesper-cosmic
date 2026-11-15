@@ -196,6 +196,12 @@ export default function AdminPage() {
               產品管理 →
             </Link>
             <Link
+              href="/admin/inventory"
+              className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+            >
+              原料庫存 →
+            </Link>
+            <Link
               href="/admin/shipments"
               className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#A7C7E7]"
             >

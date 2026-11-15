@@ -175,3 +175,11 @@ Several paid orders for the same recipient can go in one parcel.
 - **標記已出貨** sets every order to 🚚 已出貨 with the tracking number — it sends no email. **寄出貨通知信** (separate button) sends one email per customer listing their order numbers.
 - **拆分** removes an order from a shipment before it is marked shipped. Single-order shipping is unchanged (no shipment record).
 - The EZPost line limit (40) is an unverified assumption: `EZPOST_MAX_LINES` in `lib/customs/validate.js`.
+
+## Raw-material inventory and cost (原料庫存與成本)
+
+- Three Notion databases under the "Vesper Cosmos" page: **原料 Materials**, **進貨紀錄 Purchases**, **庫存異動 Stock movements**. Env vars: `NOTION_MATERIALS_DATABASE_ID`, `NOTION_PURCHASES_DATABASE_ID`, `NOTION_STOCK_MOVEMENTS_DATABASE_ID` (connect each to the "Vesper Cosmic" integration; missing columns are added automatically).
+- **/admin/inventory/purchase (進貨登記):** tick the materials bought, enter the quantity and the total paid (TWD) for each; one submission records the whole purchase (`VC-PUR-YYYYMMDD-NN`).
+- **/admin/inventory:** stock, average unit cost and stock value per material, low-stock flags (安全庫存量), manual adjustments (stocktake or +/−), purchase history and the movement log.
+- Stock = the sum of stock movements. Average cost = everything ever spent on the material ÷ everything ever bought (weighted across batches); using or adjusting stock never changes the unit cost.
+- All money is TWD. Product recipes, per-order cost and the margin report come next.
