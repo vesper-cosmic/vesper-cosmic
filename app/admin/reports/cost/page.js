@@ -94,19 +94,61 @@ export default function CostReportPage() {
             </p>
           ) : null}
 
-          <h2 className="mt-6 text-sm font-bold text-[#1C2B48]">目前上架商品的毛利（依今日匯率 {data.todayRate?.rate}、目前原料平均成本；不含郵資、關稅、分潤）</h2>
-          <Table
-            head={["商品", "售價 US$", "售價 NT$", "單件成本", "PayPal 費", "毛利", "毛利率"]}
-            rows={(data.catalog || []).map((p) => [
-              <span key="n">{p.name}{!p.hasRecipe ? <span className="ml-1 text-[11px] text-[#7A5410]" title="還沒設定成本配方，成本可能偏低">（未設配方）</span> : null}</span>,
-              p.priceUSD.toFixed(2),
-              money(p.priceTWD),
-              money(p.unitCostTWD),
-              money(p.paypalFeeTWD),
-              <span key="m" className={p.marginTWD < 0 ? "text-[#A93226]" : ""}>{money(p.marginTWD)}</span>,
-              <span key="p" className={p.marginPct < 0 ? "text-[#A93226]" : ""}>{pct(p.marginPct)}</span>,
-            ])}
-          />
+          <div className="mt-6 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-sm font-bold text-[#1C2B48]">目前上架商品的毛利與淨利估算（今日匯率 {data.todayRate?.rate}、目前原料平均成本）</h2>
+            <Link href="/admin/settings/profit" className="text-xs underline">淨利設定 →</Link>
+          </div>
+          <div className="mt-2 overflow-x-auto">
+            <table className="w-full min-w-[1180px] text-left text-xs text-[#1C2B48]">
+              <thead className="text-[#5B7893]">
+                <tr>
+                  <th className="sticky left-0 bg-[#F3F6F8] py-1.5 pr-2">商品</th>
+                  {["售價 US$", "售價 NT$", "單件成本", "PayPal 費", "材料毛利", "材料毛利率", "郵資", "關稅與規費", "包材", "分潤", "人工", "行銷", "淨利", "淨利率"].map((h) => (
+                    <th key={h} className={`py-1.5 pr-2 text-right ${h.startsWith("淨利") ? "font-bold text-[#1C2B48]" : ""}`}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(data.catalog || []).map((p) => {
+                  const n = p.net || {};
+                  const w = n.warnings || {};
+                  const cell = (v) => (v === null || v === undefined ? "—" : money(v));
+                  return (
+                    <tr key={p.productId} className="border-t border-[#8EB1D1]/20">
+                      <td className="sticky left-0 bg-[#F3F6F8] py-1.5 pr-2 font-sans">
+                        {p.name}
+                        {w.noRecipe ? <span className="ml-1 text-[11px] text-[#7A5410]">（未設配方）</span> : null}
+                        {w.noWeight ? <span className="ml-1 text-[11px] text-[#7A5410]">（未設重量）</span> : null}
+                        {w.overLimit ? <span className="ml-1 text-[11px] text-[#7A5410]">（超過郵寄上限）</span> : null}
+                        {w.noLabor ? <span className="ml-1 text-[11px] text-[#7A5410]">（未設工時）</span> : null}
+                        {n.digital ? <span className="ml-1 text-[11px] text-[#5B7893]">（數位）</span> : null}
+                      </td>
+                      <td className="py-1.5 pr-2 text-right font-mono">{p.priceUSD.toFixed(2)}</td>
+                      <td className="py-1.5 pr-2 text-right font-mono">{money(p.priceTWD)}</td>
+                      <td className="py-1.5 pr-2 text-right font-mono">{money(p.unitCostTWD)}</td>
+                      <td className="py-1.5 pr-2 text-right font-mono">{money(p.paypalFeeTWD)}</td>
+                      <td className={`py-1.5 pr-2 text-right font-mono ${p.marginTWD < 0 ? "text-[#A93226]" : ""}`}>{money(p.marginTWD)}</td>
+                      <td className={`py-1.5 pr-2 text-right font-mono ${p.marginPct < 0 ? "text-[#A93226]" : ""}`}>{pct(p.marginPct)}</td>
+                      <td className="py-1.5 pr-2 text-right font-mono">{cell(n.postageTWD)}</td>
+                      <td className="py-1.5 pr-2 text-right font-mono">{cell(n.dutyFeesTWD)}</td>
+                      <td className="py-1.5 pr-2 text-right font-mono">{cell(n.packagingTWD)}</td>
+                      <td className="py-1.5 pr-2 text-right font-mono">{cell(n.referralTWD)}</td>
+                      <td className="py-1.5 pr-2 text-right font-mono">{cell(n.laborTWD)}</td>
+                      <td className="py-1.5 pr-2 text-right font-mono">{cell(n.marketingTWD)}</td>
+                      <td className={`py-1.5 pr-2 text-right font-mono font-bold ${n.netTWD < 0 ? "text-[#A93226]" : ""}`}>{cell(n.netTWD)}</td>
+                      <td className={`py-1.5 pr-2 text-right font-mono font-bold ${n.netPct < 0 ? "text-[#A93226]" : ""}`}>{n.netPct === null || n.netPct === undefined ? "—" : pct(n.netPct)}</td>
+                    </tr>
+                  );
+                })}
+                {(data.catalog || []).length === 0 ? (
+                  <tr><td colSpan={15} className="py-3 text-sm text-[#5B7893]">沒有上架商品。</td></tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-[11px] text-[#8B99A8]">
+            材料毛利 = 售價 − 單件成本（含包材、人工固定金額）− PayPal 費。淨利另用淨利設定的包材與人工，不含商品上舊的固定包材／人工金額，避免重複。估算假設每個包裹只裝一件商品；多件訂單會共用郵資、入口規費與報關行費，實際毛利會更高。
+          </p>
 
           <h2 className="mt-6 text-sm font-bold text-[#1C2B48]">每月</h2>
           <Table

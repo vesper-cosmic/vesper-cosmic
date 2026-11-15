@@ -207,3 +207,11 @@ Several paid orders for the same recipient can go in one parcel.
 Charms are not tracked individually. If wanted later, group them into tiers — budget / standard / premium — each with one average unit cost (a small "Charm tiers" table). A ready-made design would then list how many charms of each tier it uses (e.g. 4 standard + 1 premium), and its decoration allowance would be computed from those counts instead of the flat NT$35. `decorationAllowance()` in `lib/cost.js` is the single place to change.
 
 Materials can be grouped with a **分類** (e.g. 水晶類, 蠟粒類): type a new one or pick an existing one on the inventory page. The list is grouped by category, filterable by category chips, and searchable by name, category, unit or note. The recipe's material picker is grouped the same way. New Materials column: 分類 (added automatically).
+
+### Net profit estimate (淨利估算)
+
+The cost report's "目前上架商品" table adds estimated **net profit** after the material margin: postage, duty & fees (declared value × duty rate + US entry fee + broker fee), packaging, referral commission, labour and marketing. It assumes one product per parcel (multi-item orders share postage, entry fee and broker fee, so real margins are higher).
+
+- Rates and the postage table are edited at **/admin/settings/profit** and stored in one row of the Notion "設定 Settings" database (`NOTION_SETTINGS_DATABASE_ID`; connected to the integration like the others). Without it the built-in defaults (labour NT$300/h, marketing NT$400, broker NT$80 — an estimate until confirmed in EZPost, entry fee US$2, duty 10%, envelope NT$30/30 g, box NT$60/150 g, ePacket and Air Parcel tables) are used and saving is refused.
+- Per-product inputs live in the product form's 成本配方: labour minutes, packaging type and postage service (blank = default by category: nails/sachets/kits → envelope + ePacket, energy bottles → box + Air Parcel; digital products have no postage, duty or packaging).
+- Net profit uses material cost (recipe + decoration allowance) only; the product's older fixed 包材/人工 amounts are not subtracted again. The "材料毛利" columns are unchanged.

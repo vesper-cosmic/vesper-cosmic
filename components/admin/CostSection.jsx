@@ -139,6 +139,30 @@ export default function CostSection({ form, updateField, materials, products, ed
         </label>
       </div>
 
+      <div className="grid gap-3 sm:grid-cols-3">
+        <label className="text-xs font-semibold text-[#5B7893]">
+          每件工時（分鐘；用於淨利估算）
+          <input type="number" min="0" step="any" value={form.costLaborMinutes} onChange={(e) => updateField("costLaborMinutes", e.target.value)} className={`${box} mt-1`} />
+        </label>
+        <label className="text-xs font-semibold text-[#5B7893]">
+          包裝類型（留空 = 依類別預設）
+          <select value={form.costShippingType} onChange={(e) => updateField("costShippingType", e.target.value)} className={`${box} mt-1`}>
+            <option value="">預設</option>
+            <option value="envelope">信封 Envelope</option>
+            <option value="box">箱子 Box（易碎）</option>
+          </select>
+        </label>
+        <label className="text-xs font-semibold text-[#5B7893]">
+          郵寄方式（留空 = 依類別預設）
+          <select value={form.costPostageService} onChange={(e) => updateField("costPostageService", e.target.value)} className={`${box} mt-1`}>
+            <option value="">預設</option>
+            <option value="epacket">e小包 ePacket</option>
+            <option value="airParcel">航空包裹 Air Parcel</option>
+          </select>
+        </label>
+      </div>
+      <p className="text-[11px] text-[#5B7893]">穿戴甲、香包、DIY 組預設信封＋e小包；能量瓶預設箱子＋航空包裹；數位商品不計郵寄。費率在「設定 → 淨利設定」。</p>
+
       <p className="text-sm text-[#1C2B48]">
         預估單件成本：<strong>NT${estimate.unitCostTWD.toLocaleString("zh-TW")}</strong>
         <span className="ml-2 text-xs text-[#5B7893]">

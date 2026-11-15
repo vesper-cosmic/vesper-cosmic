@@ -202,6 +202,12 @@ export default function AdminPage() {
               成本報表 →
             </Link>
             <Link
+              href="/admin/settings/profit"
+              className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+            >
+              淨利設定 →
+            </Link>
+            <Link
               href="/admin/inventory"
               className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#A7C7E7]"
             >

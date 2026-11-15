@@ -5,6 +5,8 @@ import { getAllProducts } from "@/lib/productServer";
 import { listShipments } from "@/lib/shipmentServer";
 import { getInventory, inventoryConfigured } from "@/lib/inventoryServer";
 import { buildCostReport, catalogMargins, monthOf, paypalFeeConfig } from "@/lib/cost";
+import { productNetProfit } from "@/lib/profit";
+import { loadProfitSettings } from "@/lib/profitSettingsServer";
 import { fallbackRate, getUsdTwdRate } from "@/lib/fx";
 
 export const runtime = "nodejs";
@@ -35,6 +37,8 @@ export async function GET(request) {
   const productsById = Object.fromEntries((productsResult.products || []).map((p) => [p.id, p]));
   const materialCostById = Object.fromEntries((inventory.materials || []).map((m) => [m.id, m.recipeUnitCostTWD]));
   const live = await getUsdTwdRate({ timeoutMs: 2000 });
+  const { settings: profitSettings } = await loadProfitSettings();
+  const todayRate = live?.rate || fallbackRate();
 
   const report = buildCostReport({
     orders: ordersResult.orders,
@@ -55,7 +59,16 @@ export async function GET(request) {
       months,
       feeConfig: paypalFeeConfig(process.env),
       todayRate: live,
-      catalog: catalogMargins(productsResult.products || [], productsById, materialCostById, live?.rate || fallbackRate(), paypalFeeConfig(process.env)),
+      catalog: catalogMargins(productsResult.products || [], productsById, materialCostById, todayRate, paypalFeeConfig(process.env)).map((row) => ({
+        ...row,
+        net: productNetProfit(productsById[row.productId], {
+          rate: todayRate,
+          settings: profitSettings,
+          feeConfig: paypalFeeConfig(process.env),
+          productsById,
+          materialCostById,
+        }),
+      })),
       inventory: {
         configured: inventoryConfigured(),
         totalValueTWD: inventory.summary?.totalValueTWD ?? 0,
