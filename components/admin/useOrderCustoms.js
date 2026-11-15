@@ -64,6 +64,13 @@ export function LoadState({ state, orderId }) {
 export function CheckList({ validation }) {
   if (!validation) return null;
   const { errors = [], warnings = [] } = validation;
+  if (validation.digitalOnly) {
+    return (
+      <p className="rounded border border-[#8EB1D1]/40 bg-[#C4D8E5]/50 p-3 text-sm text-[#35506B]">
+        此訂單只有數位商品（以 Email 交付），不需要寄送，也不需要報關文件或 EZPost。
+      </p>
+    );
+  }
   if (!errors.length && !warnings.length) {
     return <p className="rounded border border-[#2E8B57]/30 bg-[#E9F5EE] p-3 text-sm text-[#1F5E3B]">✓ 海關資料完整，可以產生文件。</p>;
   }

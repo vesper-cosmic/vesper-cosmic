@@ -26,7 +26,13 @@ export default function EzpostHelperPage({ params }) {
         <h1 className="mt-2 text-2xl font-bold text-[#1C2B48]">EZPost 填寫小幫手</h1>
         <p className="mt-1 text-sm text-[#35506B]">照順序一格一格複製貼上到 EZPost。</p>
       </div>
-      {state.status !== "ready" ? <LoadState state={state} orderId={orderId} /> : <Helper data={state.data} />}
+      {state.status !== "ready" ? (
+        <LoadState state={state} orderId={orderId} />
+      ) : state.data.digitalOnly ? (
+        <CheckList validation={state.data.validation} />
+      ) : (
+        <Helper data={state.data} />
+      )}
     </AdminFrame>
   );
 }

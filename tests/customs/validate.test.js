@@ -18,6 +18,13 @@ describe("validateForCustoms", () => {
     expect(result.ok).toBe(true);
   });
 
+  it("treats a digital-only order as nothing to ship, without address errors", () => {
+    const result = validateForCustoms({ address: {}, lines: [], missingProducts: [], products: [], digitalOnly: true });
+    expect(result.digitalOnly).toBe(true);
+    expect(result.ok).toBe(false);
+    expect(result.errors).toEqual([]);
+  });
+
   it("blocks on missing phone and non-US destinations", () => {
     const result = check([{ productId: "jar", quantity: 1, price: 48 }], { ...usAddress, phone: "", country: "Canada" });
     expect(result.ok).toBe(false);

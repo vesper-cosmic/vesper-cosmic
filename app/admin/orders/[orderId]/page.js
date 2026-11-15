@@ -24,7 +24,7 @@ export default function AdminOrderDetailPage({ params }) {
           </Link>
           <h1 className="mt-2 font-mono text-2xl font-bold text-[#1C2B48]">{orderId}</h1>
         </div>
-        {data ? (
+        {data && !data.digitalOnly ? (
           <Link
             href={`/admin/orders/${encodeURIComponent(orderId)}/ezpost?packaging=${packaging}`}
             className="rounded border border-[#1C2B48] bg-[#1C2B48] px-4 py-2 text-sm font-bold text-white hover:bg-[#2A3D60]"
@@ -40,16 +40,19 @@ export default function AdminOrderDetailPage({ params }) {
         <div className="space-y-5">
           <CheckList validation={data.validation} />
 
-          <Documents
-            orderId={orderId}
-            data={data}
-            packaging={packaging}
-            setPackaging={setPackaging}
-            showPrices={showPrices}
-            setShowPrices={setShowPrices}
-          />
+          {data.digitalOnly ? null : (
+            <Documents
+              orderId={orderId}
+              data={data}
+              packaging={packaging}
+              setPackaging={setPackaging}
+              showPrices={showPrices}
+              setShowPrices={setShowPrices}
+            />
+          )}
 
           <section className="grid gap-4 sm:grid-cols-2">
+            {data.digitalOnly ? null : (
             <Card title="收件人 Ship to">
               <p className="font-semibold">{data.address.fullName || "—"}</p>
               <p>{data.address.addressLine1}</p>
@@ -59,6 +62,7 @@ export default function AdminOrderDetailPage({ params }) {
               <p className="mt-1">Tel: {data.address.phone || <span className="text-[#A93226]">（缺）</span>}</p>
               <p className="text-[#5B7893]">{data.order.email}</p>
             </Card>
+            )}
             <Card title="訂單 Order">
               <p>金額：${data.order.amountUSD.toFixed(2)} USD（含運費 ${data.shippingChargedUSD.toFixed(2)}）</p>
               <p>付款：{data.order.paymentStatus || "—"}</p>
