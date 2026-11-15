@@ -36,11 +36,11 @@ describe("suggestPresetId", () => {
 });
 
 describe("applyPreset", () => {
-  it("fills empty fields and keeps a null weight empty", () => {
+  it("fills empty fields, including the default weight", () => {
     const { next, changes, conflicts } = applyPreset({}, nails);
     expect(next.htsus).toBe("3926400090");
     expect(next.description).toMatch(/press-on/);
-    expect(next.unitWeightG).toBeNull();
+    expect(next.unitWeightG).toBe(26);
     expect(next.preset).toBe("press-on-nails");
     expect(changes.every((c) => c.action === "fill")).toBe(true);
     expect(conflicts).toEqual([]);
@@ -48,12 +48,14 @@ describe("applyPreset", () => {
 
   it("does not overwrite existing values unless asked", () => {
     const customs = { description: "My own", htsus: "1111111111", unitWeightG: 50 };
-    const keep = applyPreset(customs, nails);
+    // a preset with no weight never clears an existing one
+    const noWeight = { ...nails, unitWeightG: null };
+    const keep = applyPreset(customs, noWeight);
     expect(keep.next.description).toBe("My own");
     expect(keep.next.htsus).toBe("1111111111");
     expect(keep.conflicts.map((c) => c.field).sort()).toEqual(["description", "htsus"]);
 
-    const over = applyPreset(customs, nails, { overwrite: true });
+    const over = applyPreset(customs, noWeight, { overwrite: true });
     expect(over.next.htsus).toBe("3926400090");
     expect(over.next.unitWeightG).toBe(50); // preset has no weight: never clears
     expect(over.changes.every((c) => c.action === "overwrite" || c.action === "fill")).toBe(true);
@@ -108,7 +110,7 @@ describe("planBulkApply", () => {
     { id: "b", name: "B", category: "energy-bottles", customs: { description: "Own text", htsus: "7013999090" } },
     { id: "c", name: "C", category: "digital-reports", requiresShipping: false, customs: {} },
     { id: "d", name: "D", category: "bundles", customs: {} },
-    { id: "e", name: "E", category: "nails", customs: { preset: "press-on-nails", origin: "Taiwan", htsus: "3926400090", description: nails.customsDescription } },
+    { id: "e", name: "E", category: "nails", customs: { preset: "press-on-nails", origin: "Taiwan", htsus: "3926400090", unitWeightG: 26, description: nails.customsDescription } },
   ];
 
   it("suggests by category and never overwrites by default", () => {
