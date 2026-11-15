@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ADMIN_NEXT_STEPS,
   ADMIN_ORDER_STATUSES,
@@ -48,6 +49,48 @@ export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
+
+  // Combined shipments: selected order ids, which orders are already in a shipment
+  const router = useRouter();
+  const [selected, setSelected] = useState([]);
+  const [orderIndex, setOrderIndex] = useState({});
+  const [combining, setCombining] = useState(false);
+  const [combineProblem, setCombineProblem] = useState(null);
+
+  function toggleSelected(orderId) {
+    setCombineProblem(null);
+    setSelected((prev) => (prev.includes(orderId) ? prev.filter((id) => id !== orderId) : [...prev, orderId]));
+  }
+
+  async function combineSelected() {
+    setCombining(true);
+    setCombineProblem(null);
+    try {
+      const response = await fetch("/api/admin/shipments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderIds: selected }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok && data.shipment?.shipmentNo) {
+        router.push(`/admin/shipments/${encodeURIComponent(data.shipment.shipmentNo)}`);
+        return;
+      }
+      setCombineProblem({ title: data.error || "無法建立出貨單。", errors: data.errors || [] });
+    } catch {
+      setCombineProblem({ title: "網路錯誤，請再試一次。", errors: [] });
+    } finally {
+      setCombining(false);
+    }
+  }
+
+  useEffect(() => {
+    if (authStatus !== "authenticated") return;
+    fetch("/api/admin/shipments", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => setOrderIndex(data?.orderIndex || {}))
+      .catch(() => {});
+  }, [authStatus]);
 
   useEffect(() => {
     if (authStatus !== "authenticated") return;
@@ -153,6 +196,12 @@ export default function AdminPage() {
               產品管理 →
             </Link>
             <Link
+              href="/admin/shipments"
+              className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+            >
+              合併出貨 →
+            </Link>
+            <Link
               href="/admin/referrals"
               className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#A7C7E7]"
             >
@@ -203,10 +252,56 @@ export default function AdminPage() {
         ) : (
           <div className="mt-6 space-y-4">
             {visibleOrders.map((order) => (
-              <OrderCard key={order.orderId} order={order} onUpdated={updateLocalOrder} />
+              <OrderCard
+                key={order.orderId}
+                order={order}
+                onUpdated={updateLocalOrder}
+                selected={selected.includes(order.orderId)}
+                onToggle={() => toggleSelected(order.orderId)}
+                shipmentNo={orderIndex[order.orderId] || ""}
+              />
             ))}
           </div>
         )}
+
+        {selected.length > 0 ? (
+          <div className="sticky bottom-3 z-10 mt-5 rounded-lg border border-[#1C2B48] bg-[#1C2B48] p-3 text-white shadow-lg">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm font-semibold">已選 {selected.length} 張訂單</span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelected([]);
+                    setCombineProblem(null);
+                  }}
+                  className="rounded border border-white/40 px-3 py-1.5 text-xs font-semibold hover:bg-white/10"
+                >
+                  清除
+                </button>
+                <button
+                  type="button"
+                  disabled={combining || selected.length < 2}
+                  onClick={combineSelected}
+                  className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-1.5 text-xs font-bold text-[#1C2B48] hover:bg-[#A7C7E7] disabled:opacity-50"
+                >
+                  {combining ? "檢查中…" : "合併出貨 Combine into one shipment"}
+                </button>
+              </div>
+            </div>
+            {selected.length < 2 ? <p className="mt-1 text-xs text-white/70">請至少勾選 2 張同一位收件人的已付款訂單。</p> : null}
+            {combineProblem ? (
+              <div className="mt-2 rounded bg-[#FDE8E6] p-2 text-xs text-[#7B241C]">
+                <p className="font-semibold">{combineProblem.title}</p>
+                <ul className="mt-1 list-disc pl-4">
+                  {combineProblem.errors.map((error) => (
+                    <li key={error}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </AdminShell>
   );
@@ -259,7 +354,7 @@ function StatusBadge({ status }) {
   return <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${tone}`}>{status}</span>;
 }
 
-function OrderCard({ order, onUpdated }) {
+function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = "" }) {
   const current = adminOrderStatus(order);
   const items = Array.isArray(order.items) ? order.items : [];
   const nextSteps = ADMIN_NEXT_STEPS[current] || [];
@@ -369,8 +464,24 @@ function OrderCard({ order, onUpdated }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={onToggle}
+              disabled={Boolean(shipmentNo)}
+              aria-label={`選取 ${order.orderId} 合併出貨`}
+              title={shipmentNo ? `已在出貨單 ${shipmentNo}` : "勾選以合併出貨"}
+            />
             <p className="font-mono text-sm font-bold text-[#1C2B48]">{order.orderId}</p>
             <StatusBadge status={current} />
+            {shipmentNo ? (
+              <Link
+                href={`/admin/shipments/${encodeURIComponent(shipmentNo)}`}
+                className="rounded-full border border-[#8EB1D1] bg-[#C4D8E5]/60 px-2 py-0.5 text-[11px] font-semibold text-[#35506B] hover:bg-[#C4D8E5]"
+              >
+                📦 {shipmentNo}
+              </Link>
+            ) : null}
           </div>
           <div className="mt-1.5 flex flex-wrap gap-1.5 text-[11px] font-semibold">
             <Link href={`/admin/orders/${encodeURIComponent(order.orderId)}`} className="rounded border border-[#8EB1D1]/50 bg-white px-2 py-0.5 text-[#35506B] hover:bg-[#C4D8E5]">

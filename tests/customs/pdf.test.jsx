@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { buildCustomsLines, mergeCustomsLines } from "@/lib/customs/lines";
-import { renderInvoicePdf, renderPackingSlipPdf } from "@/lib/customs/render";
+import { renderInvoicePdf, renderPackingListPdf, renderPackingSlipPdf } from "@/lib/customs/render";
+import { buildShipmentData } from "@/lib/customs/shipments";
 import { customsData, productsById } from "../fixtures/customs.js";
 
 const isPdf = (buffer) => Buffer.from(buffer).subarray(0, 5).toString() === "%PDF-";
@@ -36,6 +37,36 @@ describe("multi-item order", () => {
     const data = { ...customsData(lines), invoiceLines: mergeCustomsLines(lines) };
     expect(isPdf(await renderInvoicePdf(data))).toBe(true);
     expect(isPdf(await renderPackingSlipPdf(data))).toBe(true);
+  }, 30000);
+});
+
+describe("combined shipment PDFs", () => {
+  it("renders one invoice and a grouped packing list for two orders (nails + energy bottle)", async () => {
+    const mk = (orderId, items) => ({
+      orderId,
+      fullName: "Emily Johnson",
+      email: "emily@example.com",
+      createdAt: "2026-11-12T08:00:00.000Z",
+      amount: items.reduce((sum, i) => sum + i.price * i.quantity, 0) + 8,
+      paypalCaptureId: `CAP-${orderId}`,
+      address: "Emily Johnson, 12 Main St, Austin, TX, 78701, United States, Tel: +1 512 555 0100",
+      items,
+    });
+    const data = buildShipmentData({
+      shipment: { shipmentNo: "VC-SHP-20261115-01", trackingNumber: "RR123456789TW", service: "Air Parcel" },
+      orders: [
+        mk("VC-20261112-AAA1", [{ productId: "nails-ready", quantity: 1, price: 88 }]),
+        mk("VC-20261112-BBB2", [{ productId: "jar", quantity: 1, price: 48 }]),
+      ],
+      productsById,
+      defaults: { packagingEnvelopeG: 30, packagingBoxG: 150 },
+      seller: { businessName: "VESPER COSMOS", country: "Taiwan", email: "hello@example.com" },
+      packaging: "box",
+    });
+    expect(data.validation.ok).toBe(true);
+    expect(data.invoiceLines).toHaveLength(2);
+    expect(isPdf(await renderInvoicePdf(data))).toBe(true);
+    expect(isPdf(await renderPackingListPdf(data))).toBe(true);
   }, 30000);
 });
 

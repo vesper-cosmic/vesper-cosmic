@@ -163,3 +163,15 @@ press-on nails, energy bottle, crystal sachet, DIY kit (needs classification) an
 - Product list → 批次套用海關預設 previews every change and writes nothing until confirmed; non-empty fields are kept unless "overwrite" is ticked.
 - After editing a preset, "同步到使用此預設的商品" previews and applies it to the products using it.
 - The invoice and EZPost helper merge lines with the same HTSUS, description, origin and unit value; the packing slip lists every item.
+
+### Combined shipments (合併出貨)
+
+Several paid orders for the same recipient can go in one parcel.
+
+- Setup: the Notion "Shipments" database (`NOTION_SHIPMENTS_DATABASE_ID`), connected to the "Vesper Cosmic" integration. Columns are added automatically if missing.
+- 訂單管理 → tick two or more orders → **合併出貨**. Allowed only if every order is paid, not shipped, not already in a shipment, and has the same recipient name, address, city, state, ZIP and country; otherwise the field that differs is shown.
+- `/admin/shipments/[VC-SHP-YYYYMMDD-NN]`: one Commercial Invoice (all order numbers in the header, merged customs lines, goods actually paid; shipping charged shown separately), a Packing List grouped by order, and one EZPost helper for the whole parcel (gross weight = items + packaging).
+- Service suggestion: fragile goods → air parcel / express in a box; ≤ 2 kg and not fragile → ePacket in an envelope.
+- **標記已出貨** sets every order to 🚚 已出貨 with the tracking number — it sends no email. **寄出貨通知信** (separate button) sends one email per customer listing their order numbers.
+- **拆分** removes an order from a shipment before it is marked shipped. Single-order shipping is unchanged (no shipment record).
+- The EZPost line limit (40) is an unverified assumption: `EZPOST_MAX_LINES` in `lib/customs/validate.js`.

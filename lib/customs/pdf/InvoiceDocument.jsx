@@ -67,8 +67,12 @@ export default function InvoiceDocument({ data, shippingService = "", generatedA
             <Text style={s.title}>COMMERCIAL INVOICE</Text>
             <Text style={s.meta}>Invoice No.: {invoiceNumber}</Text>
             <Text style={{ textAlign: "right" }}>Invoice date: {formatDate(generatedAt)}</Text>
+            {data.shipment ? (
+              <Text style={{ textAlign: "right" }}>Shipment No.: {data.shipment.shipmentNo}</Text>
+            ) : null}
             <Text style={{ textAlign: "right" }}>
-              Order No.: {order.orderId} · Order date: {formatDate(order.createdAt)}
+              {data.orderIds?.length > 1 ? "Order Nos." : "Order No."}: {order.orderId} · Order date:{" "}
+              {formatDate(order.createdAt)}
             </Text>
             <Text style={{ textAlign: "right" }}>
               Payment ref. (PayPal): {order.paypalCaptureId || "PayPal — see order " + order.orderId}

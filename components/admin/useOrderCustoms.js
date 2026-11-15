@@ -7,15 +7,23 @@ import { useCallback, useEffect, useState } from "react";
  * access; this only shows the result. status: loading | ready | signin | denied | error
  */
 export function useOrderCustoms(orderId, packaging = "envelope") {
+  return useCustomsData(`/api/admin/orders/${encodeURIComponent(orderId)}/customs?packaging=${packaging}`);
+}
+
+/** Same as useOrderCustoms, for a combined shipment (packaging omitted = the shipment's own). */
+export function useShipmentCustoms(shipmentNo, packaging = "") {
+  return useCustomsData(
+    `/api/admin/shipments/${encodeURIComponent(shipmentNo)}${packaging ? `?packaging=${packaging}` : ""}`
+  );
+}
+
+function useCustomsData(url) {
   const [state, setState] = useState({ status: "loading", data: null, error: "" });
 
   const load = useCallback(async () => {
     setState((prev) => ({ ...prev, status: prev.data ? "ready" : "loading" }));
     try {
-      const response = await fetch(
-        `/api/admin/orders/${encodeURIComponent(orderId)}/customs?packaging=${packaging}`,
-        { cache: "no-store" }
-      );
+      const response = await fetch(url, { cache: "no-store" });
       const body = await response.json().catch(() => ({}));
       if (response.status === 401) return setState({ status: "signin", data: null, error: "" });
       if (response.status === 404 && !body?.order) {
@@ -26,7 +34,7 @@ export function useOrderCustoms(orderId, packaging = "envelope") {
     } catch {
       setState({ status: "error", data: null, error: "Network error — please try again." });
     }
-  }, [orderId, packaging]);
+  }, [url]);
 
   useEffect(() => {
     load();
