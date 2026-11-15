@@ -47,11 +47,19 @@ export default function CostSection({ form, updateField, materials, products, ed
           <div key={index} className="grid gap-2 sm:grid-cols-[1fr_8rem_9rem_auto]">
             <select value={line.materialId} onChange={(e) => setLine(index, { materialId: e.target.value })} className={box}>
               <option value="">選擇原料…</option>
-              {materials.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name}（{m.unit || "單位"}）
-                </option>
-              ))}
+              {[...new Set(materials.map((m) => m.category || ""))]
+                .sort((x, y) => (x || "\uffff").localeCompare(y || "\uffff", "zh-Hant"))
+                .map((cat) => (
+                  <optgroup key={cat} label={cat || "未分類"}>
+                    {materials
+                      .filter((m) => (m.category || "") === cat)
+                      .map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.name}（{m.unit || "單位"}）
+                        </option>
+                      ))}
+                  </optgroup>
+                ))}
             </select>
             <input
               type="number"

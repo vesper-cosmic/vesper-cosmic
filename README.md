@@ -205,3 +205,5 @@ Several paid orders for the same recipient can go in one parcel.
 #### Design note (not built): charm price tiers
 
 Charms are not tracked individually. If wanted later, group them into tiers — budget / standard / premium — each with one average unit cost (a small "Charm tiers" table). A ready-made design would then list how many charms of each tier it uses (e.g. 4 standard + 1 premium), and its decoration allowance would be computed from those counts instead of the flat NT$35. `decorationAllowance()` in `lib/cost.js` is the single place to change.
+
+Materials can be grouped with a **分類** (e.g. 水晶類, 蠟粒類): type a new one or pick an existing one on the inventory page. The list is grouped by category, filterable by category chips, and searchable by name, category, unit or note. The recipe's material picker is grouped the same way. New Materials column: 分類 (added automatically).

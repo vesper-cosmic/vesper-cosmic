@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { AdminFrame } from "@/components/admin/useOrderCustoms";
 
 const input =
   "w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]";
+const NONE = "__none__";
 const money = (n) => Number(n || 0).toLocaleString("zh-TW", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 const when = (value) => (value ? String(value).slice(0, 16).replace("T", " ") : "—");
 
@@ -19,8 +20,10 @@ export default function InventoryPage() {
   const [editing, setEditing] = useState(null); // material id being edited
   const [adjusting, setAdjusting] = useState(null);
   const [usingUp, setUsingUp] = useState(null);
+  const [query, setQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [message, setMessage] = useState("");
-  const [newMaterial, setNewMaterial] = useState({ name: "", unit: "", safetyStock: "", mode: "計數", estimatedUnitsPerPack: "", lowUnits: "" });
+  const [newMaterial, setNewMaterial] = useState({ name: "", unit: "", safetyStock: "", mode: "計數", estimatedUnitsPerPack: "", lowUnits: "", category: "" });
 
   async function load() {
     try {
@@ -54,7 +57,13 @@ export default function InventoryPage() {
     return true;
   }
 
-  const rows = data.materials.filter((m) => showInactive || m.active !== false);
+  const categories = [...new Set(data.materials.map((m) => m.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, "zh-Hant"));
+  const needle = query.trim().toLowerCase();
+  const rows = data.materials
+    .filter((m) => showInactive || m.active !== false)
+    .filter((m) => !categoryFilter || (categoryFilter === NONE ? !m.category : m.category === categoryFilter))
+    .filter((m) => !needle || [m.name, m.category, m.unit, m.note].some((t) => String(t || "").toLowerCase().includes(needle)))
+    .sort((a, b) => (a.category || "\uffff").localeCompare(b.category || "\uffff", "zh-Hant") || a.name.localeCompare(b.name, "zh-Hant"));
   const s = data.summary;
 
   return (
@@ -92,7 +101,18 @@ export default function InventoryPage() {
           顯示已停用
         </label>
       </div>
+      <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜尋原料（名稱、分類、備註）" className={`${input} mt-2`} aria-label="搜尋原料" />
+      {categories.length ? (
+        <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
+          {[["", "全部"], ...categories.map((c) => [c, c]), [NONE, "未分類"]].map(([value, label]) => (
+            <button key={value} type="button" onClick={() => setCategoryFilter(value)} className={`rounded-full border px-3 py-1 ${categoryFilter === value ? "border-[#1C2B48] bg-[#1C2B48] text-white" : "border-[#8EB1D1]/60 bg-white text-[#35506B]"}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      ) : null}
       {loading ? <p className="mt-2 text-sm text-[#5B7893]">載入中…</p> : null}
+      <datalist id="material-categories">{categories.map((c) => <option key={c} value={c} />)}</datalist>
       <div className="mt-2 overflow-x-auto">
         <table className="w-full min-w-[640px] text-left text-sm text-[#1C2B48]">
           <thead className="text-xs text-[#5B7893]">
@@ -106,8 +126,12 @@ export default function InventoryPage() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((m) => (
-              <tr key={m.id} className={`border-t border-[#8EB1D1]/20 ${m.active === false ? "opacity-50" : ""}`}>
+            {rows.map((m, i) => (
+              <Fragment key={m.id}>
+              {i === 0 || (rows[i - 1].category || "") !== (m.category || "") ? (
+                <tr className="bg-[#E8ECEF]"><td colSpan={6} className="px-2 py-1 text-xs font-bold text-[#35506B]">{m.category || "未分類"}</td></tr>
+              ) : null}
+              <tr className={`border-t border-[#8EB1D1]/20 ${m.active === false ? "opacity-50" : ""}`}>
                 <td className="py-2 pr-2">
                   {m.name} <span className="text-xs text-[#5B7893]">{m.unit}</span>
                   {m.mode === "散裝" ? <span className="ml-2 rounded-full bg-[#E8ECEF] px-2 py-0.5 text-[11px] font-semibold text-[#35506B]">散裝</span> : null}
@@ -133,10 +157,11 @@ export default function InventoryPage() {
                   <button type="button" onClick={() => { setEditing(editing === m.id ? null : m.id); setAdjusting(null); }} className="underline">編輯</button>
                 </td>
               </tr>
+              </Fragment>
             ))}
             {!loading && rows.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-4 text-sm text-[#5B7893]">還沒有原料。先在下方新增，或到「進貨登記」直接新增並進貨。</td>
+                <td colSpan={6} className="py-4 text-sm text-[#5B7893]">{data.materials.length ? "沒有符合的原料。" : "還沒有原料。先在下方新增，或到「進貨登記」直接新增並進貨。"}</td>
               </tr>
             ) : null}
           </tbody>
@@ -156,6 +181,7 @@ export default function InventoryPage() {
       <details className="mt-5 rounded border border-dashed border-[#8EB1D1]/60 p-3">
         <summary className="cursor-pointer text-sm font-semibold text-[#35506B]">＋ 新增原料</summary>
         <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_7rem_8rem_auto]">
+          <input type="text" list="material-categories" value={newMaterial.category} onChange={(e) => setNewMaterial((p) => ({ ...p, category: e.target.value }))} placeholder="分類（例如 水晶類、蠟粒類；可新打）" className={`${input} sm:col-span-4`} />
           <select value={newMaterial.mode} onChange={(e) => setNewMaterial((p) => ({ ...p, mode: e.target.value }))} className={`${input} sm:col-span-4`} aria-label="追蹤方式">
             <option value="計數">計數型（點得出個數：甲片、瓶子、軟木塞、袋子、盒子…）</option>
             <option value="散裝">散裝耗材（緞帶、水晶碎石、封蠟、凝膠、金箔…；每包估計能做幾件）</option>
@@ -166,7 +192,7 @@ export default function InventoryPage() {
           {newMaterial.mode === "散裝" ? (
             <input type="number" min="1" step="any" value={newMaterial.estimatedUnitsPerPack} onChange={(e) => setNewMaterial((p) => ({ ...p, estimatedUnitsPerPack: e.target.value }))} placeholder="每包預估可做幾件" className={`${input} sm:col-span-2`} />
           ) : null}
-          <button type="button" onClick={() => send("/api/admin/inventory", "POST", { ...newMaterial, lowUnits: newMaterial.mode === "散裝" ? newMaterial.safetyStock : "", safetyStock: newMaterial.mode === "散裝" ? "" : newMaterial.safetyStock }, "已新增原料。").then((ok) => ok && setNewMaterial({ name: "", unit: "", safetyStock: "", mode: "計數", estimatedUnitsPerPack: "", lowUnits: "" }))} className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-bold text-[#1C2B48] hover:bg-[#A7C7E7]">
+          <button type="button" onClick={() => send("/api/admin/inventory", "POST", { ...newMaterial, lowUnits: newMaterial.mode === "散裝" ? newMaterial.safetyStock : "", safetyStock: newMaterial.mode === "散裝" ? "" : newMaterial.safetyStock }, "已新增原料。").then((ok) => ok && setNewMaterial({ name: "", unit: "", safetyStock: "", mode: "計數", estimatedUnitsPerPack: "", lowUnits: "", category: "" }))} className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-bold text-[#1C2B48] hover:bg-[#A7C7E7]">
             新增
           </button>
         </div>
@@ -211,7 +237,7 @@ function Stat({ label, value, warn }) {
 }
 
 function EditPanel({ material, onSave, onClose }) {
-  const [form, setForm] = useState({ name: material.name, unit: material.unit, safetyStock: material.safetyStock || "", active: material.active !== false, mode: material.mode || "計數", estimatedUnitsPerPack: material.estimatedUnitsPerPack || "", lowUnits: material.lowUnits || "" });
+  const [form, setForm] = useState({ name: material.name, unit: material.unit, safetyStock: material.safetyStock || "", active: material.active !== false, category: material.category || "", mode: material.mode || "計數", estimatedUnitsPerPack: material.estimatedUnitsPerPack || "", lowUnits: material.lowUnits || "" });
   return (
     <div className="mt-3 rounded border border-[#8EB1D1]/40 bg-white p-3">
       <p className="text-xs font-bold text-[#5B7893]">編輯「{material.name}」</p>
@@ -219,6 +245,7 @@ function EditPanel({ material, onSave, onClose }) {
         <input type="text" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} className={input} aria-label="名稱" />
         <input type="text" value={form.unit} onChange={(e) => setForm((p) => ({ ...p, unit: e.target.value }))} className={input} aria-label="單位" />
         <input type="number" min="0" value={form.safetyStock} onChange={(e) => setForm((p) => ({ ...p, safetyStock: e.target.value }))} className={input} aria-label="安全庫存量" placeholder="安全庫存量" />
+        <input type="text" list="material-categories" value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))} className={input} aria-label="分類" placeholder="分類（例如 水晶類）" />
         <select value={form.mode} onChange={(e) => setForm((p) => ({ ...p, mode: e.target.value }))} className={input} aria-label="追蹤方式">
           <option value="計數">計數型</option>
           <option value="散裝">散裝耗材</option>
