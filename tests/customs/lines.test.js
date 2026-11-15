@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { allocateCents, buildCustomsLines, estimateLandedCost, summarize } from "@/lib/customs/lines";
+import { allocateCents, buildCustomsLines, estimateLandedCost, mergeCustomsLines, summarize } from "@/lib/customs/lines";
 import { formatHtsus, isValidHtsus, stripHtsus } from "@/lib/customs/htsus";
 import { productsById } from "../fixtures/customs.js";
 
@@ -95,5 +95,57 @@ describe("HTSUS helpers", () => {
     expect(isValidHtsus("3926.40.0000")).toBe(true);
     expect(isValidHtsus("3926.40")).toBe(false);
     expect(isValidHtsus("39264000001")).toBe(false);
+  });
+});
+
+describe("mergeCustomsLines", () => {
+  const base = {
+    description: "Plastic press-on artificial nails set",
+    htsus: "3926400000",
+    origin: "Taiwan",
+    unitValueUSD: 88,
+  };
+  const line = (productName, qty, extra = {}) => ({
+    productId: productName,
+    productName,
+    ...base,
+    qty,
+    totalValueUSD: base.unitValueUSD * qty,
+    unitWeightG: 50,
+    totalWeightG: 50 * qty,
+    ...extra,
+  });
+
+  it("merges identical declarations across different products", () => {
+    const merged = mergeCustomsLines([line("Nails S", 1), line("Nails M", 2)]);
+    expect(merged).toHaveLength(1);
+    expect(merged[0]).toMatchObject({ qty: 3, totalValueUSD: 264, totalWeightG: 150, unitWeightG: 50 });
+    expect(merged[0].productName).toBe("Nails S / Nails M");
+  });
+
+  it("keeps lines apart when value, HTSUS or origin differ", () => {
+    const merged = mergeCustomsLines([
+      line("A", 1),
+      line("B", 1, { unitValueUSD: 60, totalValueUSD: 60 }),
+      line("C", 1, { htsus: "7013999090" }),
+      line("D", 1, { origin: "China" }),
+    ]);
+    expect(merged).toHaveLength(4);
+  });
+
+  it("keeps the total value and weight of the original lines", () => {
+    const { lines } = buildCustomsLines(
+      {
+        items: [
+          { productId: "nails-ready", quantity: 1, price: 88 },
+          { productId: "jar", quantity: 2, price: 48 },
+          { productId: "sachet", quantity: 1, price: 28 },
+        ],
+      },
+      productsById
+    );
+    const merged = mergeCustomsLines(lines);
+    expect(cents(merged)).toBe(cents(lines));
+    expect(summarize(merged).netWeightG).toBe(summarize(lines).netWeightG);
   });
 });

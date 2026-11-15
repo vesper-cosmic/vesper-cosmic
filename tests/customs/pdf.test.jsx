@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { buildCustomsLines } from "@/lib/customs/lines";
+import { buildCustomsLines, mergeCustomsLines } from "@/lib/customs/lines";
 import { renderInvoicePdf, renderPackingSlipPdf } from "@/lib/customs/render";
 import { customsData, productsById } from "../fixtures/customs.js";
 
@@ -22,6 +22,21 @@ describe("PDF rendering", () => {
       expect(isPdf(await renderPackingSlipPdf(data))).toBe(true);
     }, 30000);
   }
+});
+
+describe("multi-item order", () => {
+  it("renders an order with three different products, invoice merged and packing slip itemised", async () => {
+    const items = [
+      { productId: "nails-ready", quantity: 1, price: 88 },
+      { productId: "jar", quantity: 2, price: 48 },
+      { productId: "sachet", quantity: 1, price: 28 },
+    ];
+    const { lines } = buildCustomsLines({ items }, productsById);
+    expect(lines).toHaveLength(3);
+    const data = { ...customsData(lines), invoiceLines: mergeCustomsLines(lines) };
+    expect(isPdf(await renderInvoicePdf(data))).toBe(true);
+    expect(isPdf(await renderPackingSlipPdf(data))).toBe(true);
+  }, 30000);
 });
 
 // ── Route: admin only, PDF content type, Notion mocked ──

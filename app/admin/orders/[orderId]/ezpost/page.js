@@ -38,7 +38,8 @@ export default function EzpostHelperPage({ params }) {
 }
 
 function Helper({ data }) {
-  const { address, seller, lines, summary, suggestion, defaults, order } = data;
+  const { address, seller, summary, suggestion, defaults, order } = data;
+  const lines = data.invoiceLines || data.lines;
 
   const sections = useMemo(() => {
     const out = [
@@ -81,7 +82,7 @@ function Helper({ data }) {
           ["數量", String(line.qty)],
           ["幣別", "USD"],
           ["單價", line.unitValueUSD.toFixed(2)],
-          ["重量 kg", kg3(line.unitWeightG)],
+          ["重量 kg（每件）", kg3(line.unitWeightG)],
           ["稅則號數（10 碼，無小數點）", stripHtsus(line.htsus)],
           ["原產國", line.origin],
         ],

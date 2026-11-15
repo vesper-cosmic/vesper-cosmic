@@ -3,6 +3,15 @@
 import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import PresetPlanDialog from "@/components/admin/PresetPlanDialog";
+import {
+  applyPreset,
+  findPreset,
+  planBulkApply,
+  presetWarnings,
+  resolvePresets,
+  suggestPresetId,
+} from "@/lib/customs/presets";
 import {
   INCLUDES_PRESETS,
   defaultIncludesForCategory,
@@ -94,6 +103,7 @@ function emptyForm() {
     customsHtsus: "",
     customsWeightG: "",
     customsOrigin: "Taiwan",
+    customsPreset: "",
     customsValueOverride: "",
     bundleComponents: [],
     published: true,
@@ -129,10 +139,88 @@ export default function AdminProductsPage() {
   const [expandedId, setExpandedId] = useState(null);
   const [page, setPage] = useState(1);
 
+  // Customs presets (code defaults + admin overrides) and the bulk-apply dialog
+  const [presets, setPresets] = useState(() => resolvePresets());
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkOverwrite, setBulkOverwrite] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkResult, setBulkResult] = useState("");
+
   useEffect(() => {
     if (authStatus !== "authenticated") return;
     loadProducts();
   }, [authStatus]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    fetch("/api/admin/customs-presets")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (Array.isArray(data?.presets)) setPresets(data.presets);
+      })
+      .catch(() => {});
+  }, [isAdmin]);
+
+  async function applyBulkPlan(rows) {
+    setBulkBusy(true);
+    setBulkResult("");
+    let ok = 0;
+    const failed = [];
+    for (const row of rows) {
+      try {
+        const response = await fetch("/api/admin/products", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...row.product, id: row.product.id, customs: row.next }),
+        });
+        if (response.ok) ok += 1;
+        else failed.push(row.product.name);
+      } catch {
+        failed.push(row.product.name);
+      }
+    }
+    setBulkBusy(false);
+    setBulkResult(`已更新 ${ok} 個商品。${failed.length ? `失敗：${failed.join("、")}` : ""}`);
+    await loadProducts();
+  }
+
+  /** Fill the customs fields from a preset; ask before replacing existing values. */
+  function choosePreset(id) {
+    const preset = findPreset(presets, id);
+    if (!preset) return;
+    const hasValues = Boolean(
+      form.customsDescription.trim() || form.customsHtsus.trim() || form.customsWeightG !== ""
+    );
+    if (!preset.isPhysical) {
+      if (hasValues && !window.confirm("覆蓋現有資料？Overwrite existing values?\n（會清空海關欄位，並標為不需寄送的數位商品）")) return;
+      updateField("customsDescription", "");
+      updateField("customsHtsus", "");
+      updateField("customsWeightG", "");
+      updateField("requiresShipping", false);
+      updateField("customsPreset", preset.id);
+      return;
+    }
+    const current = {
+      description: form.customsDescription,
+      htsus: form.customsHtsus,
+      unitWeightG: form.customsWeightG === "" ? null : Number(form.customsWeightG),
+      origin: form.customsOrigin,
+    };
+    let result = applyPreset(current, preset);
+    if (result.conflicts.length > 0) {
+      const lines = result.conflicts.map((c) => `• ${c.field}: ${c.from} → ${c.to}`).join("\n");
+      if (window.confirm(`覆蓋現有資料？Overwrite existing values?\n${lines}`)) {
+        result = applyPreset(current, preset, { overwrite: true });
+      }
+    }
+    const next = result.next;
+    updateField("customsDescription", next.description || "");
+    updateField("customsHtsus", next.htsus ? formatHtsus(next.htsus) : "");
+    updateField("customsWeightG", next.unitWeightG ?? "");
+    updateField("customsOrigin", next.origin || "Taiwan");
+    updateField("customsPreset", preset.id);
+    updateField("requiresShipping", true);
+  }
 
   async function loadProducts() {
     setLoading(true);
@@ -254,6 +342,7 @@ export default function AdminProductsPage() {
       customsHtsus: product.customs?.htsus ? formatHtsus(product.customs.htsus) : "",
       customsWeightG: product.customs?.unitWeightG ?? "",
       customsOrigin: product.customs?.origin || "Taiwan",
+      customsPreset: product.customs?.preset || "",
       customsValueOverride: product.customs?.valueOverrideUSD ?? "",
       bundleComponents: Array.isArray(product.customs?.bundleComponents)
         ? product.customs.bundleComponents
@@ -338,6 +427,7 @@ export default function AdminProductsPage() {
         htsus: stripHtsus(form.customsHtsus),
         unitWeightG: form.customsWeightG === "" ? null : Number(form.customsWeightG),
         origin: form.customsOrigin || "Taiwan",
+        preset: form.customsPreset || "",
         valueOverrideUSD: form.customsValueOverride === "" ? null : Number(form.customsValueOverride),
         bundleComponents: form.bundleComponents,
       },
@@ -881,6 +971,8 @@ export default function AdminProductsPage() {
               errors={formErrors}
               updateField={updateField}
               products={products.filter((p) => p.id !== editingId)}
+              presets={presets}
+              onChoosePreset={choosePreset}
             />
 
             <Field label="產品圖片 Product Images" error={formErrors.images}>
@@ -997,9 +1089,41 @@ export default function AdminProductsPage() {
 
         {/* ── Product list ── */}
         <section className="mt-10">
-          <h2 className="text-xl font-semibold text-[#1C2B48]">
-            全部產品 ({products.length})
-          </h2>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold text-[#1C2B48]">
+              全部產品 ({products.length})
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setBulkResult("");
+                  setBulkOpen(true);
+                }}
+                className="rounded border border-[#8EB1D1]/60 bg-white px-3 py-1.5 text-xs font-semibold text-[#35506B] hover:bg-[#C4D8E5]"
+              >
+                批次套用海關預設 Apply presets to products
+              </button>
+              <Link
+                href="/admin/settings/customs-presets"
+                className="rounded border border-[#8EB1D1]/60 bg-white px-3 py-1.5 text-xs font-semibold text-[#35506B] hover:bg-[#C4D8E5]"
+              >
+                編輯預設值
+              </Link>
+            </div>
+          </div>
+          {bulkOpen ? (
+            <PresetPlanDialog
+              title="批次套用海關預設 Apply presets to products"
+              rows={planBulkApply(products, presets, { mode: "apply", overwrite: bulkOverwrite })}
+              overwrite={bulkOverwrite}
+              onOverwriteChange={setBulkOverwrite}
+              onApply={applyBulkPlan}
+              onClose={() => setBulkOpen(false)}
+              busy={bulkBusy}
+              result={bulkResult}
+            />
+          ) : null}
 
           {loading ? (
             <p className="mt-4 text-sm text-[#5B7893]">Loading…</p>
@@ -1088,9 +1212,21 @@ function CheckboxGrid({ children }) {
 }
 
 // Customs data for EZPost and the commercial invoice (admin only; never shown to shoppers).
-function CustomsSection({ form, errors, updateField, products }) {
+function CustomsSection({ form, errors, updateField, products, presets = [], onChoosePreset }) {
   const physical = form.requiresShipping;
   const suggestion = CUSTOMS_SUGGESTIONS[form.category];
+  const suggestedPresetId = suggestPresetId(form.category);
+  const suggestedPreset = findPreset(presets, suggestedPresetId);
+  const selectedPreset = findPreset(presets, form.customsPreset);
+  const warnings = presetWarnings({
+    customs: {
+      description: form.customsDescription,
+      htsus: form.customsHtsus,
+      unitWeightG: form.customsWeightG === "" ? null : Number(form.customsWeightG),
+    },
+    preset: selectedPreset,
+    physical,
+  });
   const blocked = findBlocklistedWords(form.customsDescription);
   const htsusDigits = stripHtsus(form.customsHtsus);
   const htsusError =
@@ -1119,6 +1255,42 @@ function CustomsSection({ form, errors, updateField, products }) {
           </button>
         ) : null}
       </div>
+
+      <div className="space-y-1.5">
+        <label className="block text-xs font-semibold text-[#5B7893]">套用海關預設 Apply preset</label>
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={form.customsPreset}
+            onChange={(e) => e.target.value && onChoosePreset?.(e.target.value)}
+            className={box}
+            style={{ maxWidth: "20rem" }}
+          >
+            <option value="">選擇預設…</option>
+            {presets.map((preset) => (
+              <option key={preset.id} value={preset.id}>
+                {preset.label}
+              </option>
+            ))}
+          </select>
+          {warnings.needsClassification ? (
+            <span className="rounded-full bg-[#FDF6E3] px-2.5 py-0.5 text-xs font-semibold text-[#7A5410] ring-1 ring-[#C77A0A]/40">
+              需要分類 Needs classification
+            </span>
+          ) : null}
+        </div>
+        {suggestedPreset && suggestedPreset.id !== form.customsPreset ? (
+          <p className="text-xs text-[#5B7893]">
+            💡 此分類建議使用「{suggestedPreset.label}」（不會自動套用）
+          </p>
+        ) : null}
+        <p className="text-[11px] text-[#8B99A8]">套用後所有欄位仍可修改。HTSUS 為未驗證的建議值，請到 hts.usitc.gov 確認。</p>
+      </div>
+
+      {physical && warnings.weightMissing ? (
+        <p className="rounded border border-[#C0392B]/40 bg-[#FDE8E6] px-3 py-1.5 text-xs font-semibold text-[#7B241C]">
+          ⚠️ 尚未填單件重量：沒有重量就無法產生此商品的發票。
+        </p>
+      ) : null}
 
       {!physical ? (
         <p className="text-xs text-[#5B7893]">

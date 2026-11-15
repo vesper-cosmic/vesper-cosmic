@@ -50,7 +50,8 @@ function Lines({ children }) {
 }
 
 export default function InvoiceDocument({ data, shippingService = "", generatedAt = new Date() }) {
-  const { order, address, seller, lines, summary, shippingChargedUSD, invoiceNumber } = data;
+  const { order, address, seller, summary, shippingChargedUSD, invoiceNumber } = data;
+  const lines = data.invoiceLines || data.lines;
   const record = order.shippingRecord || {};
   const service = shippingService || record.shippingService || "________";
   const goods = summary.totalValueUSD;

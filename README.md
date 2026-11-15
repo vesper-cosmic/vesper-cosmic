@@ -151,3 +151,15 @@ Env vars (see `.env.example`): `SELLER_BUSINESS_NAME`, `SELLER_CONTACT_NAME`,
 `CUSTOMS_ENTRY_FEE_USD` (2).
 
 Tests: `npm test` (vitest).
+
+### Customs presets (海關預設)
+
+One-click defaults for a product's customs data (description, HTSUS, unit weight, origin):
+press-on nails, energy bottle, crystal sachet, DIY kit (needs classification) and digital.
+
+- Code defaults live in `lib/customs/presets.js`. **HTSUS codes there are unverified suggestions — confirm at hts.usitc.gov.**
+- Edit them without code at **/admin/settings/customs-presets** (description, HTSUS, unit weight, fragile). Edits are stored in the Notion "Customs Presets" database: set `NOTION_CUSTOMS_PRESETS_DATABASE_ID` and connect the database to the "Vesper Cosmic" integration. Without it the code defaults are used and the page is read-only.
+- In the product form: 海關資料 → 套用海關預設. Empty fields are filled; existing values are only replaced after a confirmation. The applied preset is saved on the product (`customs.preset`).
+- Product list → 批次套用海關預設 previews every change and writes nothing until confirmed; non-empty fields are kept unless "overwrite" is ticked.
+- After editing a preset, "同步到使用此預設的商品" previews and applies it to the products using it.
+- The invoice and EZPost helper merge lines with the same HTSUS, description, origin and unit value; the packing slip lists every item.
