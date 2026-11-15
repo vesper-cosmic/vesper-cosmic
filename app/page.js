@@ -97,13 +97,27 @@ function HomePageContent() {
               Vesper Cosmos
             </p>
             <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-none text-white sm:text-6xl">
-              Cosmos goods and personalized BaZi reports
+              Your elements, at your fingertips.
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-7 text-[#1C2B48]">
-              A lightweight storefront for ready-to-ship ritual objects, custom
-              BaZi pieces, and digital reports. Browse the full collection
-              below and click any product to view details and add to cart.
+              Handcrafted press-on nails and crystal ritual objects, designed
+              around your BaZi chart — the ancient Chinese art of reading your
+              Five Elements.
             </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/shop"
+                className="rounded border border-[#1C2B48] bg-[#1C2B48] px-6 py-3 text-center text-sm font-bold text-white transition hover:bg-[#2A3D60]"
+              >
+                Shop the Collection
+              </Link>
+              <Link
+                href="/order/custom-bazi-crystal-press-on-nails-bwsz4y"
+                className="rounded border border-[#1C2B48] bg-transparent px-6 py-3 text-center text-sm font-bold text-[#1C2B48] transition hover:bg-white/30"
+              >
+                Design Your Custom Set
+              </Link>
+            </div>
           </header>
 
           {/* Sidebar + Content Layout */}
