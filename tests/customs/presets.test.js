@@ -38,7 +38,7 @@ describe("suggestPresetId", () => {
 describe("applyPreset", () => {
   it("fills empty fields and keeps a null weight empty", () => {
     const { next, changes, conflicts } = applyPreset({}, nails);
-    expect(next.htsus).toBe("3926400000");
+    expect(next.htsus).toBe("3926400090");
     expect(next.description).toMatch(/press-on/);
     expect(next.unitWeightG).toBeNull();
     expect(next.preset).toBe("press-on-nails");
@@ -54,7 +54,7 @@ describe("applyPreset", () => {
     expect(keep.conflicts.map((c) => c.field).sort()).toEqual(["description", "htsus"]);
 
     const over = applyPreset(customs, nails, { overwrite: true });
-    expect(over.next.htsus).toBe("3926400000");
+    expect(over.next.htsus).toBe("3926400090");
     expect(over.next.unitWeightG).toBe(50); // preset has no weight: never clears
     expect(over.changes.every((c) => c.action === "overwrite" || c.action === "fill")).toBe(true);
   });
@@ -78,14 +78,15 @@ describe("resolvePresets", () => {
     expect(out).toHaveLength(CUSTOMS_PRESETS.length);
   });
 
-  it("clears needsClassification once the diy kit is filled in", () => {
-    const out = resolvePresets({ "diy-kit": { customsDescription: "Fabric pouch kit", htsus: "6307909891" } });
-    expect(findPreset(out, "diy-kit").needsClassification).toBe(false);
+  it("ships the diy kit and sachet with provisional codes, no longer unclassified", () => {
+    expect(findPreset(presets, "diy-kit").htsus).toBe("7103995000");
+    expect(findPreset(presets, "diy-kit").needsClassification).toBeFalsy();
+    expect(findPreset(presets, "crystal-sachet").htsus).toBe("7103995000");
   });
 });
 
 describe("presetWarnings", () => {
-  const diy = findPreset(presets, "diy-kit");
+  const diy = { ...findPreset(presets, "diy-kit"), needsClassification: true }; // a preset still awaiting a code
   it("flags diy kits as needing classification and missing weight", () => {
     expect(presetWarnings({ customs: {}, preset: diy })).toEqual({ needsClassification: true, weightMissing: true });
   });
@@ -107,12 +108,12 @@ describe("planBulkApply", () => {
     { id: "b", name: "B", category: "energy-bottles", customs: { description: "Own text", htsus: "7013999090" } },
     { id: "c", name: "C", category: "digital-reports", requiresShipping: false, customs: {} },
     { id: "d", name: "D", category: "bundles", customs: {} },
-    { id: "e", name: "E", category: "nails", customs: { preset: "press-on-nails", origin: "Taiwan", htsus: "3926400000", description: nails.customsDescription } },
+    { id: "e", name: "E", category: "nails", customs: { preset: "press-on-nails", origin: "Taiwan", htsus: "3926400090", description: nails.customsDescription } },
   ];
 
   it("suggests by category and never overwrites by default", () => {
     const rows = Object.fromEntries(planBulkApply(products, presets).map((r) => [r.product.id, r]));
-    expect(rows.a.next.htsus).toBe("3926400000");
+    expect(rows.a.next.htsus).toBe("3926400090");
     expect(rows.b.next.description).toBe("Own text");
     expect(rows.b.conflicts.map((c) => c.field)).toContain("description");
     expect(rows.c.skipped).toMatch(/數位/);
