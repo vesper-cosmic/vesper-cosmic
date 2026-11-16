@@ -9,7 +9,8 @@ export const dynamic = "force-dynamic";
 const NO_STORE = { "Cache-Control": "no-store, max-age=0" };
 
 /** Customs lines, checks and EZPost data for one order (admin only). */
-export async function GET(request, { params }) {
+export async function GET(request, context) {
+  const params = await context.params;
   const denied = await adminGuard();
   if (denied) return denied;
 
@@ -22,7 +23,8 @@ export async function GET(request, { params }) {
 }
 
 /** Save the shipping record (service, weight, postage, duties, EZPost label, tracking). */
-export async function PATCH(request, { params }) {
+export async function PATCH(request, context) {
+  const params = await context.params;
   const denied = await adminGuard();
   if (denied) return denied;
 

@@ -8,7 +8,8 @@ export const dynamic = "force-dynamic";
 const NO_STORE = { "Cache-Control": "no-store, max-age=0" };
 
 /** Body: any of { name, unit, safetyStock, note, active }. */
-export async function PATCH(request, { params }) {
+export async function PATCH(request, context) {
+  const params = await context.params;
   const denied = await adminGuard();
   if (denied) return denied;
   const body = await request.json().catch(() => null);

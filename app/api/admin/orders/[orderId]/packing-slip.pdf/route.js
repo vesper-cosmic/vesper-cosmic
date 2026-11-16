@@ -7,7 +7,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /** GET /api/admin/orders/:orderId/packing-slip.pdf[?prices=1] */
-export async function GET(request, { params }) {
+export async function GET(request, context) {
+  const params = await context.params;
   return pdfResponse(request, params, {
     render: (data, url) => renderPackingSlipPdf(data, { showPrices: url.searchParams.get("prices") === "1" }),
     filename: (data) => `packing-slip-${data.order.orderId}.pdf`,

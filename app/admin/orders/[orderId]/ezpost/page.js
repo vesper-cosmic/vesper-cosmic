@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { AdminFrame, CheckList, LoadState, useOrderCustoms } from "@/components/admin/useOrderCustoms";
 import Helper from "@/components/admin/EzpostHelper";
 
-export default function EzpostHelperPage({ params }) {
+export default function EzpostHelperPage() {
+  const params = useParams();
   const orderId = decodeURIComponent(params.orderId);
   const search = useSearchParams();
   const packaging = search.get("packaging") === "box" ? "box" : "envelope";

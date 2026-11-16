@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { AdminFrame, LoadState, useShipmentCustoms } from "@/components/admin/useOrderCustoms";
 import Helper from "@/components/admin/EzpostHelper";
 
-export default function ShipmentEzpostPage({ params }) {
+export default function ShipmentEzpostPage() {
+  const params = useParams();
   const shipmentNo = decodeURIComponent(params.shipmentId);
   const search = useSearchParams();
   const packaging = search.get("packaging") === "box" ? "box" : search.get("packaging") === "envelope" ? "envelope" : "";

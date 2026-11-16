@@ -15,11 +15,6 @@ const NAV_ITEMS = [
   { label: "Contact", href: "/contact" },
 ];
 
-const ADMIN_EMAILS = String(process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
-  .split(",")
-  .map((value) => value.trim().toLowerCase())
-  .filter(Boolean);
-
 export default function SiteHeader() {
   const pathname = usePathname();
   const isShop = pathname?.startsWith("/shop");
@@ -27,10 +22,8 @@ export default function SiteHeader() {
   const { data: session, status } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const isAdmin = Boolean(
-    session?.user?.email &&
-      ADMIN_EMAILS.includes(session.user.email.toLowerCase())
-  );
+  // Set by the server in the session callback (lib/auth.js).
+  const isAdmin = Boolean(session?.user?.isAdmin);
 
   // Close the mobile menu whenever the route changes
   useEffect(() => {

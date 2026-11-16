@@ -9,7 +9,8 @@ export const dynamic = "force-dynamic";
 const SERVICES = ["ePacket", "Air Parcel", "EMS"];
 
 /** GET /api/admin/orders/:orderId/invoice.pdf[?service=ePacket&packaging=box] */
-export async function GET(request, { params }) {
+export async function GET(request, context) {
+  const params = await context.params;
   return pdfResponse(request, params, {
     render: (data, url) => {
       const service = url.searchParams.get("service");

@@ -22,7 +22,8 @@ const NO_STORE = { "Cache-Control": "no-store, max-age=0" };
 const json = (body, status = 200) => NextResponse.json(body, { status, headers: NO_STORE });
 
 /** The shipment with its orders, merged customs lines, checks and EZPost data. */
-export async function GET(request, { params }) {
+export async function GET(request, context) {
+  const params = await context.params;
   const denied = await adminGuard();
   if (denied) return denied;
   const packaging = new URL(request.url).searchParams.get("packaging");
@@ -41,7 +42,8 @@ export async function GET(request, { params }) {
  *   mark-shipped  { trackingNumber, shippedAt? }    sets every order to 已出貨; sends NO email
  *   send-emails   { note?, attachInvoice?, force? } one email per customer, only when asked
  */
-export async function PATCH(request, { params }) {
+export async function PATCH(request, context) {
+  const params = await context.params;
   const denied = await adminGuard();
   if (denied) return denied;
 

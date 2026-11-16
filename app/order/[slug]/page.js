@@ -7,7 +7,8 @@ import { isProductPublished } from "@/lib/productData";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }) {
-  const { product } = await getProductBySlug(params.slug);
+  const { slug } = await params;
+  const { product } = await getProductBySlug(slug);
 
   if (!product) {
     return {
@@ -22,7 +23,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ProductOrderPage({ params }) {
-  const { product } = await getProductBySlug(params.slug);
+  const { slug } = await params;
+  const { product } = await getProductBySlug(slug);
 
   if (!isProductPublished(product)) {
     notFound();

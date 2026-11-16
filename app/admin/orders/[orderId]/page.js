@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { AdminFrame, CheckList, LoadState, useOrderCustoms } from "@/components/admin/useOrderCustoms";
 
 const SERVICES = ["ePacket", "Air Parcel", "EMS"];
 const input =
   "w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]";
 
-export default function AdminOrderDetailPage({ params }) {
+export default function AdminOrderDetailPage() {
+  const params = useParams();
   const orderId = decodeURIComponent(params.orderId);
   const [packaging, setPackaging] = useState("envelope");
   const [showPrices, setShowPrices] = useState(false);
