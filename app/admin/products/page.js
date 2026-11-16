@@ -73,6 +73,54 @@ const commonCategories = [
   { id: "sets", label: "Sets" },
 ];
 
+// Nail categories, also offered together as one filter.
+const NAIL_CATEGORY_IDS = ["nails", "ready-made-nails", "custom-nails"];
+
+/**
+ * Category filter chips for the product list: 全部, 指甲類（全部） when more than
+ * one nail category is in use, then every category that has products.
+ */
+function categoryFilterOptions(productsList) {
+  const counts = new Map();
+  const labels = new Map();
+  productsList.forEach((product) => {
+    const id = product.category || "";
+    counts.set(id, (counts.get(id) || 0) + 1);
+    if (!labels.has(id) && product.categoryLabel) labels.set(id, product.categoryLabel);
+  });
+
+  const options = [{ id: "all", label: "全部", count: productsList.length, match: () => true }];
+
+  const nailIds = NAIL_CATEGORY_IDS.filter((id) => counts.has(id));
+  if (nailIds.length > 1) {
+    options.push({
+      id: "group:nails",
+      label: "指甲類（全部）",
+      count: nailIds.reduce((sum, id) => sum + counts.get(id), 0),
+      match: (product) => NAIL_CATEGORY_IDS.includes(product.category),
+    });
+  }
+
+  const order = commonCategories.map((category) => category.id);
+  [...counts.keys()]
+    .sort((a, b) => {
+      const ia = order.indexOf(a) === -1 ? order.length : order.indexOf(a);
+      const ib = order.indexOf(b) === -1 ? order.length : order.indexOf(b);
+      return ia - ib || a.localeCompare(b);
+    })
+    .forEach((id) => {
+      const known = commonCategories.find((category) => category.id === id);
+      options.push({
+        id: `category:${id}`,
+        label: id ? known?.label || labels.get(id) || id : "未分類",
+        count: counts.get(id),
+        match: (product) => (product.category || "") === id,
+      });
+    });
+
+  return options;
+}
+
 function emptyForm() {
   return {
     name: "",
@@ -146,6 +194,7 @@ export default function AdminProductsPage() {
   const [stockSavingId, setStockSavingId] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [page, setPage] = useState(1);
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   // Customs presets (code defaults + admin overrides) and the bulk-apply dialog
   const [presets, setPresets] = useState(() => resolvePresets());
@@ -571,8 +620,12 @@ export default function AdminProductsPage() {
     );
   }
 
-  const paginated = products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
+  const filterOptions = categoryFilterOptions(products);
+  const activeFilter = filterOptions.find((option) => option.id === categoryFilter) || filterOptions[0];
+  const filteredProducts = products.filter(activeFilter.match);
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = filteredProducts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
     <AdminShell>
@@ -1138,7 +1191,9 @@ export default function AdminProductsPage() {
         <section className="mt-10">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-xl font-semibold text-[#1C2B48]">
-              全部產品 ({products.length})
+              {activeFilter.id === "all"
+                ? `全部產品 (${products.length})`
+                : `${activeFilter.label} (${filteredProducts.length} / ${products.length})`}
             </h2>
             <div className="flex flex-wrap gap-2">
               <button
@@ -1172,6 +1227,33 @@ export default function AdminProductsPage() {
             />
           ) : null}
 
+          {!loading && products.length > 0 ? (
+            <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="依分類篩選">
+              {filterOptions.map((option) => {
+                const active = option.id === activeFilter.id;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => {
+                      setCategoryFilter(option.id);
+                      setPage(1);
+                      setExpandedId(null);
+                    }}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                      active
+                        ? "border-[#1C2B48] bg-[#1C2B48] text-white"
+                        : "border-[#8EB1D1]/60 bg-white text-[#35506B] hover:bg-[#C4D8E5]"
+                    }`}
+                  >
+                    {option.label} ({option.count})
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+
           {loading ? (
             <p className="mt-4 text-sm text-[#5B7893]">Loading…</p>
           ) : products.length === 0 ? (
@@ -1203,19 +1285,19 @@ export default function AdminProductsPage() {
                 <div className="mt-4 flex items-center justify-center gap-2">
                   <button
                     type="button"
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => p - 1)}
+                    disabled={currentPage <= 1}
+                    onClick={() => setPage(currentPage - 1)}
                     className="rounded border border-[#8EB1D1]/40 px-3 py-1.5 text-sm disabled:opacity-40"
                   >
                     ← Prev
                   </button>
                   <span className="text-sm text-[#5B7893]">
-                    {page} / {totalPages}
+                    {currentPage} / {totalPages}
                   </span>
                   <button
                     type="button"
-                    disabled={page >= totalPages}
-                    onClick={() => setPage((p) => p + 1)}
+                    disabled={currentPage >= totalPages}
+                    onClick={() => setPage(currentPage + 1)}
                     className="rounded border border-[#8EB1D1]/40 px-3 py-1.5 text-sm disabled:opacity-40"
                   >
                     Next →
