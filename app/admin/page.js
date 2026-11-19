@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { isDigitalOnlyOrder } from "@/lib/orderDigital";
 import {
   ADMIN_NEXT_STEPS,
   ADMIN_ORDER_STATUSES,
@@ -54,6 +55,7 @@ export default function AdminPage() {
   const router = useRouter();
   const [selected, setSelected] = useState([]);
   const [orderIndex, setOrderIndex] = useState({});
+  const [productsById, setProductsById] = useState({});
   const [combining, setCombining] = useState(false);
   const [combineProblem, setCombineProblem] = useState(null);
 
@@ -89,6 +91,14 @@ export default function AdminPage() {
     fetch("/api/admin/shipments", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => setOrderIndex(data?.orderIndex || {}))
+      .catch(() => {});
+  }, [authStatus]);
+
+  useEffect(() => {
+    if (authStatus !== "authenticated") return;
+    fetch("/api/products", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => setProductsById(Object.fromEntries((data?.products || []).map((p) => [p.id, p]))))
       .catch(() => {});
   }, [authStatus]);
 
@@ -277,6 +287,7 @@ export default function AdminPage() {
                 selected={selected.includes(order.orderId)}
                 onToggle={() => toggleSelected(order.orderId)}
                 shipmentNo={orderIndex[order.orderId] || ""}
+                digital={isDigitalOnlyOrder(order.items, productsById)}
               />
             ))}
           </div>
@@ -372,7 +383,7 @@ function StatusBadge({ status }) {
   return <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${tone}`}>{status}</span>;
 }
 
-function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = "" }) {
+function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = "", digital = false }) {
   const current = adminOrderStatus(order);
   const items = Array.isArray(order.items) ? order.items : [];
   const nextSteps = ADMIN_NEXT_STEPS[current] || [];
@@ -399,7 +410,7 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
 
   async function confirm() {
     if (!target) return;
-    if (target === OS_SHIPPED && !trackingNumber.trim()) {
+    if (target === OS_SHIPPED && !digital && !trackingNumber.trim()) {
       if (!window.confirm("還沒填郵政追蹤碼，確定要先標記已出貨嗎？")) return;
     }
     setSaving(true);
@@ -411,10 +422,10 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
         body: JSON.stringify({
           orderId: order.orderId,
           orderStatus: target,
-          trackingNumber: target === OS_SHIPPED ? trackingNumber.trim() : "",
+          trackingNumber: target === OS_SHIPPED && !digital ? trackingNumber.trim() : "",
           note,
           notifyCustomer: Boolean(ADMIN_STATUS_EMAIL[target]) && notify,
-          attachInvoice: target === OS_SHIPPED && notify && attachInvoice,
+          attachInvoice: target === OS_SHIPPED && !digital && notify && attachInvoice,
         }),
       });
       const data = await response.json().catch(() => ({}));
@@ -432,7 +443,7 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
       } else if (payment === PAYMENT_PAID && (!production || production === "📋 訂單已發出")) {
         patch.productionStatus = "✅ 訂單已接受";
       }
-      if (target === OS_SHIPPED && trackingNumber.trim()) patch.trackingNumber = trackingNumber.trim();
+      if (target === OS_SHIPPED && !digital && trackingNumber.trim()) patch.trackingNumber = trackingNumber.trim();
       onUpdated(order.orderId, patch);
 
       const emailText = data?.email?.success
@@ -472,10 +483,16 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
     }
   }
 
+  // Paid orders (PayPal confirms them automatically) don't need the manual
+  // "payment notice" / "verified notice" steps.
+  const paid = order.paymentStatus === PAYMENT_PAID;
   const otherStatuses = ADMIN_ORDER_STATUSES.filter(
-    (status) => status !== current && !nextSteps.includes(status)
+    (status) =>
+      status !== current &&
+      !nextSteps.includes(status) &&
+      !(paid && (status === OS_PAYMENT_NOTICE || status === OS_VERIFIED_NOTICE))
   );
-  const emailLabel = ADMIN_STATUS_EMAIL[target];
+  const emailLabel = digital && target === OS_SHIPPED ? "電子商品完成通知信（不含追蹤碼）" : ADMIN_STATUS_EMAIL[target];
 
   return (
     <div className="rounded border border-[#8EB1D1]/30 bg-white/60 p-4">
@@ -502,12 +519,18 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
             ) : null}
           </div>
           <div className="mt-1.5 flex flex-wrap gap-1.5 text-[11px] font-semibold">
+            {digital ? (
+              <span className="rounded border border-[#8EB1D1]/50 bg-[#E8ECEF] px-2 py-0.5 text-[#35506B]">電子商品（不需寄送）</span>
+            ) : (
+              <>
             <Link href={`/admin/orders/${encodeURIComponent(order.orderId)}`} className="rounded border border-[#8EB1D1]/50 bg-white px-2 py-0.5 text-[#35506B] hover:bg-[#C4D8E5]">
               Commercial Invoice / Packing Slip (PDF)
             </Link>
             <Link href={`/admin/orders/${encodeURIComponent(order.orderId)}/ezpost`} className="rounded border border-[#8EB1D1]/50 bg-white px-2 py-0.5 text-[#35506B] hover:bg-[#C4D8E5]">
               EZPost Helper
             </Link>
+              </>
+            )}
           </div>
           <p className="mt-1 text-sm font-semibold text-[#35506B]">{order.fullName}</p>
           <p className="truncate text-xs text-[#5B7893]">{order.email}</p>
@@ -569,10 +592,10 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
                 : "border-[#8EB1D1] bg-[#8EB1D1] text-[#1C2B48] hover:bg-[#A7C7E7]"
             }`}
           >
-            {status}
+            {digital && status === OS_SHIPPED ? "🚚 已出貨（電子報告已寄出）" : status}
           </button>
         ))}
-        {current === OS_SHIPPED ? (
+        {current === OS_SHIPPED && !digital ? (
           <button
             type="button"
             onClick={() => choose(OS_SHIPPED)}
@@ -602,9 +625,9 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
           <p className="text-sm text-[#1C2B48]">
             改成 <strong>{target}</strong>
           </p>
-          <p className="text-xs leading-5 text-[#35506B]">{STATUS_EFFECT[target]}</p>
+          <p className="text-xs leading-5 text-[#35506B]">{digital && target === OS_SHIPPED ? "電子商品不用寄包裹：只會改成「已出貨」並記錄出貨日，不需要追蹤碼。通知信會告訴顧客報告已寄出，你可以在附加說明貼上下載連結。" : STATUS_EFFECT[target]}</p>
 
-          {target === OS_SHIPPED ? (
+          {target === OS_SHIPPED && !digital ? (
             <div>
               <label className="mb-1 block text-xs font-semibold text-[#5B7893]">郵政追蹤碼</label>
               <input
@@ -624,12 +647,12 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
                 <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} className="mt-0.5" />
                 <span>
                   寄信通知顧客：{emailLabel}
-                  {target === OS_SHIPPED && current === OS_SHIPPED ? "（只有追蹤碼改變時才會寄）" : ""}
+                  {target === OS_SHIPPED && current === OS_SHIPPED && !digital ? "（只有追蹤碼改變時才會寄）" : ""}
                   <br />
                   <span className="text-[#8B99A8]">不勾選＝只改狀態（例如你已經用其他方式通知過顧客）</span>
                 </span>
               </label>
-              {notify && target === OS_SHIPPED ? (
+              {notify && target === OS_SHIPPED && !digital ? (
                 <label className="flex items-center gap-2 text-xs text-[#35506B]">
                   <input type="checkbox" checked={attachInvoice} onChange={(e) => setAttachInvoice(e.target.checked)} />
                   Attach commercial invoice PDF（附上商業發票 PDF）
@@ -648,6 +671,8 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
                     placeholder={
                       target === OS_CANCELLED
                         ? "e.g. The crystal you chose is out of stock."
+                        : digital && target === OS_SHIPPED
+                        ? "e.g. Download your report here: https://…"
                         : "e.g. Your set will be ready in about 10 days."
                     }
                     className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"

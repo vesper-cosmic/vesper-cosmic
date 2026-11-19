@@ -178,3 +178,19 @@ describe("decoration allowance", () => {
     expect(r.unitCostTWD).toBe(60);
   });
 });
+
+import { isDigitalOnlyOrder } from "@/lib/orderDigital";
+import { ADMIN_NEXT_STEPS, OS_PAID, OS_SHIPPED, OS_VERIFIED_NOTICE } from "@/lib/orderStatus";
+describe("digital orders and paid next steps", () => {
+  const products = { r: { requiresShipping: false }, n: { requiresShipping: true }, u: {} };
+  it("is digital only when every item needs no shipping", () => {
+    expect(isDigitalOnlyOrder([{ productId: "r" }], products)).toBe(true);
+    expect(isDigitalOnlyOrder([{ productId: "r" }, { productId: "n" }], products)).toBe(false);
+    expect(isDigitalOnlyOrder([{ productId: "x" }], products)).toBe(false);
+    expect(isDigitalOnlyOrder([], products)).toBe(false);
+  });
+  it("a paid order goes straight to shipped, no manual verified-notice step", () => {
+    expect(ADMIN_NEXT_STEPS[OS_PAID]).toContain(OS_SHIPPED);
+    expect(ADMIN_NEXT_STEPS[OS_PAID]).not.toContain(OS_VERIFIED_NOTICE);
+  });
+});

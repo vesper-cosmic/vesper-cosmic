@@ -22,6 +22,8 @@ import {
   sendPaymentRequestEmail,
   sendShippedEmail,
 } from "@/lib/customerEmails";
+import { getAllProducts } from "@/lib/productServer";
+import { isDigitalOnlyOrder } from "@/lib/orderDigital";
 import { syncOrderReferrer } from "@/lib/referral";
 import { consumeMaterialsForOrder, restoreStockForCancelledOrder } from "@/lib/costServer";
 import { loadOrderCustoms } from "@/lib/customs/context";
@@ -142,9 +144,11 @@ async function changeOrderStatus(orderId, payload) {
       email = await sendPaymentConfirmedEmail(before, note);
     } else if (orderStatus === OS_SHIPPED) {
       const newTracking = trackingNumber && trackingNumber !== before.trackingNumber;
-      if (previous !== OS_SHIPPED || newTracking) {
-        const attachments = payload.attachInvoice === true ? await invoiceAttachment(orderId) : [];
-        if (payload.attachInvoice === true && attachments.length === 0) {
+      const { products } = await getAllProducts();
+      const digital = isDigitalOnlyOrder(before.items, Object.fromEntries((products || []).map((p) => [p.id, p])));
+      if (previous !== OS_SHIPPED || (!digital && newTracking)) {
+        const attachments = payload.attachInvoice === true && !digital ? await invoiceAttachment(orderId) : [];
+        if (payload.attachInvoice === true && !digital && attachments.length === 0) {
           return NextResponse.json({
             ok: true,
             orderId,
@@ -152,7 +156,7 @@ async function changeOrderStatus(orderId, payload) {
             email: { success: false, error: "Status saved, but the invoice couldn't be created (check the order's customs data). Email not sent." },
           });
         }
-        email = await sendShippedEmail(before, trackingNumber, note, { attachments });
+        email = await sendShippedEmail(before, trackingNumber, note, { attachments, digital });
       }
     } else if (orderStatus === OS_CANCELLED && previous !== OS_CANCELLED) {
       email = await sendOrderCancelledEmail(before, note);
