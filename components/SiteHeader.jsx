@@ -173,11 +173,11 @@ export default function SiteHeader() {
             <AccountButton />
           </div>
 
-          {/* Mobile: hamburger menu */}
+          {/* Mobile: member center (person icon) — opens the account + site links panel */}
           <button
             type="button"
             onClick={() => setMenuOpen((prev) => !prev)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-label={menuOpen ? "Close member menu" : "Open member menu"}
             aria-expanded={menuOpen}
             className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#8EB1D1]/40 bg-white/60 text-[#1C2B48] transition hover:bg-[#C4D8E5] md:hidden"
           >
@@ -208,7 +208,7 @@ export default function SiteHeader() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
             )}
@@ -227,37 +227,9 @@ export default function SiteHeader() {
           className="absolute inset-x-0 top-0 mx-auto max-h-[calc(100dvh-61px)] overflow-y-auto rounded-b-2xl border-b border-[#8EB1D1]/25 bg-[#E8ECEF] p-5 shadow-[0_20px_60px_rgba(28,43,72,0.25)]"
           aria-label="Mobile navigation"
         >
-          <div className="space-y-2">
-            {NAV_ITEMS.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMenuOpen(false)}
-                  className={`block rounded-lg border px-4 py-3 text-base font-semibold transition ${
-                    active
-                      ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
-                      : "border-[#8EB1D1]/20 text-[#1C2B48] hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-            {isAdmin ? (
-              <Link
-                href="/admin"
-                onClick={() => setMenuOpen(false)}
-                className="block rounded-lg border border-[#8EB1D1]/20 px-4 py-3 text-base font-semibold text-[#1C2B48] transition hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
-              >
-                Admin
-              </Link>
-            ) : null}
-          </div>
-
           {/* Mobile account section */}
-          <div className="mt-5 border-t border-[#8EB1D1]/25 pt-4">
+          <div className="mb-5 border-b border-[#8EB1D1]/25 pb-5">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#5B7893]">Member Center</p>
             {status === "loading" ? (
               <p className="rounded-lg border border-[#8EB1D1]/20 bg-white/60 px-4 py-3 text-sm text-[#5B7893]">
                 Loading…
@@ -292,6 +264,35 @@ export default function SiteHeader() {
               </Link>
             )}
           </div>
+          <div className="space-y-2">
+            {NAV_ITEMS.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMenuOpen(false)}
+                  className={`block rounded-lg border px-4 py-3 text-base font-semibold transition ${
+                    active
+                      ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
+                      : "border-[#8EB1D1]/20 text-[#1C2B48] hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+            {isAdmin ? (
+              <Link
+                href="/admin"
+                onClick={() => setMenuOpen(false)}
+                className="block rounded-lg border border-[#8EB1D1]/20 px-4 py-3 text-base font-semibold text-[#1C2B48] transition hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
+              >
+                Admin
+              </Link>
+            ) : null}
+          </div>
+
         </nav>
       </div>
     </header>
