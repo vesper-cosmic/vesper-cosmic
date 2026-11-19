@@ -393,6 +393,7 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
   const [note, setNote] = useState("");
   const [notify, setNotify] = useState(true);
   const [attachInvoice, setAttachInvoice] = useState(false);
+  const [reportFiles, setReportFiles] = useState([]); // PDFs to email (digital orders)
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
 
@@ -406,6 +407,7 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
     setNotify(true);
     setMessage(null);
     setTrackingNumber(order.trackingNumber || "");
+    setReportFiles([]);
   }
 
   async function confirm() {
@@ -416,18 +418,25 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
     setSaving(true);
     setMessage(null);
     try {
-      const response = await fetch("/api/admin/orders", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const payload = {
           orderId: order.orderId,
           orderStatus: target,
           trackingNumber: target === OS_SHIPPED && !digital ? trackingNumber.trim() : "",
           note,
           notifyCustomer: Boolean(ADMIN_STATUS_EMAIL[target]) && notify,
           attachInvoice: target === OS_SHIPPED && !digital && notify && attachInvoice,
-        }),
-      });
+      };
+      const withFiles = digital && target === OS_SHIPPED && reportFiles.length > 0;
+      let request;
+      if (withFiles) {
+        const form = new FormData();
+        form.append("payload", JSON.stringify(payload));
+        reportFiles.forEach((file) => form.append("reports", file));
+        request = { method: "PATCH", body: form };
+      } else {
+        request = { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) };
+      }
+      const response = await fetch("/api/admin/orders", request);
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
         setMessage({ type: "error", text: data?.error || "更新失敗，請再試一次。" });
@@ -625,7 +634,39 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
           <p className="text-sm text-[#1C2B48]">
             改成 <strong>{target}</strong>
           </p>
-          <p className="text-xs leading-5 text-[#35506B]">{digital && target === OS_SHIPPED ? "電子商品不用寄包裹：只會改成「已出貨」並記錄出貨日，不需要追蹤碼。通知信會告訴顧客報告已寄出，你可以在附加說明貼上下載連結。" : STATUS_EFFECT[target]}</p>
+          <p className="text-xs leading-5 text-[#35506B]">{digital && target === OS_SHIPPED ? "電子商品不用寄包裹：只會改成「已出貨」並記錄出貨日，不需要追蹤碼。選擇報告 PDF 後，系統會用固定的英文信件模板自動寄給顧客並附上 PDF；沒有 PDF 時也可以在附加說明貼下載連結。" : STATUS_EFFECT[target]}</p>
+
+          {target === OS_SHIPPED && digital ? (
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-[#5B7893]">報告 PDF（選填，可多選；會自動附在通知信裡）</label>
+              <input
+                type="file"
+                accept="application/pdf"
+                multiple
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  const total = files.reduce((sum, f) => sum + f.size, 0);
+                  if (files.length > 5 || total > 4 * 1024 * 1024) {
+                    setMessage({ type: "error", text: "PDF 最多 5 個、合計 4 MB 內。太大的請改用下載連結貼在附加說明。" });
+                    e.target.value = "";
+                    setReportFiles([]);
+                    return;
+                  }
+                  setMessage(null);
+                  setReportFiles(files);
+                  if (files.length) setNotify(true);
+                }}
+                className="block w-full text-xs text-[#35506B]"
+              />
+              {reportFiles.length ? (
+                <ul className="mt-1 text-[11px] text-[#5B7893]">
+                  {reportFiles.map((f) => (
+                    <li key={f.name}>📎 {f.name}（{(f.size / 1024).toFixed(0)} KB）</li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : null}
 
           {target === OS_SHIPPED && !digital ? (
             <div>
@@ -644,7 +685,7 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
           {emailLabel ? (
             <>
               <label className="flex items-start gap-2 text-xs text-[#35506B]">
-                <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} className="mt-0.5" />
+                <input type="checkbox" checked={notify} disabled={reportFiles.length > 0} onChange={(e) => setNotify(e.target.checked)} className="mt-0.5" />
                 <span>
                   寄信通知顧客：{emailLabel}
                   {target === OS_SHIPPED && current === OS_SHIPPED && !digital ? "（只有追蹤碼改變時才會寄）" : ""}

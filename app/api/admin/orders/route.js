@@ -24,6 +24,7 @@ import {
 } from "@/lib/customerEmails";
 import { getAllProducts } from "@/lib/productServer";
 import { isDigitalOnlyOrder } from "@/lib/orderDigital";
+import { safeReportName, validateReportFiles } from "@/lib/reportFiles";
 import { syncOrderReferrer } from "@/lib/referral";
 import { consumeMaterialsForOrder, restoreStockForCancelledOrder } from "@/lib/costServer";
 import { loadOrderCustoms } from "@/lib/customs/context";
@@ -64,10 +65,27 @@ export async function PATCH(request) {
   }
 
   let payload;
+  let reports = [];
   try {
-    payload = await request.json();
+    if ((request.headers.get("content-type") || "").includes("multipart/form-data")) {
+      // Digital delivery: { payload: "<json>", reports: PDF files }
+      const form = await request.formData();
+      payload = JSON.parse(String(form.get("payload") || "{}"));
+      const files = form.getAll("reports").filter((f) => typeof f === "object" && f.size > 0);
+      const loaded = await Promise.all(
+        files.map(async (file, index) => {
+          const content = Buffer.from(await file.arrayBuffer());
+          return { filename: safeReportName(file.name, index), content, contentType: "application/pdf", name: file.name, size: content.length, head: content.subarray(0, 4).toString("latin1") };
+        })
+      );
+      const check = validateReportFiles(loaded);
+      if (!check.ok) return NextResponse.json({ error: check.error, ok: false }, { status: 422 });
+      reports = loaded.map(({ filename, content, contentType }) => ({ filename, content, contentType }));
+    } else {
+      payload = await request.json();
+    }
   } catch {
-    return NextResponse.json({ error: "Invalid JSON payload.", ok: false }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request payload.", ok: false }, { status: 400 });
   }
 
   const orderId = String(payload.orderId || "").trim();
@@ -76,7 +94,7 @@ export async function PATCH(request) {
   }
 
   if (payload.orderStatus !== undefined) {
-    return changeOrderStatus(orderId, payload);
+    return changeOrderStatus(orderId, payload, reports);
   }
 
   // Production step only (no emails; shipping goes through 已出貨).
@@ -104,7 +122,7 @@ async function invoiceAttachment(orderId) {
   }
 }
 
-async function changeOrderStatus(orderId, payload) {
+async function changeOrderStatus(orderId, payload, reports = []) {
   const orderStatus = String(payload.orderStatus || "").trim();
   const trackingNumber = String(payload.trackingNumber || "").trim().slice(0, 64);
   const note = String(payload.note || "").trim().slice(0, 2000);
@@ -112,6 +130,13 @@ async function changeOrderStatus(orderId, payload) {
 
   if (!ADMIN_ORDER_STATUSES.includes(orderStatus)) {
     return NextResponse.json({ error: "Invalid order status.", ok: false }, { status: 422 });
+  }
+
+  if (reports.length > 0 && (orderStatus !== OS_SHIPPED || !notify)) {
+    return NextResponse.json(
+      { error: "要附上 PDF，必須是「已出貨」並勾選寄信通知顧客。", ok: false },
+      { status: 422 }
+    );
   }
 
   const result = await setAdminOrderStatus({
@@ -146,8 +171,11 @@ async function changeOrderStatus(orderId, payload) {
       const newTracking = trackingNumber && trackingNumber !== before.trackingNumber;
       const { products } = await getAllProducts();
       const digital = isDigitalOnlyOrder(before.items, Object.fromEntries((products || []).map((p) => [p.id, p])));
-      if (previous !== OS_SHIPPED || (!digital && newTracking)) {
-        const attachments = payload.attachInvoice === true && !digital ? await invoiceAttachment(orderId) : [];
+      if (previous !== OS_SHIPPED || (!digital && newTracking) || reports.length > 0) {
+        if (reports.length > 0 && !digital) {
+          return NextResponse.json({ error: "只有電子商品訂單可以附上報告 PDF。", ok: false }, { status: 422 });
+        }
+        const attachments = digital ? reports : payload.attachInvoice === true ? await invoiceAttachment(orderId) : [];
         if (payload.attachInvoice === true && !digital && attachments.length === 0) {
           return NextResponse.json({
             ok: true,
