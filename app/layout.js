@@ -63,7 +63,7 @@ export const metadata = {
     },
   },
   alternates: {
-    canonical: "https://vespercosmos.com/",
+    canonical: "./", // each page canonicalises to its own URL (resolved against metadataBase)
   },
 };
 
