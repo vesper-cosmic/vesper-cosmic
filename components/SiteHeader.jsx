@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useCart } from "@/lib/cartContext";
 import AccountButton from "@/components/AccountButton";
+import { OPEN_CATEGORIES_EVENT } from "@/components/shop/CategoryDrawer";
 
 const NAV_ITEMS = [
   { label: "Shop", href: "/shop" },
@@ -18,6 +19,8 @@ const NAV_ITEMS = [
 export default function SiteHeader() {
   const pathname = usePathname();
   const isShop = pathname?.startsWith("/shop");
+  // Pages with a category list get a ☰ button (mobile) that opens the category drawer.
+  const hasCategories = pathname === "/" || isShop;
   const { totalItems, openCart, syncing } = useCart();
   const { data: session, status } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -58,17 +61,31 @@ export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-[#8EB1D1]/20 bg-[#E8ECEF]/95 backdrop-blur-sm">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link href="/" className="group flex items-center gap-2.5">
-          <img
-            src="/images/vesper-logo.png"
-            alt="Vesper Cosmos"
-            className="h-9 w-auto sm:h-10"
-          />
-          <span className="text-sm font-semibold uppercase tracking-[0.24em] text-[#1C2B48] transition group-hover:text-[#35506B] sm:text-base">
-            Vesper<span className="text-[#8EB1D1]"> Cosmos</span>
-          </span>
-        </Link>
+        <div className="flex min-w-0 items-center gap-2">
+          {hasCategories ? (
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event(OPEN_CATEGORIES_EVENT))}
+              aria-label="Open categories"
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-[#8EB1D1]/40 bg-white/60 text-[#1C2B48] transition hover:bg-[#C4D8E5] lg:hidden"
+            >
+              <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          ) : null}
+          {/* Logo */}
+          <Link href="/" className="group flex min-w-0 items-center gap-2 sm:gap-2.5">
+            <img
+              src="/images/vesper-logo.png"
+              alt="Vesper Cosmos"
+              className="h-8 w-auto flex-shrink-0 sm:h-10"
+            />
+            <span className="truncate text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1C2B48] transition group-hover:text-[#35506B] sm:text-base sm:tracking-[0.24em]">
+              Vesper<span className="text-[#8EB1D1]"> Cosmos</span>
+            </span>
+          </Link>
+        </div>
 
         {/* Right side */}
         <div className="flex items-center gap-2">

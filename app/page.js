@@ -5,6 +5,8 @@ import Link from "next/link";
 import { staticCategories, groupCategoryIds, categoryCountsFor, categoryMemberIds } from "@/lib/productData";
 import { useProducts } from "@/components/ProductProvider";
 import ShopProductCard from "@/components/shop/ShopProductCard";
+import CategoryPanel from "@/components/shop/CategoryPanel";
+import CategoryDrawer from "@/components/shop/CategoryDrawer";
 import ProductDetailModal from "@/components/shop/ProductDetailModal";
 
 export default function HomePage() {
@@ -123,111 +125,31 @@ function HomePageContent() {
           {/* Sidebar + Content Layout */}
           <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start">
             {/* Sidebar — Category Filter (persistent on the side) */}
-            <aside className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-4 lg:sticky lg:top-24">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8EB1D1]">
+            <aside className="hidden rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-4 lg:sticky lg:top-24 lg:block">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#8EB1D1]">
                 Shop by Category
               </p>
-              <nav className="mt-4 flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0">
-                {staticCategories.map((group) => {
-                  const isParent = Boolean(group.children);
-                  const groupCount = isParent
-                    ? group.children.reduce(
-                        (sum, child) =>
-                          sum + (categoryCounts[child.categoryId] || 0),
-                        0
-                      )
-                    : categoryCounts[group.categoryId] || 0;
-                  const isActive =
-                    selectedFilter?.type === "group"
-                      ? selectedFilter.id === group.id
-                      : selectedFilter?.type === "category" &&
-                        selectedFilter.id === group.categoryId;
-
-                  return (
-                    <div
-                      key={group.id}
-                      className="flex flex-shrink-0 flex-col lg:w-full"
-                    >
-                      {/* Category button (parent or single-level) */}
-                      <button
-                        type="button"
-                        onClick={() => toggleGroup(group)}
-                        aria-expanded={isParent ? isActive : undefined}
-                        className={`flex items-center gap-2 rounded border px-3 py-2 text-left text-sm font-semibold transition ${
-                          isActive
-                            ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
-                            : "border-[#8EB1D1]/20 text-[#1C2B48] hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
-                        }`}
-                      >
-                        <span>{group.title}</span>
-                        <span className="text-xs font-normal text-[#5B7893]">
-                          {groupCount}
-                        </span>
-                      </button>
-
-                      {/* Child sub-categories */}
-                      {isParent ? (
-                        <div className="mt-1 flex gap-1 pl-3 lg:flex-col">
-                          {group.children.map((child) => {
-                            const count = child.categoryId
-                              ? categoryCounts[child.categoryId] || 0
-                              : 0;
-                            const childActive =
-                              selectedFilter?.type === "category" &&
-                              selectedFilter.id === child.categoryId;
-                            const isDisabled =
-                              !child.categoryId && count === 0;
-
-                            return (
-                              <button
-                                key={child.id}
-                                type="button"
-                                onClick={() => toggleCategory(child.categoryId)}
-                                disabled={isDisabled}
-                                className={`flex flex-shrink-0 items-center gap-2 rounded border px-2.5 py-1.5 text-left text-xs font-medium transition lg:w-full ${
-                                  isDisabled
-                                    ? "cursor-not-allowed border-transparent text-[#5B7893]/60"
-                                    : childActive
-                                      ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
-                                      : "border-[#8EB1D1]/20 text-[#35506B] hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
-                                }`}
-                              >
-                                <span>{child.title}</span>
-                                <span className="text-xs font-normal text-[#5B7893]">
-                                  {count}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ) : null}
-                    </div>
-                  );
-                })}
-              </nav>
-
-              {/* About Link — 側邊欄最下方 */}
-              <Link
-                href="/about"
-                className="mt-4 flex items-center gap-2 rounded border border-[#8EB1D1]/20 px-3 py-2 text-sm font-semibold text-[#1C2B48] transition hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
-              >
-                <svg
-                  aria-hidden="true"
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                About
-              </Link>
+              <CategoryPanel
+                categoryCounts={categoryCounts}
+                selectedFilter={selectedFilter}
+                onToggleGroup={toggleGroup}
+                onToggleCategory={toggleCategory}
+                showAbout={true}
+              />
             </aside>
+            <CategoryDrawer>
+              {(close) => (
+                <CategoryPanel
+                  categoryCounts={categoryCounts}
+                  selectedFilter={selectedFilter}
+                  onToggleGroup={toggleGroup}
+                  onToggleCategory={toggleCategory}
+                  showAbout={true}
+                  onPick={close}
+                  roomy
+                />
+              )}
+            </CategoryDrawer>
 
             {/* Product Grid — full collection, or the selected category */}
             <div>
