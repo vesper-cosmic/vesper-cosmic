@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL } from "@/lib/siteEmail";
 import ContactForm from "@/components/ContactForm";
 
 export const metadata = {
@@ -32,10 +33,10 @@ export default function ContactPage() {
             </h2>
             <p className="mt-3 text-sm leading-7 text-[#35506B]">
               <a
-                href="mailto:vesper.cosmic.blueprint@gmail.com"
+                href={`mailto:${CONTACT_EMAIL}`}
                 className="font-semibold text-[#1C2B48] underline decoration-[#8EB1D1] decoration-2 underline-offset-2 transition hover:text-[#5B7893]"
               >
-                vesper.cosmic.blueprint@gmail.com
+                {CONTACT_EMAIL}
               </a>
             </p>
             <p className="mt-2 text-sm leading-7 text-[#5B7893]">
@@ -54,10 +55,10 @@ export default function ContactPage() {
             <p className="mt-3 text-sm leading-7 text-[#35506B]">
               For collaborations, press, or wholesale inquiries, please contact:{" "}
               <a
-                href="mailto:vesper.cosmic.blueprint@gmail.com"
+                href={`mailto:${CONTACT_EMAIL}`}
                 className="font-semibold text-[#1C2B48] underline decoration-[#8EB1D1] decoration-2 underline-offset-2 transition hover:text-[#5B7893]"
               >
-                vesper.cosmic.blueprint@gmail.com
+                {CONTACT_EMAIL}
               </a>
               .
             </p>

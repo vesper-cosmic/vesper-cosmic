@@ -1,3 +1,4 @@
+import { OWNER_EMAIL } from "@/lib/siteEmail";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
@@ -5,7 +6,6 @@ import { safeSendEmail } from "@/lib/orderServer";
 import { rateLimitResponse } from "@/lib/rateLimit";
 import { requestWithdrawal, validatePayoutInfo } from "@/lib/referral";
 
-const OWNER_EMAIL = "vesper.cosmic.blueprint@gmail.com";
 
 /**
  * POST /api/member/referral/withdraw

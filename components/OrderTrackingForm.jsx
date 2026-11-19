@@ -1,5 +1,6 @@
 "use client";
 
+import { CONTACT_EMAIL } from "@/lib/siteEmail";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cartContext";
@@ -335,10 +336,10 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
       <p className="text-sm leading-6 text-[#5B7893]">
         Questions? Email{" "}
         <a
-          href="mailto:vesper.cosmic.blueprint@gmail.com"
+          href={`mailto:${CONTACT_EMAIL}`}
           className="text-[#8EB1D1] underline"
         >
-          vesper.cosmic.blueprint@gmail.com
+          {CONTACT_EMAIL}
         </a>
       </p>
       <Link

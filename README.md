@@ -215,3 +215,7 @@ The cost report's "目前上架商品" table adds estimated **net profit** after
 - Rates and the postage table are edited at **/admin/settings/profit** and stored in one row of the Notion "設定 Settings" database (`NOTION_SETTINGS_DATABASE_ID`; connected to the integration like the others). Without it the built-in defaults (labour NT$300/h, marketing NT$400, broker NT$80 — an estimate until confirmed in EZPost, entry fee US$2, duty 10%, envelope NT$30/30 g, box NT$60/150 g, ePacket and Air Parcel tables) are used and saving is refused.
 - Per-product inputs live in the product form's 成本配方: labour minutes, packaging type and postage service (blank = default by category: nails/sachets/kits → envelope + ePacket, energy bottles → box + Air Parcel; digital products have no postage, duty or packaging).
 - Net profit uses material cost (recipe + decoration allowance) only; the product's older fixed 包材/人工 amounts are not subtracted again. The "材料毛利" columns are unchanged.
+
+### Email addresses and the custom domain
+
+Addresses live in `lib/siteEmail.js` and are set by environment variables (defaults = the original Gmail inbox, so nothing changes until they are set): `NEXT_PUBLIC_CONTACT_EMAIL` (public address, Reply-To, signatures), `OWNER_EMAIL` (shop notifications), `EMAIL_FROM` (From address; with Gmail SMTP it must be a verified "Send mail as" alias of `GMAIL_USER`, or the Workspace mailbox itself). `NEXT_PUBLIC_*` is baked in at build time, so redeploy after changing it.

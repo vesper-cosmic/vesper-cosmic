@@ -1,8 +1,9 @@
+import { CONTACT_EMAIL, OWNER_EMAIL, fromEmail } from "@/lib/siteEmail";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { safeSendEmail } from "@/lib/orderServer";
 
-const ownerEmail = "vesper.cosmic.blueprint@gmail.com";
+const ownerEmail = OWNER_EMAIL;
 const storeName = "Vesper Cosmos";
 
 // Simple in-memory rate limiter: max 5 submissions per IP per 10 minutes.
@@ -87,12 +88,10 @@ export async function POST(request) {
     "With love,",
     "Team Vesper",
     storeName,
-    ownerEmail,
+    CONTACT_EMAIL,
   ].join("\n");
 
-  const from = `${storeName} <${
-    process.env.RESEND_FROM_EMAIL || "vesper.cosmic.blueprint@gmail.com"
-  }>`;
+  const from = `${storeName} <${fromEmail()}>`;
 
   const results = await Promise.all([
     sendWithResend({
@@ -105,7 +104,7 @@ export async function POST(request) {
     sendWithResend({
       from,
       to: email,
-      replyTo: ownerEmail,
+      replyTo: CONTACT_EMAIL,
       subject: `${storeName} — We received your message`,
       text: customerText,
     }),

@@ -1,5 +1,6 @@
 "use client";
 
+import { CONTACT_EMAIL } from "@/lib/siteEmail";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useProducts } from "@/components/ProductProvider";
@@ -115,7 +116,7 @@ export default function ThankYouMessage() {
           </p>
         )}
         <p className="mt-6 text-sm leading-6 text-[#1C2B48]">
-          Questions? Email me at vesper.cosmic.blueprint@gmail.com
+          Questions? Email me at {CONTACT_EMAIL}
         </p>
         <Link
           href="/shop"
@@ -153,7 +154,7 @@ export default function ThankYouMessage() {
         </p>
       )}
       <p className="mt-6 text-sm leading-6 text-[#1C2B48]">
-        Questions? Email me at vesper.cosmic.blueprint@gmail.com
+        Questions? Email me at {CONTACT_EMAIL}
       </p>
       {confirmationStatus === "sending" ? (
         <p className="mt-4 rounded border border-[#8EB1D1]/35 bg-[#C4D8E5] p-3 text-sm text-[#35506B]">
