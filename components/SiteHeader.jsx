@@ -271,7 +271,7 @@ export default function SiteHeader() {
                 onClick={() => setMenuOpen(false)}
                 className="block w-full rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-3 text-center text-base font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
               >
-                Sign in 登入
+                Sign in
               </Link>
             )}
           </div>
