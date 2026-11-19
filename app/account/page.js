@@ -303,9 +303,9 @@ export default function AccountPage() {
                           ${Number(order.amount || 0).toFixed(2)} USD
                         </p>
                         <p className="mt-1 inline-block rounded bg-[#D6E4EE] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#35506B]">
-                          {customerStatusLabel(order.productionStatus, order.paymentStatus, order.orderStatus)}
+                          {customerStatusLabel(order.productionStatus, order.paymentStatus, order.orderStatus, order.digital)}
                         </p>
-                        {order.trackingNumber ? (
+                        {order.trackingNumber && !order.digital ? (
                           <p className="mt-1 font-mono text-[10px] text-[#5B7893]">
                             Tracking: {order.trackingNumber}
                           </p>

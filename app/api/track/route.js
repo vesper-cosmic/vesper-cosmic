@@ -1,6 +1,17 @@
 import { NextResponse } from "next/server";
 import { rateLimitResponse } from "@/lib/rateLimit";
 import { findNotionOrder } from "@/lib/orderServer";
+import { getAllProducts } from "@/lib/productServer";
+import { isDigitalOnlyOrder } from "@/lib/orderDigital";
+
+async function orderIsDigital(order) {
+  try {
+    const { products } = await getAllProducts();
+    return isDigitalOnlyOrder(order.items, Object.fromEntries((products || []).map((p) => [p.id, p])));
+  } catch {
+    return false;
+  }
+}
 
 export async function GET(request) {
   const rateLimited = rateLimitResponse(request);
@@ -62,6 +73,7 @@ export async function GET(request) {
       orderStatus: order.orderStatus,
       trackingNumber: order.trackingNumber,
       shippingDate: order.shippingDate,
+      digital: await orderIsDigital(order),
     },
   });
 }

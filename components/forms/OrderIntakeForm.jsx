@@ -62,7 +62,9 @@ export default function OrderIntakeForm({ product }) {
   const { data: session } = useSession();
   const { member, isSignedIn, saveDefaultBirthData } = useCart();
   const isCustomProduct = Boolean(product.requiresBirthData || product.requiresNailDetails);
+  const isDigitalProduct = !product.requiresShipping;
   const [ackFinalSale, setAckFinalSale] = useState(false);
+  const [ackDigital, setAckDigital] = useState(false);
   const [form, setForm] = useState(baseForm);
 
   // Nail size is not sensitive, so keeping it for next time is on by default.
@@ -259,6 +261,7 @@ export default function OrderIntakeForm({ product }) {
         ...orderDraft,
         referralCode: getReferralCode() || null,
         acknowledgedFinalSale: isCustomProduct ? ackFinalSale : undefined,
+        acknowledgedDigital: isDigitalProduct ? ackDigital : undefined,
         saveNailSizing: keepNails,
       }),
     });
@@ -384,13 +387,16 @@ export default function OrderIntakeForm({ product }) {
       <CheckoutNotices
         hasCustomItems={isCustomProduct}
         hasShippingItems={Boolean(product.requiresShipping)}
+        hasDigitalItems={isDigitalProduct}
         ackFinalSale={ackFinalSale}
         onAckChange={setAckFinalSale}
+        ackDigital={ackDigital}
+        onDigitalChange={setAckDigital}
       />
 
       <button
         type="submit"
-        disabled={isSubmitting || (isCustomProduct && !ackFinalSale)}
+        disabled={isSubmitting || (isCustomProduct && !ackFinalSale) || (isDigitalProduct && !ackDigital)}
         className="mist-button w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? "Preparing Checkout..." : "Continue to Review & Pay"}

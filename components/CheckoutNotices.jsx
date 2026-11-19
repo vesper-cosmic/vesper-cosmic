@@ -8,7 +8,7 @@ import Link from "next/link";
  * - import duties for shipped orders (prepaid for the U.S.);
  * - terms, returns and privacy notice.
  */
-export default function CheckoutNotices({ hasCustomItems, hasShippingItems, ackFinalSale, onAckChange }) {
+export default function CheckoutNotices({ hasCustomItems, hasShippingItems, hasDigitalItems = false, ackFinalSale, onAckChange, ackDigital = false, onDigitalChange = () => {} }) {
   return (
     <div className="space-y-3">
       {hasCustomItems ? (
@@ -25,6 +25,28 @@ export default function CheckoutNotices({ hasCustomItems, hasShippingItems, ackF
             sizes, including digital reports) are made to order and are <strong>final sale</strong>,
             and I ask you to start preparing them after payment. They can&apos;t be returned for a
             change of mind or incorrect details I provide, but are covered if damaged or defective.
+          </span>
+        </label>
+      ) : null}
+
+      {hasDigitalItems ? (
+        <label className="flex items-start gap-2 rounded border border-[#C77A0A]/40 bg-[#FDF6E3] p-3 text-sm leading-6 text-[#5B4210]">
+          <input
+            type="checkbox"
+            checked={ackDigital}
+            onChange={(event) => onDigitalChange(event.target.checked)}
+            className="mt-1"
+            required
+          />
+          <span>
+            <strong>Digital items:</strong> I agree that my digital report is delivered by email and
+            that you start preparing and delivering it right after payment. I understand that, once
+            delivery has begun, it can&apos;t be cancelled or refunded, and I give up any right of
+            withdrawal (including the 7-day withdrawal period for customers in Taiwan) for digital
+            content.{" "}
+            <Link href="/returns" target="_blank" className="underline">
+              Return &amp; Refund Policy
+            </Link>
           </span>
         </label>
       ) : null}

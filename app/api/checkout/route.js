@@ -45,6 +45,14 @@ export async function POST(request) {
     );
   }
 
+  // Digital items: the customer must agree that delivery starts after payment (no refund once delivered).
+  if (order.items.some((item) => !item.requiresShipping)) {
+    if (payload.acknowledgedDigital !== true) {
+      return NextResponse.json({ errors: { submit: "Please confirm the digital-content terms: your digital order is delivered by email after payment and can't be refunded once delivery has begun." } }, { status: 422 });
+    }
+    order.digitalConsentAt = new Date().toISOString();
+  }
+
   // The member link comes from the session, never from the request body.
   const session = await getServerSession(authOptions);
   order.memberEmail = session?.user?.email?.toLowerCase() || null;

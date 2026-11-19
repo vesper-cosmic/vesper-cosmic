@@ -2,6 +2,8 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { findNotionOrdersByEmail } from "@/lib/orderServer";
+import { getAllProducts } from "@/lib/productServer";
+import { isDigitalOnlyOrder } from "@/lib/orderDigital";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -21,8 +23,13 @@ export async function GET() {
   }
 
   // Hide internal bookkeeping (referrer, commission, Notion ids).
+  const { products } = await getAllProducts();
+  const productsById = Object.fromEntries((products || []).map((p) => [p.id, p]));
   const orders = (result.orders || []).map(
-    ({ referrerEmail, referralReward, referralStatus, pageId, paypalCaptureId, ...order }) => order
+    ({ referrerEmail, referralReward, referralStatus, pageId, paypalCaptureId, ...order }) => ({
+      ...order,
+      digital: isDigitalOnlyOrder(order.items, productsById),
+    })
   );
   return NextResponse.json({ orders });
 }

@@ -7,14 +7,15 @@ import { ORDER_STATUSES, OS_CANCELLED, normalizedStatus } from "@/lib/orderStatu
 import {
   ORDER_STATUS_EN,
   ORDER_STATUS_DESCRIPTION_EN,
+  ORDER_STATUS_EN_DIGITAL,
+  ORDER_STATUS_DESCRIPTION_EN_DIGITAL,
   customerStatusLabel,
 } from "@/lib/orderStatus";
 
-const STATUS_STEPS = ORDER_STATUSES.map((key) => ({
-  key,
-  label: ORDER_STATUS_EN[key] || key,
-  description: ORDER_STATUS_DESCRIPTION_EN[key] || "",
-}));
+const stepsFor = (labels, descriptions) =>
+  ORDER_STATUSES.map((key) => ({ key, label: labels[key] || key, description: descriptions[key] || "" }));
+const STATUS_STEPS = stepsFor(ORDER_STATUS_EN, ORDER_STATUS_DESCRIPTION_EN);
+const STATUS_STEPS_DIGITAL = stepsFor(ORDER_STATUS_EN_DIGITAL, ORDER_STATUS_DESCRIPTION_EN_DIGITAL);
 
 export default function OrderTrackingForm() {
   const { isSignedIn, userEmail } = useCart();
@@ -152,7 +153,7 @@ export default function OrderTrackingForm() {
                             ${Number(item.amount || 0).toFixed(2)} USD
                           </p>
                           <p className="mt-1 inline-block rounded bg-[#D6E4EE] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#35506B]">
-                            {customerStatusLabel(item.productionStatus, item.paymentStatus, item.orderStatus)}
+                            {customerStatusLabel(item.productionStatus, item.paymentStatus, item.orderStatus, item.digital)}
                           </p>
                         </div>
                       </div>
@@ -238,6 +239,8 @@ export default function OrderTrackingForm() {
 }
 
 function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
+  const digital = Boolean(order.digital);
+  const steps = digital ? STATUS_STEPS_DIGITAL : STATUS_STEPS;
   return (
     <div className="space-y-4">
       <div className="rounded bg-white/60 p-4">
@@ -255,12 +258,12 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
             Order Status
           </p>
           <ol className="mt-4 space-y-0">
-            {STATUS_STEPS.map((step, index) => {
+            {steps.map((step, index) => {
               const isActive = index === currentStatusIndex;
               const isCompleted = index < currentStatusIndex;
               return (
                 <li key={step.key} className="relative flex gap-3 pb-6 last:pb-0">
-                  {index < STATUS_STEPS.length - 1 ? (
+                  {index < steps.length - 1 ? (
                     <span
                       className={`absolute left-[7px] top-5 h-full w-0.5 ${
                         index < currentStatusIndex
@@ -300,12 +303,12 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
       ) : (
         <StatusRow label="Status">
           {order.productionStatus
-            ? customerStatusLabel(order.productionStatus, order.paymentStatus, order.orderStatus)
+            ? customerStatusLabel(order.productionStatus, order.paymentStatus, order.orderStatus, digital)
             : "N/A"}
         </StatusRow>
       )}
 
-      {order.trackingNumber ? (
+      {digital ? null : order.trackingNumber ? (
         <div className="rounded border border-[#8EB1D1]/40 bg-[#EAF2F8] p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
             Postal Tracking Number
@@ -324,7 +327,7 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
       )}
 
       {order.shippingDate ? (
-        <StatusRow label="Shipped On">
+        <StatusRow label={digital ? "Delivered On" : "Shipped On"}>
           {formatDate(order.shippingDate)}
         </StatusRow>
       ) : null}

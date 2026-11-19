@@ -194,3 +194,12 @@ describe("digital orders and paid next steps", () => {
     expect(ADMIN_NEXT_STEPS[OS_PAID]).not.toContain(OS_VERIFIED_NOTICE);
   });
 });
+
+import { customerStatusLabel } from "@/lib/orderStatus";
+describe("customer-facing digital wording", () => {
+  it("shows Delivered instead of Shipped for digital orders", () => {
+    expect(customerStatusLabel("🚚 貨品已寄出", "✅ 已付款", "🚚 已出貨")).toBe("Shipped");
+    expect(customerStatusLabel("🚚 貨品已寄出", "✅ 已付款", "🚚 已出貨", true)).toBe("Delivered");
+    expect(customerStatusLabel("🎨 貨品製作中", "✅ 已付款", "", true)).toBe("Report in Preparation");
+  });
+});

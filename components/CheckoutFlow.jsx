@@ -143,7 +143,9 @@ export default function CheckoutFlow() {
   const hasCustomItems = enrichedItems.some(
     (item) => item.product?.requiresBirthData || item.product?.requiresNailDetails
   );
+  const hasDigitalItems = enrichedItems.some((item) => item.product && !item.product.requiresShipping);
   const [ackFinalSale, setAckFinalSale] = useState(false);
+  const [ackDigital, setAckDigital] = useState(false);
 
   function updateField(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -219,6 +221,7 @@ export default function CheckoutFlow() {
       saveAddressToMember: form.saveAddressToMember && isSignedIn,
       referralCode: referralCode.trim() || null,
       acknowledgedFinalSale: hasCustomItems ? ackFinalSale : undefined,
+      acknowledgedDigital: hasDigitalItems ? ackDigital : undefined,
       saveNailSizing: keepNails,
     };
 
@@ -418,13 +421,16 @@ export default function CheckoutFlow() {
       <CheckoutNotices
         hasCustomItems={hasCustomItems}
         hasShippingItems={hasShippingItems}
+        hasDigitalItems={hasDigitalItems}
         ackFinalSale={ackFinalSale}
         onAckChange={setAckFinalSale}
+        ackDigital={ackDigital}
+        onDigitalChange={setAckDigital}
       />
 
       <button
         type="submit"
-        disabled={submitting || (hasCustomItems && !ackFinalSale)}
+        disabled={submitting || (hasCustomItems && !ackFinalSale) || (hasDigitalItems && !ackDigital)}
         className="w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:opacity-60"
       >
         {submitting ? "Submitting…" : "Continue to Review & Pay"}
