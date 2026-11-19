@@ -96,17 +96,6 @@ export default function SiteHeader() {
           >
             Track Order
           </Link>
-          {!isShop ? (
-            <>
-              {/* Desktop: Shop */}
-              <Link
-                href="/shop"
-                className="hidden rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5] md:block"
-              >
-                Shop
-              </Link>
-            </>
-          ) : null}
           {isAdmin ? (
             <Link
               href="/admin"
