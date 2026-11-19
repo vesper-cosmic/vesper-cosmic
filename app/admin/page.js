@@ -604,13 +604,13 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
             {digital && status === OS_SHIPPED ? "🚚 已出貨（電子報告已寄出）" : status}
           </button>
         ))}
-        {current === OS_SHIPPED && !digital ? (
+        {current === OS_SHIPPED ? (
           <button
             type="button"
             onClick={() => choose(OS_SHIPPED)}
             className="rounded border border-[#8EB1D1]/50 bg-white px-3 py-1.5 text-xs font-semibold text-[#35506B] hover:bg-[#C4D8E5]"
           >
-            更新追蹤碼
+            {digital ? "重寄報告 PDF" : "更新追蹤碼"}
           </button>
         ) : null}
         <select
