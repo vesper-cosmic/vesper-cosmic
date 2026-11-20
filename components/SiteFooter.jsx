@@ -18,6 +18,7 @@ const footerNav = [
       { label: "Return & Refund Policy", href: "/returns" },
       { label: "FAQ", href: "/faq" },
       { label: "Contact Us", href: "/contact" },
+      { label: "Become a Tester", href: "/creators" },
     ],
   },
   {

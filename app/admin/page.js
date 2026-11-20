@@ -236,6 +236,12 @@ export default function AdminPage() {
               分潤提現 →
             </Link>
             <Link
+              href="/admin/pr"
+              className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+            >
+              試用申請 →
+            </Link>
+            <Link
               href="/shop"
               className="rounded border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
             >
