@@ -2,25 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { BirthDateSelect, BirthTimeSelect } from "@/components/BirthDateTimeInputs";
-import NailSizePicker from "@/components/NailSizePicker";
-import {
-  daylightSavingOptions,
-  fortuneAreas,
-  maxFortuneSelections,
-  nailLengths,
-  nailShapes,
-  stylePreferences,
-} from "@/lib/formOptions";
 import {
   PR_CONTENT_TYPES,
-  PR_GENDERS,
   PR_PLATFORMS,
   PR_POST_TIMELINES,
   PR_PRESS_ON_EXPERIENCE,
   PR_PUBLIC_DURATIONS,
-  PR_TEST_ORDER,
   PR_USAGE_RIGHTS,
+  US_STATES,
   emptyPrApplication,
   normalizePrApplication,
   validatePrApplication,
@@ -52,7 +41,7 @@ function Section({ step, title, intro, children }) {
   );
 }
 
-function ChoiceGroup({ label, options, value, onChange, error, multiple = false, max }) {
+function ChoiceGroup({ label, options, value, onChange, error, multiple = false }) {
   const selected = multiple ? value : [value];
   return (
     <fieldset>
@@ -62,18 +51,16 @@ function ChoiceGroup({ label, options, value, onChange, error, multiple = false,
           const id = typeof option === "string" ? option : option.id;
           const text = typeof option === "string" ? option : option.label;
           const on = selected.includes(id);
-          const disabled = multiple && !on && max && value.length >= max;
           return (
             <button
               key={id}
               type="button"
-              disabled={disabled}
               aria-pressed={on}
               onClick={() => {
                 if (!multiple) return onChange(id);
                 onChange(on ? value.filter((v) => v !== id) : [...value, id]);
               }}
-              className={`border px-3.5 py-2 text-left text-sm transition disabled:opacity-40 ${
+              className={`border px-3.5 py-2 text-left text-sm transition ${
                 on ? "border-[#1C2B48] bg-[#1C2B48] text-white" : "border-[#1C2B48]/20 bg-white text-[#1C2B48] hover:border-[#1C2B48]/50"
               }`}
             >
@@ -106,14 +93,13 @@ export default function CreatorApplicationForm() {
   const [done, setDone] = useState("");
 
   const set = (patch) => setForm((prev) => ({ ...prev, ...patch }));
-  const setIn = (key, patch) => setForm((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }));
+  const agree = (patch) => setForm((prev) => ({ ...prev, agreements: { ...prev.agreements, ...patch } }));
   const setSocial = (index, patch) =>
     setForm((prev) => ({ ...prev, social: prev.social.map((row, i) => (i === index ? { ...row, ...patch } : row)) }));
 
   async function submit(event) {
     event.preventDefault();
-    const clean = normalizePrApplication(form);
-    const found = validatePrApplication(clean);
+    const found = validatePrApplication(normalizePrApplication(form));
     setErrors(found);
     if (Object.keys(found).length) {
       requestAnimationFrame(() => document.querySelector("[data-form-error]")?.scrollIntoView({ behavior: "smooth", block: "center" }));
@@ -151,8 +137,8 @@ export default function CreatorApplicationForm() {
           </p>
         ) : null}
         <p className="mx-auto mt-4 max-w-md text-[15px] leading-7 text-[#35506B]">
-          We read every application ourselves. If you&rsquo;re selected, we&rsquo;ll email you with the next steps. A
-          confirmation is on its way to {form.email}.
+          We read every application ourselves. If you&rsquo;re selected, we&rsquo;ll email you a link to place your test
+          order — please check out with <strong>{form.email}</strong> so we can match it to your application.
         </p>
         <Link
           href="/shop"
@@ -176,7 +162,7 @@ export default function CreatorApplicationForm() {
         </label>
       </div>
 
-      <Section step="1" title="About you" intro="Where we'll send your set if you're selected. US addresses only for now.">
+      <Section step="1" title="About you" intro="Use the email you'll check out with — that's how we match your test order to this application.">
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="First name" error={errors.firstName}>
             <input className={inputClass(errors.firstName)} autoComplete="given-name" value={form.firstName} onChange={(e) => set({ firstName: e.target.value })} />
@@ -184,124 +170,26 @@ export default function CreatorApplicationForm() {
           <Field label="Last name" error={errors.lastName}>
             <input className={inputClass(errors.lastName)} autoComplete="family-name" value={form.lastName} onChange={(e) => set({ lastName: e.target.value })} />
           </Field>
-          <Field label="Email" error={errors.email}>
-            <input type="email" className={inputClass(errors.email)} autoComplete="email" value={form.email} onChange={(e) => set({ email: e.target.value })} />
-          </Field>
-          <Field label="Phone" hint="For the courier only." error={errors.phone}>
-            <input type="tel" className={inputClass(errors.phone)} autoComplete="tel" value={form.phone} onChange={(e) => set({ phone: e.target.value })} />
-          </Field>
         </div>
-        <Field label="Street address" error={errors.addressLine1}>
-          <input className={inputClass(errors.addressLine1)} autoComplete="address-line1" value={form.address.addressLine1} onChange={(e) => setIn("address", { addressLine1: e.target.value })} />
+        <Field label="Email" error={errors.email}>
+          <input type="email" className={inputClass(errors.email)} autoComplete="email" value={form.email} onChange={(e) => set({ email: e.target.value })} />
         </Field>
-        <Field label="Apt, suite, etc. (optional)">
-          <input className={inputClass()} autoComplete="address-line2" value={form.address.addressLine2} onChange={(e) => setIn("address", { addressLine2: e.target.value })} />
-        </Field>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_10rem]">
           <Field label="City" error={errors.city}>
-            <input className={inputClass(errors.city)} autoComplete="address-level2" value={form.address.city} onChange={(e) => setIn("address", { city: e.target.value })} />
+            <input className={inputClass(errors.city)} autoComplete="address-level2" value={form.city} onChange={(e) => set({ city: e.target.value })} />
           </Field>
-          <Field label="State" error={errors.stateProvince}>
-            <input className={inputClass(errors.stateProvince)} autoComplete="address-level1" value={form.address.stateProvince} onChange={(e) => setIn("address", { stateProvince: e.target.value })} />
-          </Field>
-          <Field label="ZIP code" error={errors.postalCode}>
-            <input inputMode="numeric" className={inputClass(errors.postalCode)} autoComplete="postal-code" value={form.address.postalCode} onChange={(e) => setIn("address", { postalCode: e.target.value })} />
-          </Field>
-        </div>
-      </Section>
-
-      <Section step="2" title="Your birth chart" intro="The same details we use to design every custom BaZi set. Used only to design your nails.">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Date of birth" error={errors.birthDate}>
-            <BirthDateSelect idPrefix="pr-birth" value={form.birth.birthDate} onChange={(v) => setIn("birth", { birthDate: v })} />
-          </Field>
-          <div>
-            <Field label="Exact birth time" error={errors.birthTime}>
-              {form.birth.birthTimeUnknown ? (
-                <p className="py-2.5 text-sm text-[#5B7893]">We&rsquo;ll design from your year, month and day pillars.</p>
-              ) : (
-                <BirthTimeSelect value={form.birth.birthTime} onChange={(v) => setIn("birth", { birthTime: v })} />
-              )}
-            </Field>
-            <label className="mt-2 flex items-center gap-2 text-xs text-[#35506B]">
-              <input type="checkbox" className="accent-[#1C2B48]" checked={form.birth.birthTimeUnknown} onChange={(e) => setIn("birth", { birthTimeUnknown: e.target.checked, birthTime: "" })} />
-              I don&rsquo;t know my birth time
-            </label>
-          </div>
-          <Field label="City & country of birth" error={errors.birthLocation}>
-            <input className={inputClass(errors.birthLocation)} placeholder="e.g. Austin, United States" value={form.birth.birthLocation} onChange={(e) => setIn("birth", { birthLocation: e.target.value })} />
-          </Field>
-          <Field label="Biological gender" hint="BaZi charts read differently by gender." error={errors.biologicalGender}>
-            <select className={inputClass(errors.biologicalGender)} value={form.birth.biologicalGender} onChange={(e) => setIn("birth", { biologicalGender: e.target.value })}>
+          <Field label="State" error={errors.state}>
+            <select className={inputClass(errors.state)} autoComplete="address-level1" value={form.state} onChange={(e) => set({ state: e.target.value })}>
               <option value="">Select…</option>
-              {PR_GENDERS.map((g) => (
-                <option key={g} value={g}>{g}</option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Daylight saving time at birth" error={errors.daylightSavingTime}>
-            <select className={inputClass(errors.daylightSavingTime)} value={form.birth.daylightSavingTime} onChange={(e) => setIn("birth", { daylightSavingTime: e.target.value })}>
-              <option value="">Select…</option>
-              {daylightSavingOptions.map((o) => (
-                <option key={o} value={o}>{o}</option>
+              {US_STATES.map((st) => (
+                <option key={st} value={st}>{st}</option>
               ))}
             </select>
           </Field>
         </div>
-        <ChoiceGroup
-          label={`Intention — up to ${maxFortuneSelections}`}
-          options={fortuneAreas}
-          value={form.birth.intentions}
-          multiple
-          max={maxFortuneSelections}
-          onChange={(v) => setIn("birth", { intentions: v })}
-          error={errors.intentions}
-        />
       </Section>
 
-      <Section step="3" title="Your nails" intro="So your set fits from day one.">
-        <NailSizePicker
-          sizeMode={form.nails.sizeMode}
-          standardSize={form.nails.standardSize}
-          measurements={form.nails.measurements}
-          errors={errors}
-          onChange={(patch) => setIn("nails", patch)}
-        />
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Field label="Shape" error={errors.nailShape}>
-            <select className={inputClass(errors.nailShape)} value={form.nails.nailShape} onChange={(e) => setIn("nails", { nailShape: e.target.value })}>
-              <option value="">Select…</option>
-              {nailShapes.map((s) => (
-                <option key={s.id} value={s.id}>{s.label}</option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Length" error={errors.nailLength}>
-            <select className={inputClass(errors.nailLength)} value={form.nails.nailLength} onChange={(e) => setIn("nails", { nailLength: e.target.value })}>
-              <option value="">Select…</option>
-              {nailLengths.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Style" error={errors.stylePreference}>
-            <select className={inputClass(errors.stylePreference)} value={form.nails.stylePreference} onChange={(e) => setIn("nails", { stylePreference: e.target.value })}>
-              <option value="">Select…</option>
-              {stylePreferences.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </Field>
-        </div>
-        <Field label="Colours, themes or anything to avoid (optional)">
-          <textarea rows={3} className={inputClass()} value={form.nails.nailNotes} onChange={(e) => setIn("nails", { nailNotes: e.target.value })} />
-        </Field>
-        <Field label="Any sensitivity to nail glue or adhesive tabs? (optional)">
-          <input className={inputClass()} value={form.nails.adhesiveSensitivity} onChange={(e) => setIn("nails", { adhesiveSensitivity: e.target.value })} />
-        </Field>
-      </Section>
-
-      <Section step="4" title="Where you'll share" intro="Small accounts are welcome — we care about honest, genuine content more than follower counts.">
+      <Section step="2" title="Where you'll share" intro="Small accounts are welcome — we care about honest, genuine content more than follower counts.">
         <div className="space-y-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5B7893]">Your accounts</p>
           {form.social.map((row, index) => (
@@ -337,28 +225,16 @@ export default function CreatorApplicationForm() {
           <textarea rows={2} className={inputClass()} value={form.portfolio} onChange={(e) => set({ portfolio: e.target.value })} />
         </Field>
         <ChoiceGroup label="When could you post?" options={PR_POST_TIMELINES} value={form.postTimeline} onChange={(v) => set({ postTimeline: v })} error={errors.postTimeline} />
-        <ChoiceGroup
-          label="How long can your posts stay public?"
-          options={PR_PUBLIC_DURATIONS}
-          value={form.publicDuration}
-          onChange={(v) => set({ publicDuration: v })}
-          error={errors.publicDuration}
-        />
+        <ChoiceGroup label="How long can your posts stay public?" options={PR_PUBLIC_DURATIONS} value={form.publicDuration} onChange={(v) => set({ publicDuration: v })} error={errors.publicDuration} />
         <ChoiceGroup label="Content use (optional)" options={PR_USAGE_RIGHTS} value={form.usageRights} multiple onChange={(v) => set({ usageRights: v })} />
       </Section>
 
-      <Section step="5" title="Test order & you">
-        <div className="border-l-2 border-[#BFA06A] bg-[#F6F7F9] p-4 text-sm leading-6 text-[#35506B]">
-          <p className="font-semibold text-[#1C2B48]">How the test order works</p>
-          <p className="mt-1">
-            If you&rsquo;re selected, you&rsquo;ll place a real order for the custom set on our website and pay with
-            PayPal, so we can test checkout end to end. We then refund the full amount through PayPal to your original
-            payment method within 7 days — whether or not you&rsquo;ve posted yet, and whatever you think of the set.
-          </p>
-        </div>
-        <ChoiceGroup label="Could you place a PayPal test order (refunded in full)?" options={PR_TEST_ORDER} value={form.testOrder} onChange={(v) => set({ testOrder: v })} error={errors.testOrder} />
+      <Section step="3" title="A little more about you">
         <ChoiceGroup label="Have you worn press-on nails before?" options={PR_PRESS_ON_EXPERIENCE} value={form.pressOnExperience} onChange={(v) => set({ pressOnExperience: v })} error={errors.pressOnExperience} />
-        <Field label="Tell us a little about you and why you'd like to try Vesper Cosmos (optional)">
+        <Field label="Any sensitivity to nail glue or adhesive tabs? (optional)">
+          <input className={inputClass()} value={form.adhesiveSensitivity} onChange={(e) => set({ adhesiveSensitivity: e.target.value })} />
+        </Field>
+        <Field label="Why would you like to try Vesper Cosmos? (optional)">
           <textarea rows={4} className={inputClass()} value={form.about} onChange={(e) => set({ about: e.target.value })} />
         </Field>
         <Field label="How did you hear about us? (optional)">
@@ -366,28 +242,41 @@ export default function CreatorApplicationForm() {
         </Field>
       </Section>
 
-      <Section step="6" title="Before you send">
-        <Check checked={form.agreements.adult} onChange={(v) => setIn("agreements", { adult: v })} error={errors.adult}>
+      <Section step="4" title="Before you send">
+        <div className="border-l-2 border-[#BFA06A] bg-[#F6F7F9] p-4 text-sm leading-6 text-[#35506B]">
+          <p className="font-semibold text-[#1C2B48]">How the test order works</p>
+          <p className="mt-1">
+            If you&rsquo;re selected, you&rsquo;ll order the custom set on our website at full price ($128) and pay with
+            PayPal — that&rsquo;s where you enter your birth details, nail sizes and shipping address. We refund the full
+            amount through PayPal to your original payment method within 7 days, whether or not you&rsquo;ve posted yet
+            and whatever you think of the set.
+          </p>
+        </div>
+        <Check checked={form.agreements.adult} onChange={(v) => agree({ adult: v })} error={errors.adult}>
           I am 18 or older.
         </Check>
-        <Check checked={form.agreements.usResident} onChange={(v) => setIn("agreements", { usResident: v })} error={errors.usResident}>
+        <Check checked={form.agreements.usResident} onChange={(v) => agree({ usResident: v })} error={errors.usResident}>
           My shipping address is in the United States.
         </Check>
-        <Check checked={form.agreements.disclosure} onChange={(v) => setIn("agreements", { disclosure: v })} error={errors.disclosure}>
+        <Check checked={form.agreements.testOrder} onChange={(v) => agree({ testOrder: v })} error={errors.testOrder}>
+          If selected, I&rsquo;ll place the test order with PayPal using this email, and I understand it will be refunded
+          in full within 7 days.
+        </Check>
+        <Check checked={form.agreements.disclosure} onChange={(v) => agree({ disclosure: v })} error={errors.disclosure}>
           I will clearly disclose that I received the set free (for example #gifted or #ad, in the caption and on screen), as
           the FTC requires.
         </Check>
-        <Check checked={form.agreements.honest} onChange={(v) => setIn("agreements", { honest: v })} error={errors.honest}>
+        <Check checked={form.agreements.honest} onChange={(v) => agree({ honest: v })} error={errors.honest}>
           I understand Vesper Cosmos wants my honest opinion — I&rsquo;m not required to say anything positive.
         </Check>
-        <Check checked={form.agreements.feedback} onChange={(v) => setIn("agreements", { feedback: v })} error={errors.feedback}>
+        <Check checked={form.agreements.feedback} onChange={(v) => agree({ feedback: v })} error={errors.feedback}>
           If selected, I&rsquo;ll share feedback on the website and checkout, and tell you when the parcel arrives and how
           it was packed.
         </Check>
-        <Check checked={form.agreements.privacy} onChange={(v) => setIn("agreements", { privacy: v })} error={errors.privacy}>
-          Vesper Cosmos may store these details, including my birth details, to review my application and make my set, as
-          described in the{" "}
-          <Link href="/privacy#section-3" className="underline" target="_blank">Privacy Policy</Link>. I can ask for them to be deleted at any time.
+        <Check checked={form.agreements.privacy} onChange={(v) => agree({ privacy: v })} error={errors.privacy}>
+          Vesper Cosmos may store these details to review my application, as described in the{" "}
+          <Link href="/privacy#section-3" className="underline" target="_blank">Privacy Policy</Link>. I can ask for them to
+          be deleted at any time.
         </Check>
       </Section>
 

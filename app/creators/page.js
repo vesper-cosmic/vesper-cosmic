@@ -14,7 +14,7 @@ const GIVE = [
 ];
 
 const ASK = [
-  ["A test order", "Place a real order with PayPal so we can test checkout — refunded in full within 7 days."],
+  ["A test order", "Order your set on our website with PayPal (that's where you enter your birth details and sizes) — refunded in full within 7 days."],
   ["Delivery notes", "Tell us the day it arrives and how the parcel looked."],
   ["Honest content", "Share a video or post, clearly marked #gifted or #ad, kept public for the time you choose."],
   ["Your review", "An honest written review we may show on our website."],

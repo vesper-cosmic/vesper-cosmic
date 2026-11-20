@@ -12,7 +12,7 @@ const CATEGORIES = [
   ["Commercial information", "Orders, products purchased, amounts, payment status (not card numbers), saved cart, member level and spending totals.", "From you and our order records"],
   ["Personalization details", "Birth date, birth time, birth city, daylight-saving information, biological gender, intentions, nail sizes and style preferences you choose to give for custom items.", "From you"],
   ["Referral Program information", "Who referred you or whom you referred (shown to referrers only as a first initial), commissions earned, payout requests and the PayPal email you give for payouts.", "From you and our records"],
-  ["Creator & Tester Program applications", "If you apply: contact details and US shipping address, the same birth and nail details as a custom order, any sensitivity to nail adhesives, the social accounts and follower counts you list, links to your content, and your answers about posting, content use and a PayPal test order.", "From you"],
+  ["Creator & Tester Program applications", "If you apply: name, email, city and state, any sensitivity to nail adhesives, the social accounts and follower counts you list, links to your content, and your answers about posting and content use. Birth details, nail sizes and your full address are collected only if you are selected and place the test order.", "From you"],
   ["Communications and preferences", "Messages you send us, newsletter preference, and records of which version of our terms you accepted and when.", "From you"],
   ["Technical information", "Basic server logs (such as IP address and browser type) kept by our hosting provider for security and troubleshooting.", "Automatically"],
 ];
@@ -61,7 +61,7 @@ const sections = [
   {
     title: "Creator & Tester Program",
     paragraphs: [
-      "Applications are read only by the VESPER COSMOS team and stored in our Notion database. Your birth details are used only to review your application and design your set — never to judge or rank you, and never shared with anyone else. We look at the public accounts you list to understand the content you make; we do not collect anything from them beyond what you tell us and what is publicly visible.",
+      "Applications are read only by the VESPER COSMOS team and stored in our Notion database. The application does not ask for your birth details or address: if you are selected, you enter those when you place your test order, and they are handled like any other order. We look at the public accounts you list to understand the content you make; we do not collect anything from them beyond what you tell us and what is publicly visible. We match your test order to your application by email address.",
       "If you are not selected, we keep your application for up to 12 months so we can consider you for a later round, then delete it. If you are selected, your details become part of your order and are kept as described under “How Long We Keep Information”. You can ask us to delete your application at any time by emailing us. (Section added November 20, 2026.)",
     ],
   },

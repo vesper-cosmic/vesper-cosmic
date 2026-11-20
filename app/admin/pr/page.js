@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AdminFrame } from "@/components/admin/useOrderCustoms";
 import { PR_STATUSES, PR_USAGE_RIGHTS, totalFollowers } from "@/lib/prProgram";
-import { formatNailSizing } from "@/lib/formOptions";
 
 const SORTS = [
   ["new", "最新申請"],
@@ -26,9 +25,6 @@ function Detail({ app, onSave }) {
   const [note, setNote] = useState(app.note || "");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
-  const b = app.birth || {};
-  const n = app.nails || {};
-  const a = app.address || {};
   const rights = (app.usageRights || []).map((id) => PR_USAGE_RIGHTS.find((r) => r.id === id)?.label || id);
 
   async function save() {
@@ -42,23 +38,29 @@ function Detail({ app, onSave }) {
   return (
     <div className="mt-3 grid gap-5 border-t border-[#8EB1D1]/30 pt-4 lg:grid-cols-2">
       <dl>
-        <p className="mb-1 text-xs font-bold text-[#5B7893]">聯絡與寄送</p>
+        <p className="mb-1 text-xs font-bold text-[#5B7893]">聯絡</p>
         <Row label="Email">{app.email}</Row>
-        <Row label="電話">{app.phone}</Row>
-        <Row label="地址">{[a.addressLine1, a.addressLine2, `${a.city}, ${a.stateProvince} ${a.postalCode}`, a.country].filter(Boolean).join("\n")}</Row>
-        <p className="mb-1 mt-4 text-xs font-bold text-[#5B7893]">八字資料</p>
-        <Row label="出生日期">{b.birthDate}</Row>
-        <Row label="出生時間">{b.birthTimeUnknown ? "不知道" : b.birthTime}</Row>
-        <Row label="出生地">{b.birthLocation}</Row>
-        <Row label="性別">{b.biologicalGender}</Row>
-        <Row label="夏令時間">{b.daylightSavingTime}</Row>
-        <Row label="意圖">{(b.intentions || []).join("、")}</Row>
-        <p className="mb-1 mt-4 text-xs font-bold text-[#5B7893]">指甲</p>
-        <Row label="尺寸">{formatNailSizing(n)}</Row>
-        <Row label="形狀 / 長度">{[n.nailShape, n.nailLength].filter(Boolean).join(" / ")}</Row>
-        <Row label="風格">{n.stylePreference}</Row>
-        <Row label="備註">{n.nailNotes}</Row>
-        <Row label="膠過敏">{n.adhesiveSensitivity}</Row>
+        <Row label="所在地">{app.city ? `${app.city}, ${app.state}` : ""}</Row>
+        <Row label="指甲膠過敏">{app.adhesiveSensitivity || app.nails?.adhesiveSensitivity}</Row>
+
+        <p className="mb-1 mt-4 text-xs font-bold text-[#5B7893]">測試訂單（同 Email）</p>
+        {app.orders?.length ? (
+          <ul className="space-y-1.5 text-sm">
+            {app.orders.map((order) => (
+              <li key={order.orderId} className="rounded border border-[#8EB1D1]/30 bg-white px-2 py-1.5">
+                <span className="font-mono font-semibold text-[#1C2B48]">{order.orderId}</span>
+                <span className="ml-2 text-[#35506B]">${Number(order.amount || 0).toFixed(2)}</span>
+                <span className="ml-2 text-xs text-[#5B7893]">
+                  {[order.orderStatus, order.paymentStatus].filter(Boolean).join(" · ")}
+                </span>
+                <p className="text-xs text-[#5B7893]">{order.productName}</p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-[#5B7893]">還沒有用這個 Email 下的訂單。</p>
+        )}
+        <p className="mt-1 text-xs text-[#5B7893]">八字、尺寸、地址請看訂單本身。退款後記得把訂單改成對應狀態。</p>
       </dl>
       <dl>
         <p className="mb-1 text-xs font-bold text-[#5B7893]">社群與合作</p>
@@ -209,7 +211,7 @@ export default function PrApplicationsPage() {
                 <span className="text-xs text-[#35506B]">
                   {[...new Set((app.social || []).map((s) => s.platform))].join(" · ")} · 追蹤 {totalFollowers(app).toLocaleString()}
                 </span>
-                <span className="text-xs text-[#35506B]">測試下單：{app.testOrder || "—"}</span>
+                <span className="text-xs text-[#35506B]">{app.orders?.length ? `已下單 ${app.orders[0].orderId}` : "尚未下單"}</span>
                 <span className="ml-auto text-xs text-[#5B7893]">{new Date(app.createdAt).toLocaleDateString("zh-TW")} {expanded ? "▲" : "▼"}</span>
               </button>
               {expanded ? <Detail app={app} onSave={saveApplication} /> : null}
