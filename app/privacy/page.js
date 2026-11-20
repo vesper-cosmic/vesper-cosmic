@@ -12,6 +12,7 @@ const CATEGORIES = [
   ["Commercial information", "Orders, products purchased, amounts, payment status (not card numbers), saved cart, member level and spending totals.", "From you and our order records"],
   ["Personalization details", "Birth date, birth time, birth city, daylight-saving information, biological gender, intentions, nail sizes and style preferences you choose to give for custom items.", "From you"],
   ["Referral Program information", "Who referred you or whom you referred (shown to referrers only as a first initial), commissions earned, payout requests and the PayPal email you give for payouts.", "From you and our records"],
+  ["Creator & Tester Program applications", "If you apply: contact details and US shipping address, the same birth and nail details as a custom order, any sensitivity to nail adhesives, the social accounts and follower counts you list, links to your content, and your answers about posting, content use and a PayPal test order.", "From you"],
   ["Communications and preferences", "Messages you send us, newsletter preference, and records of which version of our terms you accepted and when.", "From you"],
   ["Technical information", "Basic server logs (such as IP address and browser type) kept by our hosting provider for security and troubleshooting.", "Automatically"],
 ];
@@ -54,6 +55,14 @@ const sections = [
       "To run member features: saved cart and address, order history, member level, Referral Program tracking and commission payouts.",
       "To send order, shipping and account messages, and — only if you subscribe — our newsletter.",
       "To keep the site secure, prevent fraud and Referral Program abuse, and comply with legal, tax and accounting obligations.",
+      "If you apply to the Creator & Tester Program: to review your application, contact you if you are selected, make and ship your custom set, and refund your test order.",
+    ],
+  },
+  {
+    title: "Creator & Tester Program",
+    paragraphs: [
+      "Applications are read only by the VESPER COSMOS team and stored in our Notion database. Your birth details are used only to review your application and design your set — never to judge or rank you, and never shared with anyone else. We look at the public accounts you list to understand the content you make; we do not collect anything from them beyond what you tell us and what is publicly visible.",
+      "If you are not selected, we keep your application for up to 12 months so we can consider you for a later round, then delete it. If you are selected, your details become part of your order and are kept as described under “How Long We Keep Information”. You can ask us to delete your application at any time by emailing us. (Section added November 20, 2026.)",
     ],
   },
   {

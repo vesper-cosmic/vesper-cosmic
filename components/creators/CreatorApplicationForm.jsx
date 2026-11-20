@@ -387,7 +387,7 @@ export default function CreatorApplicationForm() {
         <Check checked={form.agreements.privacy} onChange={(v) => setIn("agreements", { privacy: v })} error={errors.privacy}>
           Vesper Cosmos may store these details, including my birth details, to review my application and make my set, as
           described in the{" "}
-          <Link href="/privacy" className="underline" target="_blank">Privacy Policy</Link>. I can ask for them to be deleted at any time.
+          <Link href="/privacy#section-3" className="underline" target="_blank">Privacy Policy</Link>. I can ask for them to be deleted at any time.
         </Check>
       </Section>
 
