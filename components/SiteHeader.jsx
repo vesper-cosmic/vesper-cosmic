@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useCart } from "@/lib/cartContext";
+import { ScrollProgress } from "@/components/ScrollEffects";
 
 // Category links (desktop row under the logo, and the "Shop" part of the phone menu).
 const SHOP_LINKS = [
@@ -140,9 +141,12 @@ export default function SiteHeader() {
     };
   }, [menuOpen]);
 
-  const signInHref = `/auth/signin?callbackUrl=${encodeURIComponent(
-    typeof window !== "undefined" ? window.location.href : "/"
-  )}`;
+  // Read the full URL after mounting so the server and first client render match.
+  const [currentUrl, setCurrentUrl] = useState("/");
+  useEffect(() => {
+    setCurrentUrl(window.location.href);
+  }, [pathname]);
+  const signInHref = `/auth/signin?callbackUrl=${encodeURIComponent(currentUrl)}`;
   const accountHref = signedIn ? "/account" : signInHref;
   const firstName = session?.user?.name?.split(" ")[0] || "Account";
 
@@ -223,6 +227,9 @@ export default function SiteHeader() {
           <DesktopNav />
         </Suspense>
       </nav>
+
+      {/* How far down the page you are */}
+      <ScrollProgress />
 
       {/* Phones: slide-in menu */}
       <div

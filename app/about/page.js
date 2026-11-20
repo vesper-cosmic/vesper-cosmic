@@ -16,7 +16,7 @@ export default function AboutPage() {
       />
       <section className="mx-auto max-w-4xl px-4 pb-16 sm:px-6 lg:px-8">
 
-        <div className="mt-12 space-y-6 text-base leading-8 text-[#35506B] sm:text-lg sm:leading-9">
+        <div data-reveal className="mt-12 space-y-6 text-base leading-8 text-[#35506B] sm:text-lg sm:leading-9">
           <p>
             We believe energy isn&rsquo;t something abstract—it is a personal
             frequency you carry every single day.

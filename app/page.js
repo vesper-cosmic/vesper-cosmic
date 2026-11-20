@@ -69,7 +69,7 @@ export default function HomePage() {
         <section aria-label="Why shop with us" className="border-b border-[#1C2B48]/10 bg-white">
           <ul className="mx-auto grid max-w-7xl grid-cols-2 gap-y-6 px-4 py-7 sm:px-6 lg:grid-cols-4 lg:px-8">
             {benefits.map((item) => (
-              <li key={item.title} className="flex items-center justify-center gap-3 text-center sm:text-left">
+              <li key={item.title} data-reveal className="flex items-center justify-center gap-3 text-center sm:text-left">
                 <BenefitIcon name={item.icon} />
                 <div>
                   <p className="font-display text-lg font-semibold leading-tight text-[#1C2B48]">{item.title}</p>
@@ -119,13 +119,13 @@ export default function HomePage() {
         {/* Story: how a custom set is made */}
         <section className="bg-white">
           <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-2 lg:gap-16 lg:px-8">
-            <div className="relative isolate">
+            <div data-reveal="left" className="relative isolate">
               <div className="relative z-10 aspect-[4/5] overflow-hidden bg-[#EEF1F4] sm:aspect-[5/4] lg:aspect-[4/5]">
                 {storyImage ? <img src={storyImage} alt="A custom BaZi crystal press-on nail set" loading="lazy" className="h-full w-full object-cover" /> : null}
               </div>
               <div aria-hidden="true" className="absolute -bottom-5 -right-5 z-0 hidden h-2/3 w-2/3 border border-[#BFA06A]/60 lg:block" />
             </div>
-            <div className="relative">
+            <div data-reveal="right" className="relative">
               <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#5B7893]">The Custom Ritual</p>
               <h2 className="mt-3 font-display text-[38px] font-medium leading-[1.05] text-[#1C2B48] sm:text-6xl">
                 Designed around <em className="text-[#5B7893]">your</em> birth chart.
@@ -141,7 +141,7 @@ export default function HomePage() {
                   ["We read your Five Elements", "Which elements are strong, and which need support."],
                   ["Handcrafted for you", "Crystals and colours matched to your chart, made by hand and shipped to you."],
                 ].map(([title, text], i) => (
-                  <li key={title} className="flex gap-5">
+                  <li key={title} data-reveal className="flex gap-5">
                     <span className="font-display text-4xl font-medium leading-none text-[#BFA06A]">0{i + 1}</span>
                     <div className="border-l border-[#1C2B48]/15 pl-5">
                       <p className="font-display text-2xl font-medium text-[#1C2B48]">{title}</p>
@@ -177,7 +177,7 @@ export default function HomePage() {
             <img src={statementImage} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-40" />
           ) : null}
           <div className="absolute inset-0 bg-[#1C2B48]/55" />
-          <div className="relative mx-auto max-w-2xl bg-[#F6F7F9] px-6 py-12 text-center sm:px-14 sm:py-16">
+          <div data-reveal="zoom" className="relative mx-auto max-w-2xl bg-[#F6F7F9] px-6 py-12 text-center sm:px-14 sm:py-16">
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#5B7893]">Haute Occult Ritual Objects</p>
             <h2 className="mt-4 font-display text-[36px] font-medium leading-[1.05] text-[#1C2B48] sm:text-5xl">
               Ancient wisdom, modern ritual.

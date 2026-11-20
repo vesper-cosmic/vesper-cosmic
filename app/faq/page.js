@@ -80,7 +80,7 @@ export default function FaqPage() {
         <div className="mt-12 space-y-12">
           {faqSections.map((section) => (
             <section key={section.title}>
-              <h2 className="flex items-center gap-3 text-2xl font-semibold text-[#1C2B48] sm:text-3xl">
+              <h2 data-reveal className="flex items-center gap-3 text-2xl font-semibold text-[#1C2B48] sm:text-3xl">
                 <span aria-hidden="true">{section.icon}</span>
                 {section.title}
               </h2>
@@ -89,6 +89,7 @@ export default function FaqPage() {
                 {section.items.map((item) => (
                   <div
                     key={item.question}
+                    data-reveal
                     className="rounded-sm border border-[#1C2B48]/10 bg-white p-6"
                   >
                     <h3 className="text-base font-semibold text-[#1C2B48] sm:text-lg">

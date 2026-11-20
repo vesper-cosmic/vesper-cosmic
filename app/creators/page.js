@@ -35,7 +35,7 @@ export default function CreatorsPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#5B7893]">What you receive</p>
             <ul className="mt-5 space-y-5">
               {GIVE.map(([title, text]) => (
-                <li key={title} className="border-l border-[#BFA06A] pl-5">
+                <li key={title} data-reveal className="border-l border-[#BFA06A] pl-5">
                   <p className="font-display text-2xl font-medium text-[#1C2B48]">{title}</p>
                   <p className="mt-1 text-sm leading-6 text-[#5B7893]">{text}</p>
                 </li>
@@ -46,7 +46,7 @@ export default function CreatorsPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#5B7893]">What we ask</p>
             <ol className="mt-5 space-y-5">
               {ASK.map(([title, text], i) => (
-                <li key={title} className="flex gap-4">
+                <li key={title} data-reveal className="flex gap-4">
                   <span className="font-display text-3xl leading-none text-[#BFA06A]">0{i + 1}</span>
                   <div>
                     <p className="font-display text-2xl font-medium text-[#1C2B48]">{title}</p>

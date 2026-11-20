@@ -5,6 +5,7 @@ import { CartProvider } from "@/lib/cartContext";
 import { ProductProvider } from "@/components/ProductProvider";
 import SiteHeader from "@/components/SiteHeader";
 import AnnouncementBar from "@/components/AnnouncementBar";
+import { REVEAL_BOOT_SCRIPT, RevealOnScroll } from "@/components/ScrollEffects";
 import SiteFooter from "@/components/SiteFooter";
 import CartDrawer from "@/components/shop/CartDrawer";
 
@@ -99,8 +100,10 @@ const organizationJsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={displayFont.variable}>
+    // suppressHydrationWarning: the boot script adds a class to <html> before React loads.
+    <html lang="en" className={displayFont.variable} suppressHydrationWarning>
       <body>
+        <script dangerouslySetInnerHTML={{ __html: REVEAL_BOOT_SCRIPT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
@@ -121,6 +124,7 @@ export default function RootLayout({ children }) {
               </div>
               <SiteFooter />
               <CartDrawer />
+              <RevealOnScroll />
             </ProductProvider>
           </CartProvider>
         </Providers>

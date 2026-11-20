@@ -10,7 +10,7 @@ export default function PageHero({ eyebrow, title, subtitle, size = "md", childr
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(142,177,209,0.22),transparent_60%)]"
       />
-      <div className="relative mx-auto max-w-3xl">
+      <div data-reveal="fade" className="relative mx-auto max-w-3xl">
         {eyebrow ? (
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#BFA06A] sm:text-xs">{eyebrow}</p>
         ) : null}

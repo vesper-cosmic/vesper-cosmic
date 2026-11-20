@@ -39,7 +39,7 @@ export default function LegalDoc({ kicker, title, intro = [], sections = [], sho
         ) : null}
 
         {sections.map((section, index) => (
-          <section key={section.title} id={`section-${index + 1}`} className="mt-12 scroll-mt-24 lg:scroll-mt-36">
+          <section key={section.title} id={`section-${index + 1}`} data-reveal className="mt-12 scroll-mt-24 lg:scroll-mt-36">
             <h2 className="text-2xl font-semibold text-[#1C2B48] sm:text-3xl">
               {index + 1}. {section.title}
             </h2>

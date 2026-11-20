@@ -204,7 +204,9 @@ function ShopPageContent() {
               ) : (
                 <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-3">
                   {visibleProducts.map((product) => (
-                    <RailProductCard key={product.id} product={product} onOpen={openProductDetail} />
+                    <div key={product.id} data-reveal>
+                      <RailProductCard product={product} onOpen={openProductDetail} />
+                    </div>
                   ))}
                 </div>
               )}

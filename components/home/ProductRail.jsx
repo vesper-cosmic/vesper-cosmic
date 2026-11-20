@@ -107,7 +107,7 @@ export default function ProductRail({ eyebrow, title, href, products, lead, onOp
   return (
     <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
       <div className="flex items-end justify-between gap-4">
-        <div>
+        <div data-reveal>
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#5B7893]">{eyebrow}</p>
           <h2 className="mt-2 font-display text-[34px] font-medium leading-tight text-[#1C2B48] sm:text-5xl">{title}</h2>
         </div>
@@ -136,9 +136,9 @@ export default function ProductRail({ eyebrow, title, href, products, lead, onOp
         ref={scroller}
         className="no-scrollbar -mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 px-4 sm:mx-0 sm:mt-10 sm:gap-6 sm:scroll-px-0 sm:px-0"
       >
-        {lead ? <li className={tile}>{lead}</li> : null}
+        {lead ? <li data-reveal className={tile}>{lead}</li> : null}
         {products.map((product) => (
-          <li key={product.id} className={tile}>
+          <li key={product.id} data-reveal className={tile}>
             <RailProductCard product={product} onOpen={onOpen} />
           </li>
         ))}
@@ -152,7 +152,7 @@ export default function ProductRail({ eyebrow, title, href, products, lead, onOp
       </div>
 
       {href ? (
-        <div className="mt-10 text-center">
+        <div data-reveal className="mt-10 text-center">
           <Link
             href={href}
             className="inline-block border border-[#1C2B48] bg-[#1C2B48] px-9 py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-white transition hover:bg-transparent hover:text-[#1C2B48]"
