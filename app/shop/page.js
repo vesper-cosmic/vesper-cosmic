@@ -146,7 +146,7 @@ function ShopPageContent() {
           {/* Sidebar + Content Layout */}
           <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start">
             {/* Sidebar — Category Filter */}
-            <aside className="hidden rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-4 lg:sticky lg:top-24 lg:block">
+            <aside className="hidden rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-4 lg:sticky lg:top-36 lg:block">
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#8EB1D1]">
                 Shop by Category
               </p>

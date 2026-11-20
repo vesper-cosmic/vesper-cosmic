@@ -1,266 +1,329 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useCart } from "@/lib/cartContext";
-import AccountButton from "@/components/AccountButton";
-import { OPEN_CATEGORIES_EVENT } from "@/components/shop/CategoryDrawer";
 
-const NAV_ITEMS = [
-  { label: "Shop", href: "/shop" },
-  { label: "Track Order", href: "/track" },
+// Category links (desktop row under the logo, and the "Shop" part of the phone menu).
+const SHOP_LINKS = [
+  { label: "Shop All", href: "/shop" },
+  { label: "Nails", href: "/shop?category=nails" },
+  { label: "Custom BaZi Sets", href: "/shop?category=custom-nails" },
+  { label: "Energy Bottles", href: "/shop?category=energy-bottles" },
+  { label: "Sachets", href: "/shop?group=sachets" },
+  { label: "Digital Reports", href: "/shop?category=digital-reports" },
+];
+
+const PAGE_LINKS = [
   { label: "About", href: "/about" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
+  { label: "Track Order", href: "/track" },
 ];
+
+const iconClass = "h-[22px] w-[22px]";
+
+function MenuIcon() {
+  return (
+    <svg aria-hidden="true" className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+      <path strokeLinecap="round" d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg aria-hidden="true" className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+      <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
+function PersonIcon() {
+  return (
+    <svg aria-hidden="true" className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+      <circle cx="12" cy="8" r="4" />
+      <path strokeLinecap="round" d="M4.5 20.5c1.2-3.8 4.1-5.5 7.5-5.5s6.3 1.7 7.5 5.5" />
+    </svg>
+  );
+}
+
+function BagIcon() {
+  return (
+    <svg aria-hidden="true" className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+      <path strokeLinejoin="round" d="M5 8h14l-1.2 12.5H6.2L5 8z" />
+      <path strokeLinecap="round" d="M9 10V6.5a3 3 0 016 0V10" />
+    </svg>
+  );
+}
+
+function TrackIcon() {
+  return (
+    <svg aria-hidden="true" className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+      <path strokeLinejoin="round" d="M3 7.5l9-4.5 9 4.5v9L12 21l-9-4.5v-9z" />
+      <path strokeLinejoin="round" d="M3 7.5l9 4.5 9-4.5M12 12v9" />
+    </svg>
+  );
+}
+
+/** Is this link the page being shown? Shop links compare the category/group too. */
+function useIsActive() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  return (href) => {
+    const [path, query = ""] = href.split("?");
+    if (path !== pathname) return false;
+    if (path !== "/shop") return true;
+    const want = new URLSearchParams(query);
+    const keys = ["category", "group"];
+    return keys.every((key) => (want.get(key) || "") === (searchParams.get(key) || ""));
+  };
+}
+
+function DesktopNav() {
+  const isActive = useIsActive();
+  return <NavLinks isActive={isActive} />;
+}
+
+function NavLinks({ isActive = () => false }) {
+  return (
+    <ul className="flex items-center justify-center gap-x-7 xl:gap-x-9">
+      {[...SHOP_LINKS, ...PAGE_LINKS.slice(0, 3)].map((link) => {
+        const active = isActive(link.href);
+        return (
+          <li key={link.href}>
+            <Link
+              href={link.href}
+              aria-current={active ? "page" : undefined}
+              className={`relative inline-block py-3 text-[12px] font-semibold uppercase tracking-[0.18em] transition after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left after:bg-[#BFA06A] after:transition-transform ${
+                active
+                  ? "text-[#BFA06A] after:scale-x-100"
+                  : "text-[#E8ECEF] after:scale-x-0 hover:text-white hover:after:scale-x-100"
+              }`}
+            >
+              {link.label}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 export default function SiteHeader() {
   const pathname = usePathname();
-  const isShop = pathname?.startsWith("/shop");
-  // Pages with a category list get a ☰ button (mobile) that opens the category drawer.
-  const hasCategories = pathname === "/" || isShop;
   const { totalItems, openCart, syncing } = useCart();
   const { data: session, status } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Set by the server in the session callback (lib/auth.js).
   const isAdmin = Boolean(session?.user?.isAdmin);
+  const signedIn = status === "authenticated";
 
-  // Close the mobile menu whenever the route changes
+  // Close the phone menu whenever the page changes.
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
 
-  // Prevent body scroll while the mobile menu is open
+  // Lock page scroll while the phone menu is open; close it with Escape.
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    if (!menuOpen) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (event) => event.key === "Escape" && setMenuOpen(false);
+    document.addEventListener("keydown", onKey);
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previous;
+      document.removeEventListener("keydown", onKey);
     };
   }, [menuOpen]);
 
-  // Close on Escape
-  useEffect(() => {
-    function handleKeyDown(event) {
-      if (event.key === "Escape") setMenuOpen(false);
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  const signInHref = `/auth/signin?callbackUrl=${encodeURIComponent(
+    typeof window !== "undefined" ? window.location.href : "/"
+  )}`;
+  const accountHref = signedIn ? "/account" : signInHref;
+  const firstName = session?.user?.name?.split(" ")[0] || "Account";
 
-  const isActive = (href) => {
-    if (href === "/shop") return isShop;
-    return pathname === href;
-  };
-
-  const currentUrl =
-    typeof window !== "undefined" ? window.location.href : "/";
+  const iconButton =
+    "relative flex h-10 w-10 items-center justify-center rounded-full text-[#E8ECEF] transition hover:bg-white/10 hover:text-white";
 
   return (
-    <header className="sticky top-0 z-30 border-b border-[#8EB1D1]/20 bg-[#E8ECEF]/95 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <div className="flex min-w-0 items-center gap-2">
-          {hasCategories ? (
-            <button
-              type="button"
-              onClick={() => window.dispatchEvent(new Event(OPEN_CATEGORIES_EVENT))}
-              aria-label="Open categories"
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-[#8EB1D1]/40 bg-white/60 text-[#1C2B48] transition hover:bg-[#C4D8E5] lg:hidden"
-            >
-              <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          ) : null}
-          {/* Logo */}
-          <Link href="/" className="group flex min-w-0 items-center gap-2 sm:gap-2.5">
-            <img
-              src="/images/vesper-logo.png"
-              alt="Vesper Cosmos"
-              className="h-8 w-auto flex-shrink-0 sm:h-10"
-            />
-            <span className="truncate text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1C2B48] transition group-hover:text-[#35506B] sm:text-base sm:tracking-[0.24em]">
-              Vesper<span className="text-[#8EB1D1]"> Cosmos</span>
-            </span>
+    <header className="sticky top-0 z-30 bg-[#1C2B48] text-[#E8ECEF] shadow-[0_8px_30px_rgba(18,28,48,0.25)]">
+      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-x-1.5 px-3 sm:px-6 lg:h-[72px] lg:px-8">
+        {/* Left: menu (phones) / track order (desktop) */}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            className={`${iconButton} lg:hidden`}
+          >
+            <MenuIcon />
+          </button>
+          <Link
+            href="/track"
+            className="hidden items-center gap-2 rounded-full px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#E8ECEF] transition hover:bg-white/10 hover:text-white lg:flex"
+          >
+            <TrackIcon />
+            Track Order
           </Link>
         </div>
 
-        {/* Right side */}
-        <div className="flex items-center gap-2">
-          {/* Desktop: Track Order */}
-          <Link
-            href="/track"
-            className="hidden rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5] md:block"
-          >
-            Track Order
-          </Link>
+        {/* Center: logo */}
+        <Link href="/" className="flex min-w-0 items-center gap-2 sm:gap-3" aria-label="Vesper Cosmos — home">
+          <img src="/images/vesper-logo.png" alt="" className="h-7 w-auto flex-shrink-0 min-[360px]:h-8 sm:h-10" />
+          <span className="font-display whitespace-nowrap text-[12px] font-medium uppercase tracking-[0.12em] text-white min-[360px]:text-[14px] min-[360px]:tracking-[0.16em] min-[400px]:text-[17px] min-[400px]:tracking-[0.22em] sm:text-2xl sm:tracking-[0.28em]">
+            Vesper<span className="text-[#8EB1D1]"> Cosmos</span>
+          </span>
+        </Link>
+
+        {/* Right: account, admin, cart */}
+        <div className="flex items-center justify-end gap-0.5 sm:gap-1">
           {isAdmin ? (
             <Link
               href="/admin"
-              className="hidden rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5] lg:block"
+              className="hidden rounded-full px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#E8ECEF] transition hover:bg-white/10 lg:block"
             >
               Admin
             </Link>
           ) : null}
-
-          {/* Cart (icon-only on mobile, icon+label on desktop) */}
+          <Link
+            href={status === "loading" ? "#" : accountHref}
+            aria-label={signedIn ? `Account (${firstName})` : "Sign in"}
+            title={signedIn ? firstName : "Sign in"}
+            className={`${iconButton} lg:w-auto lg:gap-2 lg:px-3`}
+          >
+            <PersonIcon />
+            <span className="hidden max-w-28 truncate text-[12px] font-semibold uppercase tracking-[0.16em] lg:inline">
+              {signedIn ? firstName : "Sign in"}
+            </span>
+          </Link>
           <button
             type="button"
             onClick={openCart}
-            className={`relative flex items-center justify-center rounded-lg border border-[#8EB1D1]/40 bg-white/60 font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5] ${
-              syncing ? "opacity-70" : ""
-            } h-10 px-2.5 text-sm sm:px-4`}
             aria-label={`Open cart (${totalItems} items)`}
+            className={`${iconButton} ${syncing ? "opacity-70" : ""}`}
           >
-            <svg
-              aria-hidden="true"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"
-              />
-            </svg>
-            <span className="hidden sm:inline">Cart</span>
+            <BagIcon />
             {totalItems > 0 ? (
-              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#1C2B48] px-1 text-xs font-bold text-white">
+              <span className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#BFA06A] px-1 text-[11px] font-bold text-[#1C2B48]">
                 {totalItems}
               </span>
             ) : null}
           </button>
-
-          {/* Desktop: Account */}
-          <div className="hidden md:block">
-            <AccountButton />
-          </div>
-
-          {/* Mobile: member center (person icon) — opens the account + site links panel */}
-          <button
-            type="button"
-            onClick={() => setMenuOpen((prev) => !prev)}
-            aria-label={menuOpen ? "Close member menu" : "Open member menu"}
-            aria-expanded={menuOpen}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#8EB1D1]/40 bg-white/60 text-[#1C2B48] transition hover:bg-[#C4D8E5] md:hidden"
-          >
-            {menuOpen ? (
-              <svg
-                aria-hidden="true"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            ) : (
-              <svg
-                aria-hidden="true"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
-            )}
-          </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Desktop: category row */}
+      <nav aria-label="Main" className="hidden border-t border-white/10 lg:block">
+        <Suspense fallback={<NavLinks />}>
+          <DesktopNav />
+        </Suspense>
+      </nav>
+
+      {/* Phones: slide-in menu */}
       <div
-        className={`fixed inset-x-0 bottom-0 top-[61px] z-40 transition-opacity duration-200 md:hidden ${
-          menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
-        }`}
+        className={`fixed inset-0 z-50 lg:hidden ${menuOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+        inert={!menuOpen}
       >
-        <div className="absolute inset-0 bg-[#1C2B48]/60 backdrop-blur-sm" onClick={() => setMenuOpen(false)} />
+        <div
+          className={`absolute inset-0 bg-[#121C30]/60 backdrop-blur-sm transition-opacity duration-300 ${
+            menuOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={() => setMenuOpen(false)}
+        />
         <nav
-          className="absolute inset-x-0 top-0 mx-auto max-h-[calc(100dvh-61px)] overflow-y-auto rounded-b-2xl border-b border-[#8EB1D1]/25 bg-[#E8ECEF] p-5 shadow-[0_20px_60px_rgba(28,43,72,0.25)]"
-          aria-label="Mobile navigation"
+          aria-label="Menu"
+          className={`absolute inset-y-0 left-0 flex w-[86%] max-w-sm flex-col bg-[#F6F7F9] text-[#1C2B48] shadow-2xl transition-transform duration-300 ${
+            menuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         >
-          {/* Mobile account section */}
-          <div className="mb-5 border-b border-[#8EB1D1]/25 pb-5">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#5B7893]">Member Center</p>
-            {status === "loading" ? (
-              <p className="rounded-lg border border-[#8EB1D1]/20 bg-white/60 px-4 py-3 text-sm text-[#5B7893]">
-                Loading…
-              </p>
-            ) : status === "authenticated" ? (
-              <div className="space-y-2">
-                <Link
-                  href="/account"
-                  onClick={() => setMenuOpen(false)}
-                  className="block rounded-lg border border-[#8EB1D1]/20 px-4 py-3 text-base font-semibold text-[#1C2B48] transition hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
-                >
-                  Account
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    signOut({ callbackUrl: "/shop" });
-                  }}
-                  className="w-full rounded-lg border border-[#8EB1D1]/20 px-4 py-3 text-left text-base font-semibold text-[#35506B] transition hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
-                >
-                  Sign out
-                </button>
-              </div>
-            ) : (
-              <Link
-                href={`/auth/signin?callbackUrl=${encodeURIComponent(currentUrl)}`}
-                onClick={() => setMenuOpen(false)}
-                className="block w-full rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-3 text-center text-base font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
-              >
-                Sign in
-              </Link>
-            )}
-          </div>
-          <div className="space-y-2">
-            {NAV_ITEMS.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMenuOpen(false)}
-                  className={`block rounded-lg border px-4 py-3 text-base font-semibold transition ${
-                    active
-                      ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
-                      : "border-[#8EB1D1]/20 text-[#1C2B48] hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-            {isAdmin ? (
-              <Link
-                href="/admin"
-                onClick={() => setMenuOpen(false)}
-                className="block rounded-lg border border-[#8EB1D1]/20 px-4 py-3 text-base font-semibold text-[#1C2B48] transition hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
-              >
-                Admin
-              </Link>
-            ) : null}
+          <div className="flex h-16 items-center justify-between bg-[#1C2B48] px-3 text-[#E8ECEF]">
+            <span className="font-display px-2 text-lg uppercase tracking-[0.24em]">Menu</span>
+            <button type="button" onClick={() => setMenuOpen(false)} aria-label="Close menu" className={iconButton}>
+              <CloseIcon />
+            </button>
           </div>
 
+          <div className="flex-1 overflow-y-auto px-5 pb-8 pt-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#5B7893]">Shop</p>
+            <ul className="mt-2 divide-y divide-[#1C2B48]/10 border-y border-[#1C2B48]/10">
+              {SHOP_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center justify-between py-3.5 font-display text-xl text-[#1C2B48]"
+                  >
+                    {link.label}
+                    <span aria-hidden="true" className="text-sm text-[#8EB1D1]">→</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-7 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#5B7893]">Help</p>
+            <ul className="mt-2 grid grid-cols-2 gap-2">
+              {PAGE_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="block rounded border border-[#1C2B48]/15 bg-white px-3 py-2.5 text-sm font-semibold text-[#1C2B48]"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-7 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#5B7893]">Member Center</p>
+            <div className="mt-2 space-y-2">
+              {status === "loading" ? (
+                <p className="py-2 text-sm text-[#5B7893]">Loading…</p>
+              ) : signedIn ? (
+                <>
+                  <Link
+                    href="/account"
+                    onClick={() => setMenuOpen(false)}
+                    className="block rounded border border-[#1C2B48]/15 bg-white px-3 py-2.5 text-sm font-semibold text-[#1C2B48]"
+                  >
+                    My Account
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      signOut({ callbackUrl: "/shop" });
+                    }}
+                    className="w-full rounded border border-[#1C2B48]/15 bg-white px-3 py-2.5 text-left text-sm font-semibold text-[#35506B]"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href={signInHref}
+                  onClick={() => setMenuOpen(false)}
+                  className="block rounded bg-[#1C2B48] px-3 py-3 text-center text-sm font-semibold uppercase tracking-[0.16em] text-white"
+                >
+                  Sign in
+                </Link>
+              )}
+              {isAdmin ? (
+                <Link
+                  href="/admin"
+                  onClick={() => setMenuOpen(false)}
+                  className="block rounded border border-[#1C2B48]/15 bg-white px-3 py-2.5 text-sm font-semibold text-[#1C2B48]"
+                >
+                  Admin
+                </Link>
+              ) : null}
+            </div>
+          </div>
         </nav>
       </div>
     </header>

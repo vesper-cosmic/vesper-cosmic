@@ -1,8 +1,10 @@
 import "./globals.css";
+import { Cormorant_Garamond } from "next/font/google";
 import Providers from "@/components/Providers";
 import { CartProvider } from "@/lib/cartContext";
 import { ProductProvider } from "@/components/ProductProvider";
 import SiteHeader from "@/components/SiteHeader";
+import AnnouncementBar from "@/components/AnnouncementBar";
 import SiteFooter from "@/components/SiteFooter";
 import CartDrawer from "@/components/shop/CartDrawer";
 
@@ -70,8 +72,17 @@ export const metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#E8ECEF",
+  themeColor: "#1C2B48",
 };
+
+// Display serif for headings (self-hosted by Next at build time).
+const displayFont = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
@@ -88,7 +99,7 @@ const organizationJsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={displayFont.variable}>
       <body>
         <script
           type="application/ld+json"
@@ -103,6 +114,7 @@ export default function RootLayout({ children }) {
               >
                 Skip to main content
               </a>
+              <AnnouncementBar />
               <SiteHeader />
               <div id="main-content" tabIndex={-1} className="outline-none">
                 {children}

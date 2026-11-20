@@ -37,38 +37,34 @@ const paymentMethods = [
   { label: "PayPal", text: "PayPal" },
 ];
 
+
 export default function SiteFooter() {
   return (
-    <footer className="border-t border-[#8EB1D1]/20 bg-[#E8ECEF]/95" aria-label="Site footer">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-[1.2fr_2fr] lg:gap-14">
+    <footer className="bg-[#1C2B48] text-[#C4D8E5]" aria-label="Site footer">
+      <div className="mx-auto max-w-7xl px-4 pb-10 pt-14 sm:px-6 lg:px-8">
+        <div className="grid gap-10 md:grid-cols-[1.2fr_2fr] lg:gap-16">
           {/* Brand column */}
           <div>
-            <Link href="/" className="flex items-center gap-2.5">
-              <img
-                src="/images/vesper-logo.png"
-                alt="Vesper Cosmos"
-                className="h-9 w-auto"
-              />
-              <span className="text-sm font-semibold uppercase tracking-[0.24em] text-[#1C2B48]">
+            <Link href="/" className="inline-flex items-center gap-3">
+              <img src="/images/vesper-logo.png" alt="" className="h-10 w-auto" />
+              <span className="font-display text-xl font-medium uppercase tracking-[0.26em] text-white">
                 Vesper<span className="text-[#8EB1D1]"> Cosmos</span>
               </span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-6 text-[#5B7893]">
-              Haute occult ritual objects — custom BaZi press-on nails,
-              crystal energy bottles, and personalized eastern astrology
-              reports.
+            <p className="mt-5 max-w-xs font-display text-lg italic leading-7 text-[#E8ECEF]">
+              Where ancient eastern wisdom meets modern daily rituals.
+            </p>
+            <p className="mt-3 max-w-xs text-sm leading-6 text-[#8EB1D1]">
+              Custom BaZi press-on nails, crystal energy bottles and personalized
+              eastern astrology reports.
             </p>
           </div>
 
           {/* Link columns */}
-          <nav
-            className="grid grid-cols-2 gap-8 sm:grid-cols-3"
-            aria-label="Footer navigation"
-          >
+          <nav className="grid grid-cols-2 gap-8 sm:grid-cols-3" aria-label="Footer navigation">
             {footerNav.map((group) => (
               <div key={group.title}>
-                <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#1C2B48]">
+                <h2 className="font-display text-base font-semibold uppercase tracking-[0.22em] text-[#BFA06A]">
                   {group.title}
                 </h2>
                 <ul className="mt-3 space-y-0.5 sm:mt-4 sm:space-y-1">
@@ -76,7 +72,7 @@ export default function SiteFooter() {
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="inline-block py-1.5 text-sm text-[#35506B] transition hover:text-[#1C2B48] sm:py-1"
+                        className="inline-block py-1.5 text-sm text-[#C4D8E5] transition hover:text-white sm:py-1"
                       >
                         {link.label}
                       </Link>
@@ -88,35 +84,26 @@ export default function SiteFooter() {
           </nav>
         </div>
 
-        {/* Payment badges */}
-        <div className="mt-10 border-t border-[#8EB1D1]/20 pt-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8EB1D1]">
-            We Accept
-          </p>
-          <ul
-            className="mt-3 flex flex-wrap items-center gap-2"
-            aria-label="Accepted payment methods"
-          >
-            {paymentMethods.map((method) => (
-              <li
-                key={method.label}
-                className="flex h-9 min-w-[3.5rem] items-center justify-center rounded border border-[#8EB1D1]/30 bg-white px-2.5 text-[10px] font-bold tracking-wide text-[#1C2B48]"
-                title={method.label}
-              >
-                {method.text}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Copyright */}
-        <div className="mt-8 flex flex-col items-start justify-between gap-3 border-t border-[#8EB1D1]/20 pt-6 sm:flex-row sm:items-center">
-          <p className="text-sm text-[#5B7893]">
-            © 2026 VESPER COSMOS. All Rights Reserved.
-          </p>
-          <p className="text-xs text-[#8EB1D1]">
-            Crafted with intention · Aligned with your elements
-          </p>
+        {/* Payment + copyright */}
+        <div className="mt-12 flex flex-col gap-5 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8EB1D1]">We Accept</p>
+            <ul className="flex flex-wrap items-center gap-2" aria-label="Accepted payment methods">
+              {paymentMethods.map((method) => (
+                <li
+                  key={method.label}
+                  className="flex h-8 min-w-[3.5rem] items-center justify-center rounded border border-white/20 px-2.5 text-[11px] font-bold tracking-wide text-white"
+                  title={method.label}
+                >
+                  {method.text}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="sm:text-right">
+            <p className="text-sm text-[#C4D8E5]">© 2026 VESPER COSMOS. All Rights Reserved.</p>
+            <p className="mt-1 text-xs text-[#8EB1D1]">Crafted with intention · Aligned with your elements</p>
+          </div>
         </div>
       </div>
     </footer>

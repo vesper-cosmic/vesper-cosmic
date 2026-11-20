@@ -22,8 +22,29 @@ body {
 h1,
 h2,
 h3,
-.font-serif-display {
-  font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+.font-serif-display,
+.font-display {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, "Times New Roman", serif;
+}
+
+/* Top announcement strip: the track holds two identical copies and slides by one. */
+.announcement-track {
+  animation: announcement-scroll 40s linear infinite;
+}
+.announcement-bar:hover .announcement-track {
+  animation-play-state: paused;
+}
+@keyframes announcement-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Horizontal product rails: swipe/scroll without a visible scrollbar. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 input,
@@ -48,6 +69,9 @@ textarea {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .announcement-track {
+    animation: none;
+  }
   *,
   *::before,
   *::after {
