@@ -44,8 +44,8 @@ export default function CategoryPanel({
                 aria-expanded={isParent ? isActive : undefined}
                 className={`flex items-center gap-2 rounded border px-3 ${pad} text-left text-sm font-semibold transition ${
                   isActive
-                    ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
-                    : "border-[#8EB1D1]/20 text-[#1C2B48] hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
+                    ? "border-[#8EB1D1] bg-[#EEF1F4] text-[#1C2B48]"
+                    : "border-[#1C2B48]/10 text-[#1C2B48] hover:border-[#8EB1D1] hover:bg-[#EEF1F4]"
                 }`}
               >
                 <span>{group.title}</span>
@@ -72,8 +72,8 @@ export default function CategoryPanel({
                           isDisabled
                             ? "cursor-not-allowed border-transparent text-[#5B7893]/60"
                             : childActive
-                              ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
-                              : "border-[#8EB1D1]/20 text-[#35506B] hover:border-[#8EB1D1] hover:bg-[#C4D8E5]"
+                              ? "border-[#8EB1D1] bg-[#EEF1F4] text-[#1C2B48]"
+                              : "border-[#1C2B48]/10 text-[#35506B] hover:border-[#8EB1D1] hover:bg-[#EEF1F4]"
                         }`}
                       >
                         <span>{child.title}</span>
@@ -91,7 +91,7 @@ export default function CategoryPanel({
       {showAbout ? (
         <Link
           href="/about"
-          className={`mt-4 flex items-center gap-2 rounded border border-[#8EB1D1]/20 px-3 ${pad} text-sm font-semibold text-[#1C2B48] transition hover:border-[#8EB1D1] hover:bg-[#C4D8E5]`}
+          className={`mt-4 flex items-center gap-2 rounded border border-[#1C2B48]/10 px-3 ${pad} text-sm font-semibold text-[#1C2B48] transition hover:border-[#8EB1D1] hover:bg-[#EEF1F4]`}
         >
           <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

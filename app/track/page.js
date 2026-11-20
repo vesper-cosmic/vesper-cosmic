@@ -1,4 +1,5 @@
 import OrderTrackingForm from "@/components/OrderTrackingForm";
+import PageHero from "@/components/PageHero";
 
 export const metadata = {
   title: "Order Tracking | Vesper Cosmos",
@@ -8,21 +9,16 @@ export const metadata = {
 
 export default function TrackPage() {
   return (
-    <main className="min-h-screen bg-transparent px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-2xl">
-        <div className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-8 shadow-[0_18px_60px_rgba(0,0,0,0.28)]">
-          <p className="text-sm uppercase tracking-[0.24em] text-[#8EB1D1]">
-            Order Tracking
-          </p>
-          <h1 className="mt-2 text-4xl font-semibold text-[#1C2B48]">
-            Track Your Order
-          </h1>
-          <p className="mt-4 text-sm leading-6 text-[#35506B]">
-            Signed in? Your order history appears automatically — just select
-            an order to see its status. Otherwise, enter your order ID (e.g.
-            VC-20260801-AB12) and the email you used at checkout.
-          </p>
-          <div className="mt-6">
+    <main className="min-h-screen bg-transparent">
+      <PageHero
+        size="sm"
+        eyebrow="Order Tracking"
+        title="Track Your Order"
+        subtitle="Signed in? Your order history appears automatically — just select an order to see its status. Otherwise, enter your order ID (e.g. VC-20260801-AB12) and the email you used at checkout."
+      />
+      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="rounded-sm border border-[#1C2B48]/10 bg-white p-8">
+          <div>
             <OrderTrackingForm />
           </div>
         </div>

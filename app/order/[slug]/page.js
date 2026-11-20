@@ -4,6 +4,7 @@ import CheckoutGate from "@/components/CheckoutGate";
 import { getProductBySlug } from "@/lib/productServer";
 import { isProductPublished, isProductSoldOut } from "@/lib/productData";
 import { SITE_URL } from "@/lib/siteUrl";
+import PageHero from "@/components/PageHero";
 
 const absolute = (url) => (/^https?:\/\//i.test(url) ? url : `${SITE_URL}${url.startsWith("/") ? "" : "/"}${url}`);
 
@@ -62,12 +63,15 @@ export default async function ProductOrderPage({ params }) {
   };
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-10 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-transparent">
+      <PageHero size="sm" eyebrow="Step 1 of 2" title="Your Details" />
+      <div className="px-4 py-10 sm:px-6 lg:px-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <div className="mx-auto max-w-3xl">
         <CheckoutGate>
           <OrderIntakeForm product={publicProduct} />
         </CheckoutGate>
+      </div>
       </div>
     </main>
   );

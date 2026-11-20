@@ -12,8 +12,7 @@
 
 body {
   margin: 0;
-  background:
-    linear-gradient(180deg, #E8ECEF 0%, #C4D8E5 48%, #8EB1D1 100%);
+  background: #F6F7F9;
   color: #1C2B48;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
@@ -54,11 +53,11 @@ textarea {
 }
 
 .mist-button {
-  box-shadow: 0 12px 28px rgba(28, 43, 72, 0.16);
+  box-shadow: none;
 }
 
 .mist-card {
-  box-shadow: 0 18px 60px rgba(28, 43, 72, 0.14);
+  box-shadow: none;
 }
 
 

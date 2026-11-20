@@ -112,7 +112,7 @@ export default function OrderTrackingForm() {
     <div>
       {isSignedIn ? (
         <div className="space-y-4">
-          <div className="rounded bg-white/60 p-4">
+          <div className="rounded bg-white p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
               Your Orders
             </p>
@@ -137,7 +137,7 @@ export default function OrderTrackingForm() {
                       className={`w-full rounded border px-3 py-2.5 text-left text-sm transition ${
                         selectedOrder?.orderId === item.orderId
                           ? "border-[#8EB1D1] bg-[#D6E4EE]"
-                          : "border-[#8EB1D1]/20 bg-white/60 hover:border-[#8EB1D1]/60 hover:bg-[#EAF2F8]"
+                          : "border-[#1C2B48]/10 bg-white hover:border-[#1C2B48]/20 hover:bg-[#EAF2F8]"
                       }`}
                     >
                       <div className="flex items-center justify-between gap-3">
@@ -194,7 +194,7 @@ export default function OrderTrackingForm() {
                 onChange={(e) => setOrderId(e.target.value)}
                 placeholder="e.g. VC-20260801-AB12"
                 required
-                className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+                className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
               />
             </div>
             <div>
@@ -208,13 +208,13 @@ export default function OrderTrackingForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+                className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
               />
             </div>
             <button
               type="submit"
               disabled={status === "loading"}
-              className="w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-2.5 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:opacity-50"
+              className="w-full rounded border border-[#1C2B48] bg-[#1C2B48] px-5 py-2.5 text-sm font-bold uppercase tracking-[0.16em] text-white transition hover:bg-[#2A3D60] disabled:opacity-50"
             >
               {status === "loading" ? "Tracking..." : "Track Order"}
             </button>
@@ -244,7 +244,7 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
   const steps = digital ? STATUS_STEPS_DIGITAL : STATUS_STEPS;
   return (
     <div className="space-y-4">
-      <div className="rounded bg-white/60 p-4">
+      <div className="rounded bg-white p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
           Order Details
         </p>
@@ -254,7 +254,7 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
       </div>
 
       {currentStatusIndex >= 0 ? (
-        <div className="rounded bg-white/60 p-4">
+        <div className="rounded bg-white p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
             Order Status
           </p>
@@ -276,7 +276,7 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
                   <span
                     className={`relative mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
                       isCompleted || isActive
-                        ? "border-[#8EB1D1] bg-[#8EB1D1]"
+                        ? "border-[#1C2B48] bg-[#1C2B48]"
                         : "border-[#B9C8D6] bg-white"
                     }`}
                   >
@@ -310,7 +310,7 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
       )}
 
       {digital ? null : order.trackingNumber ? (
-        <div className="rounded border border-[#8EB1D1]/40 bg-[#EAF2F8] p-4">
+        <div className="rounded border border-[#1C2B48]/20 bg-[#EAF2F8] p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
             Postal Tracking Number
           </p>
@@ -344,7 +344,7 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
       </p>
       <Link
         href="/shop"
-        className="mist-button inline-flex rounded border border-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] hover:bg-[#8EB1D1]"
+        className="mist-button inline-flex rounded border border-[#1C2B48]/30 px-4 py-2 text-sm font-semibold text-[#1C2B48] hover:bg-[#8EB1D1]"
       >
         Back to Shop
       </Link>
@@ -354,7 +354,7 @@ function OrderStatusDetails({ order, currentStatusIndex, displayStatus }) {
 
 function StatusRow({ label, children }) {
   return (
-    <div className="flex items-start justify-between gap-4 rounded bg-white/60 px-4 py-3">
+    <div className="flex items-start justify-between gap-4 rounded bg-white px-4 py-3">
       <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
         {label}
       </span>

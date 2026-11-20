@@ -43,7 +43,7 @@ export default function ReferralEarnings() {
 
   return (
     <>
-      <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
+      <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-6">
         <h2 className="text-2xl font-semibold text-[#1C2B48]">Share & Earn</h2>
         <p className="mt-2 text-sm leading-6 text-[#5B7893]">
           Share your link or code. You earn a commission on every purchase your
@@ -121,14 +121,14 @@ function CopyField({ label, value, mono, copied, onCopy }) {
           type="text"
           readOnly
           value={value}
-          className={`min-w-0 flex-1 truncate rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] ${
+          className={`min-w-0 flex-1 truncate rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] ${
             mono ? "font-mono" : ""
           }`}
         />
         <button
           type="button"
           onClick={onCopy}
-          className="shrink-0 rounded border border-[#8EB1D1] bg-[#8EB1D1] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+          className="shrink-0 rounded border border-[#1C2B48] bg-[#1C2B48] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-[#2A3D60]"
         >
           {copied ? "✓ Copied" : "Copy"}
         </button>
@@ -168,7 +168,7 @@ const TILE_TONES = {
 
 function Tile({ label, value, tone }) {
   return (
-    <div className={`rounded-lg px-4 py-3 ${TILE_TONES[tone]}`}>
+    <div className={`rounded-sm px-4 py-3 ${TILE_TONES[tone]}`}>
       <p className="text-xs font-medium">{label}</p>
       <p className="mt-1 text-2xl font-bold sm:text-3xl">{money(value)}</p>
     </div>
@@ -243,7 +243,7 @@ function WithdrawPanel({ data, onDone }) {
           Withdraw {money(data.balances.available)}
         </button>
       ) : (
-        <form onSubmit={submit} className="space-y-3 rounded-lg border border-[#8EB1D1]/30 bg-white/60 p-4">
+        <form onSubmit={submit} className="space-y-3 rounded-sm border border-[#1C2B48]/10 bg-white p-4">
           <p className="text-sm font-semibold text-[#1C2B48]">
             Withdraw {money(data.balances.available)} USD
           </p>
@@ -290,7 +290,7 @@ function WithdrawPanel({ data, onDone }) {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded border border-[#8EB1D1]/50 px-4 py-2 text-sm font-semibold text-[#5B7893] hover:bg-[#C4D8E5]"
+              className="rounded border border-[#1C2B48]/20 px-4 py-2 text-sm font-semibold text-[#5B7893] hover:bg-[#EEF1F4]"
             >
               Cancel
             </button>
@@ -321,7 +321,7 @@ function History({ history = [], maturityDays }) {
     <div>
       <h3 className="text-lg font-semibold text-[#1C2B48]">Commission History</h3>
       {history.length ? (
-        <ul className="mt-2 divide-y divide-[#8EB1D1]/20 rounded border border-[#8EB1D1]/20 bg-white/60">
+        <ul className="mt-2 divide-y divide-[#1C2B48]/10 rounded border border-[#1C2B48]/10 bg-white">
           {history.map((entry, index) => (
             <li key={`${entry.date}-${index}`} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
               <div className="min-w-0">
@@ -363,7 +363,7 @@ function Withdrawals({ withdrawals = [] }) {
   return (
     <div>
       <h3 className="text-lg font-semibold text-[#1C2B48]">Payouts</h3>
-      <ul className="mt-2 divide-y divide-[#8EB1D1]/20 rounded border border-[#8EB1D1]/20 bg-white/60">
+      <ul className="mt-2 divide-y divide-[#1C2B48]/10 rounded border border-[#1C2B48]/10 bg-white">
         {withdrawals.map((entry) => {
           const status = WITHDRAWAL_STATUS[entry.status] || WITHDRAWAL_STATUS.processing;
           return (
@@ -392,7 +392,7 @@ function Withdrawals({ withdrawals = [] }) {
 function HowItWorks({ data }) {
   const { maturityDays, minimumWithdrawal } = data;
   return (
-    <section className="rounded-lg bg-[#F5F2EE] p-6 text-sm leading-7 text-[#5B5048]">
+    <section className="rounded-sm bg-[#F5F2EE] p-6 text-sm leading-7 text-[#5B5048]">
       <h3 className="font-semibold text-[#3D342D]">💡 How It Works</h3>
       <ul className="mt-1">
         <li>✓ Share your referral link (or your referral code) with friends</li>

@@ -47,7 +47,7 @@ export default function EmailPreferences() {
   }
 
   return (
-    <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
+    <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-6">
       <h2 className="text-2xl font-semibold text-[#1C2B48]">Email Preferences</h2>
       <p className="mt-2 text-sm leading-6 text-[#5B7893]">
         Choose whether you&apos;d like to receive our newsletter with new arrivals and
@@ -57,7 +57,7 @@ export default function EmailPreferences() {
       {optIn === null && !message ? (
         <p className="mt-4 text-sm text-[#5B7893]">Loading…</p>
       ) : optIn !== null ? (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded border border-[#8EB1D1]/20 bg-white/60 px-4 py-3">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded border border-[#1C2B48]/10 bg-white px-4 py-3">
           <div>
             <p className="text-sm font-semibold text-[#1C2B48]">Newsletter</p>
             <p className="text-xs text-[#5B7893]">
@@ -70,8 +70,8 @@ export default function EmailPreferences() {
             onClick={() => save(!optIn)}
             className={`rounded border px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] transition disabled:opacity-50 ${
               optIn
-                ? "border-[#8EB1D1]/50 bg-white text-[#5B7893] hover:bg-[#C4D8E5]"
-                : "border-[#8EB1D1] bg-[#8EB1D1] text-[#1C2B48] hover:bg-[#A7C7E7]"
+                ? "border-[#1C2B48]/20 bg-white text-[#5B7893] hover:bg-[#EEF1F4]"
+                : "border-[#1C2B48] bg-[#1C2B48] text-white hover:bg-[#2A3D60]"
             }`}
           >
             {saving ? "Saving…" : optIn ? "Unsubscribe" : "Subscribe"}

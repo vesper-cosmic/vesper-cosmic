@@ -1,3 +1,5 @@
+import PageHero from "@/components/PageHero";
+
 export const metadata = {
   title: "About VESPER COSMOS | Modern BaZi Mystic Boutique",
   description:
@@ -7,18 +9,12 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-transparent">
-      <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-        <header className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#8EB1D1]">
-            Haute Occult · Modern Mystic Boutique
-          </p>
-          <h1 className="mt-4 text-4xl font-semibold leading-tight text-[#1C2B48] sm:text-5xl">
-            About VESPER COSMOS
-          </h1>
-          <p className="mt-4 text-lg italic text-[#5B7893] sm:text-xl">
-            where ancient eastern wisdom meets modern daily rituals.
-          </p>
-        </header>
+      <PageHero
+        eyebrow={<>Haute Occult · Modern Mystic Boutique</>}
+        title={<>About VESPER COSMOS</>}
+        subtitle={<>where ancient eastern wisdom meets modern daily rituals.</>}
+      />
+      <section className="mx-auto max-w-4xl px-4 pb-16 sm:px-6 lg:px-8">
 
         <div className="mt-12 space-y-6 text-base leading-8 text-[#35506B] sm:text-lg sm:leading-9">
           <p>

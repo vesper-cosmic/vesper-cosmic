@@ -1,3 +1,5 @@
+import PageHero from "@/components/PageHero";
+
 export const metadata = {
   title: "FAQ | VESPER COSMOS",
   description:
@@ -68,16 +70,11 @@ const faqSections = [
 export default function FaqPage() {
   return (
     <main className="min-h-screen bg-transparent">
-      <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-        {/* Header */}
-        <header className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#8EB1D1]">
-            Customer Care · We&rsquo;re Here to Help
-          </p>
-          <h1 className="mt-4 text-4xl font-semibold leading-tight text-[#1C2B48] sm:text-5xl">
-            Frequently Asked Questions
-          </h1>
-        </header>
+      <PageHero
+        eyebrow={<>Customer Care · We&rsquo;re Here to Help</>}
+        title={<>Frequently Asked Questions</>}
+      />
+      <section className="mx-auto max-w-4xl px-4 pb-16 sm:px-6 lg:px-8">
 
         {/* FAQ Sections */}
         <div className="mt-12 space-y-12">
@@ -92,7 +89,7 @@ export default function FaqPage() {
                 {section.items.map((item) => (
                   <div
                     key={item.question}
-                    className="rounded-lg border border-[#8EB1D1]/20 bg-white/60 p-6"
+                    className="rounded-sm border border-[#1C2B48]/10 bg-white p-6"
                   >
                     <h3 className="text-base font-semibold text-[#1C2B48] sm:text-lg">
                       Q: {item.question}
@@ -130,7 +127,7 @@ export default function FaqPage() {
         </div>
 
         {/* Contact prompt */}
-        <div className="mt-14 rounded-lg border border-[#8EB1D1]/20 bg-[#E8ECEF]/95 p-6 text-center">
+        <div className="mt-14 rounded-sm border border-[#1C2B48]/10 bg-white p-6 text-center">
           <h2 className="text-xl font-semibold text-[#1C2B48]">
             Still have questions?
           </h2>

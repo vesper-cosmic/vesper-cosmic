@@ -306,16 +306,16 @@ export default function OrderIntakeForm({ product }) {
     <form onSubmit={handleSubmit} className="space-y-8">
       {errors.submit ? <ErrorBox>{errors.submit}</ErrorBox> : null}
 
-      <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5">
-        <p className="text-sm uppercase tracking-[0.24em] text-[#8EB1D1]">
+      <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-5">
+        <p className="text-sm uppercase tracking-[0.24em] text-[#5B7893]">
           Step 1 of 2 — Your Details
         </p>
-        <div className="mt-4 h-2 rounded-full bg-[#C4D8E5]">
-          <div className="h-2 w-1/2 rounded-full bg-[#8EB1D1]" />
+        <div className="mt-4 h-2 rounded-full bg-[#EEF1F4]">
+          <div className="h-2 w-1/2 rounded-full bg-[#BFA06A]" />
         </div>
-        <h1 className="mt-6 text-4xl font-semibold text-[#1C2B48]">
+        <h2 className="mt-6 text-4xl font-semibold text-[#1C2B48]">
           {product.name}
-        </h1>
+        </h2>
         <p className="mt-2 text-2xl font-semibold text-[#1C2B48]">
           ${product.price} {product.currency}
         </p>
@@ -379,7 +379,7 @@ export default function OrderIntakeForm({ product }) {
         <ShippingFields form={form} errors={errors} updateAddress={updateAddress} />
       ) : null}
 
-      <p className="rounded-lg border border-[#8EB1D1]/25 bg-[#C4D8E5] p-4 text-sm leading-6 text-[#35506B]">
+      <p className="rounded-sm border border-[#1C2B48]/10 bg-[#EEF1F4] p-4 text-sm leading-6 text-[#35506B]">
         Your information is kept strictly confidential and used only for your
         order. Your order is not confirmed until PayPal payment is completed.
       </p>
@@ -397,7 +397,7 @@ export default function OrderIntakeForm({ product }) {
       <button
         type="submit"
         disabled={isSubmitting || (isCustomProduct && !ackFinalSale) || (isDigitalProduct && !ackDigital)}
-        className="mist-button w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mist-button w-full rounded border border-[#1C2B48] bg-[#1C2B48] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white transition hover:bg-[#2A3D60] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? "Preparing Checkout..." : "Continue to Review & Pay"}
       </button>
@@ -436,7 +436,7 @@ function BirthDataFields({ form, product, errors, updateField, updateFortuneChec
   return (
     <FormPanel title="Birth Data">
       {savedBirth?.birthDate && form.birthDate === savedBirth.birthDate ? (
-        <p className="rounded border border-[#8EB1D1]/30 bg-white/70 px-3 py-2 text-xs text-[#35506B]">
+        <p className="rounded border border-[#1C2B48]/10 bg-white px-3 py-2 text-xs text-[#35506B]">
           Filled in with the birth details you saved last time — please check they are still correct.
         </p>
       ) : null}
@@ -491,7 +491,7 @@ function BirthDataFields({ form, product, errors, updateField, updateFortuneChec
         </Field>
       ) : null}
       {birthChoice ? (
-        <label className="flex items-start gap-2 rounded border border-[#8EB1D1]/30 bg-white/70 p-3 text-sm text-[#1C2B48]">
+        <label className="flex items-start gap-2 rounded border border-[#1C2B48]/10 bg-white p-3 text-sm text-[#1C2B48]">
           <input
             type="checkbox"
             checked={birthChoice.keep}
@@ -531,8 +531,8 @@ function FortuneCheckbox({ label, hint, options, selected, error, onChange }) {
               key={option}
               className={`flex items-center gap-3 rounded border p-3 text-sm transition ${
                 isChecked
-                  ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
-                  : "border-[#8EB1D1]/25 bg-white text-[#35506B] hover:border-[#8EB1D1]"
+                  ? "border-[#8EB1D1] bg-[#EEF1F4] text-[#1C2B48]"
+                  : "border-[#1C2B48]/10 bg-white text-[#35506B] hover:border-[#8EB1D1]"
               } ${isDisabled ? "cursor-not-allowed opacity-45" : "cursor-pointer"}`}
             >
               <input
@@ -564,7 +564,7 @@ function NailDetailsFields({
 }) {
   return (
     <FormPanel title="Press-On Nail Details">
-      <p className="rounded border border-[#8EB1D1]/35 bg-[#1C2B48] p-4 text-sm leading-6 text-[#E8ECEF]">
+      <p className="rounded border border-[#1C2B48]/10 bg-[#1C2B48] p-4 text-sm leading-6 text-[#E8ECEF]">
         {intro}
       </p>
       <NailSizePicker
@@ -584,7 +584,7 @@ function NailDetailsFields({
         }
       />
       {nailChoice ? (
-        <label className="flex items-start gap-2 rounded border border-[#8EB1D1]/30 bg-white/70 p-3 text-sm text-[#1C2B48]">
+        <label className="flex items-start gap-2 rounded border border-[#1C2B48]/10 bg-white p-3 text-sm text-[#1C2B48]">
           <input
             type="checkbox"
             checked={nailChoice.keep}
@@ -727,7 +727,7 @@ function RadioGroup({ label, name, value, options, onChange, error, renderOption
           const optionLabel = typeof option === "string" ? option : option.label;
 
           return (
-            <label key={optionValue} className="flex items-center gap-3 rounded border border-[#8EB1D1]/25 p-3 text-sm text-[#35506B] transition hover:border-[#8EB1D1]">
+            <label key={optionValue} className="flex items-center gap-3 rounded border border-[#1C2B48]/10 p-3 text-sm text-[#35506B] transition hover:border-[#8EB1D1]">
               <input
                 type="radio"
                 name={name}
@@ -748,7 +748,7 @@ function RadioGroup({ label, name, value, options, onChange, error, renderOption
 
 function FormPanel({ title, children }) {
   return (
-    <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.25)]">
+    <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-5">
       <h2 className="mb-5 text-2xl font-semibold text-[#1C2B48]">{title}</h2>
       <div className="grid gap-5">{children}</div>
     </section>

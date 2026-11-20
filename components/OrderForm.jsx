@@ -118,7 +118,7 @@ export default function OrderForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+    <form onSubmit={handleSubmit} className="space-y-6 rounded-sm border border-zinc-200 bg-white p-6 shadow-sm">
       {errors.submit ? (
         <p className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {errors.submit}

@@ -26,7 +26,7 @@ export default function SavedBirthDetails() {
   if (!saved && !message) return null;
 
   return (
-    <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
+    <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-6">
       <h2 className="text-2xl font-semibold text-[#1C2B48]">Saved Birth Details</h2>
       <p className="mt-2 text-sm leading-6 text-[#5B7893]">
         You chose to save these for your next BaZi order. They&apos;re only used to fill in your
@@ -34,7 +34,7 @@ export default function SavedBirthDetails() {
       </p>
 
       {saved ? (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded border border-[#8EB1D1]/20 bg-white/60 px-4 py-3">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded border border-[#1C2B48]/10 bg-white px-4 py-3">
           <dl className="grid gap-x-6 gap-y-1 text-sm text-[#1C2B48] sm:grid-cols-2">
             <Row label="Date of birth" value={saved.birthDate} />
             <Row label="Birth time" value={saved.birthTime} />
@@ -46,7 +46,7 @@ export default function SavedBirthDetails() {
             type="button"
             disabled={deleting}
             onClick={remove}
-            className="rounded border border-[#8EB1D1]/50 bg-white px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-[#5B7893] transition hover:bg-[#C4D8E5] disabled:opacity-50"
+            className="rounded border border-[#1C2B48]/20 bg-white px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-[#5B7893] transition hover:bg-[#EEF1F4] disabled:opacity-50"
           >
             {deleting ? "Deleting…" : "Delete"}
           </button>

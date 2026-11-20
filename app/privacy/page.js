@@ -23,16 +23,16 @@ const sections = [
       "We collect only what we need to run the shop, make your custom items and operate member features:",
     ],
     after: [
-      <div key="table" className="overflow-x-auto rounded-lg border border-[#8EB1D1]/25 bg-white/60">
+      <div key="table" className="overflow-x-auto rounded-sm border border-[#1C2B48]/10 bg-white">
         <table className="w-full min-w-[560px] text-left text-sm">
-          <thead className="bg-[#E8ECEF] text-xs uppercase tracking-[0.08em] text-[#5B7893]">
+          <thead className="bg-white text-xs uppercase tracking-[0.08em] text-[#5B7893]">
             <tr>
               <th className="px-4 py-3">Category</th>
               <th className="px-4 py-3">Examples</th>
               <th className="px-4 py-3">Source</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#8EB1D1]/20 text-[#35506B]">
+          <tbody className="divide-y divide-[#1C2B48]/10 text-[#35506B]">
             {CATEGORIES.map(([category, examples, source]) => (
               <tr key={category}>
                 <td className="px-4 py-3 align-top font-semibold text-[#1C2B48]">{category}</td>

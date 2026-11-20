@@ -50,9 +50,9 @@ export default function ThankYouMessage() {
   if (!order) {
     return (
       <MessageShell>
-        <h1 className="text-4xl font-semibold text-[#1C2B48]">
+        <h2 className="text-4xl font-semibold text-[#1C2B48]">
           Your order has been received
-        </h1>
+        </h2>
         <p className="mt-4 text-base leading-7 text-[#35506B]">
           Thank you. I’ll be in touch within 24 hours to confirm your order
           details.
@@ -78,18 +78,18 @@ export default function ThankYouMessage() {
 
     return (
       <MessageShell>
-        <p className="text-sm uppercase tracking-[0.24em] text-[#8EB1D1]">
+        <p className="text-sm uppercase tracking-[0.24em] text-[#5B7893]">
           Order {order.orderId || orderData.orderId}
         </p>
-        <h1 className="mt-3 text-4xl font-semibold text-[#1C2B48]">
+        <h2 className="mt-3 text-4xl font-semibold text-[#1C2B48]">
           Your order has been received
-        </h1>
+        </h2>
         <p className="mt-4 text-base leading-7 text-[#35506B]">
           {order.paid
             ? `Thank you, ${fullName}. We've received your PayPal payment and your order is confirmed. A confirmation email is on its way.`
             : `Thank you, ${fullName}. Your PayPal payment has been submitted. I'll be in touch within 24 hours to confirm your order details.`}
         </p>
-        <div className="mt-6 rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-4 text-left">
+        <div className="mt-6 rounded border border-[#1C2B48]/10 bg-[#EEF1F4] p-4 text-left">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
             Items ({items.length})
           </p>
@@ -120,7 +120,7 @@ export default function ThankYouMessage() {
         </p>
         <Link
           href="/shop"
-          className="mist-button mt-7 inline-flex rounded border border-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] hover:bg-[#8EB1D1] hover:text-[#1C2B48]"
+          className="mist-button mt-7 inline-flex rounded border border-[#1C2B48]/30 px-4 py-2 text-sm font-semibold text-[#1C2B48] hover:bg-[#8EB1D1] hover:text-[#1C2B48]"
         >
           Back to Shop
         </Link>
@@ -132,12 +132,12 @@ export default function ThankYouMessage() {
 
   return (
     <MessageShell>
-      <p className="text-sm uppercase tracking-[0.24em] text-[#8EB1D1]">
+      <p className="text-sm uppercase tracking-[0.24em] text-[#5B7893]">
         Order {order.orderId}
       </p>
-      <h1 className="mt-3 text-4xl font-semibold text-[#1C2B48]">
+      <h2 className="mt-3 text-4xl font-semibold text-[#1C2B48]">
         Your order has been received
-      </h1>
+      </h2>
       <p className="mt-4 text-base leading-7 text-[#35506B]">
         Thank you, {order.fullName}. Your PayPal payment has been submitted. I’ll
         be in touch within 24 hours to confirm your order details.
@@ -157,7 +157,7 @@ export default function ThankYouMessage() {
         Questions? Email me at {CONTACT_EMAIL}
       </p>
       {confirmationStatus === "sending" ? (
-        <p className="mt-4 rounded border border-[#8EB1D1]/35 bg-[#C4D8E5] p-3 text-sm text-[#35506B]">
+        <p className="mt-4 rounded border border-[#1C2B48]/10 bg-[#EEF1F4] p-3 text-sm text-[#35506B]">
           Sending your confirmation email now...
         </p>
       ) : null}
@@ -169,7 +169,7 @@ export default function ThankYouMessage() {
       ) : null}
       <Link
         href="/shop"
-        className="mist-button mt-7 inline-flex rounded border border-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] hover:bg-[#8EB1D1] hover:text-[#1C2B48]"
+        className="mist-button mt-7 inline-flex rounded border border-[#1C2B48]/30 px-4 py-2 text-sm font-semibold text-[#1C2B48] hover:bg-[#8EB1D1] hover:text-[#1C2B48]"
       >
         Back to Shop
       </Link>
@@ -179,7 +179,7 @@ export default function ThankYouMessage() {
 
 function MessageShell({ children }) {
   return (
-    <div className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-8 text-center shadow-[0_18px_60px_rgba(0,0,0,0.28)]">
+    <div className="rounded-sm border border-[#1C2B48]/10 bg-white p-8 text-center">
       {children}
     </div>
   );

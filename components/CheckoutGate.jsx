@@ -34,7 +34,7 @@ export default function CheckoutGate({ children }) {
   if (guest) {
     return (
       <>
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-2 rounded border border-[#8EB1D1]/30 bg-white/60 px-4 py-2.5 text-sm text-[#35506B]">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-2 rounded border border-[#1C2B48]/10 bg-white px-4 py-2.5 text-sm text-[#35506B]">
           <span>Checking out as a guest.</span>
           <a href={signInHref} className="font-semibold text-[#1C2B48] underline">
             Sign in instead
@@ -55,11 +55,11 @@ export default function CheckoutGate({ children }) {
   }
 
   return (
-    <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
+    <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-6">
       <h2 className="text-2xl font-semibold text-[#1C2B48]">How would you like to check out?</h2>
 
       <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <div className="flex flex-col rounded-lg border-2 border-[#1C2B48] bg-white p-5">
+        <div className="flex flex-col rounded-sm border-2 border-[#1C2B48] bg-white p-5">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#1E8A5A]">Recommended</p>
           <h3 className="mt-1 text-lg font-semibold text-[#1C2B48]">Sign in with Google</h3>
           <ul className="mt-3 space-y-1.5 text-sm text-[#35506B]">
@@ -76,7 +76,7 @@ export default function CheckoutGate({ children }) {
           </a>
         </div>
 
-        <div className="flex flex-col rounded-lg border border-[#8EB1D1]/40 bg-white/60 p-5">
+        <div className="flex flex-col rounded-sm border border-[#1C2B48]/20 bg-white p-5">
           <h3 className="text-lg font-semibold text-[#1C2B48]">Continue as guest</h3>
           <p className="mt-3 text-sm leading-6 text-[#35506B]">
             No account needed. You can track your order with your order ID and email, but your
@@ -85,7 +85,7 @@ export default function CheckoutGate({ children }) {
           <button
             type="button"
             onClick={continueAsGuest}
-            className="mt-auto rounded border border-[#8EB1D1] bg-white px-4 py-2.5 text-sm font-bold uppercase tracking-[0.12em] text-[#1C2B48] transition hover:bg-[#C4D8E5] md:mt-5"
+            className="mt-auto rounded border border-[#1C2B48]/30 bg-white px-4 py-2.5 text-sm font-bold uppercase tracking-[0.12em] text-[#1C2B48] transition hover:bg-[#EEF1F4] md:mt-5"
           >
             Continue as guest
           </button>

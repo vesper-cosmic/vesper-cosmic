@@ -282,16 +282,16 @@ export default function CheckoutFlow() {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6 text-center">
-        <h1 className="text-3xl font-semibold text-[#1C2B48]">
+      <div className="rounded-sm border border-[#1C2B48]/10 bg-white p-6 text-center">
+        <h2 className="text-3xl font-semibold text-[#1C2B48]">
           Your cart is empty
-        </h1>
+        </h2>
         <p className="mt-3 text-sm leading-6 text-[#35506B]">
           Add items to your cart from the shop.
         </p>
         <Link
           href="/shop"
-          className="mt-6 inline-flex rounded border border-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48]"
+          className="mt-6 inline-flex rounded border border-[#1C2B48]/30 px-4 py-2 text-sm font-semibold text-[#1C2B48]"
         >
           Back to Shop
         </Link>
@@ -302,13 +302,13 @@ export default function CheckoutFlow() {
   return (
     <CheckoutGate>
     <form onSubmit={handleSubmit} className="space-y-6">
-      <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-4 sm:p-5">
-        <p className="text-sm uppercase tracking-[0.24em] text-[#8EB1D1]">
+      <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-4 sm:p-5">
+        <p className="text-sm uppercase tracking-[0.24em] text-[#5B7893]">
           Checkout
         </p>
-        <h1 className="mt-2 text-4xl font-semibold text-[#1C2B48]">
+        <h2 className="mt-2 text-4xl font-semibold text-[#1C2B48]">
           {items.length} item{items.length > 1 ? "s" : ""} · ${totalPrice.toFixed(2)} USD
-        </h1>
+        </h2>
       </section>
 
       {/* Item customization forms */}
@@ -336,7 +336,7 @@ export default function CheckoutFlow() {
       ))}
 
       {/* Contact & Shipping */}
-      <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-4 sm:p-5">
+      <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-4 sm:p-5">
         <h2 className="text-2xl font-semibold text-[#1C2B48]">Contact & Delivery</h2>
         <div className="mt-5 space-y-4">
           <NameFields
@@ -354,7 +354,7 @@ export default function CheckoutFlow() {
               inputMode="email"
               value={form.email}
               onChange={(event) => updateField("email", event.target.value)}
-              className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+              className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
             />
           </Field>
           <Field label="Referral Code (optional)">
@@ -364,14 +364,14 @@ export default function CheckoutFlow() {
               onChange={(event) => setReferralCode(event.target.value.toUpperCase())}
               placeholder="e.g. USER-AB12C"
               maxLength={32}
-              className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 font-mono text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+              className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 font-mono text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
             />
           </Field>
 
           {hasShippingItems ? (
             <>
               <div className="pt-2">
-                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8EB1D1]">
+                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
                   Shipping Address
                 </p>
                 {member?.defaultAddress?.addressLine1 ? (
@@ -405,7 +405,7 @@ export default function CheckoutFlow() {
               </span>
             </label>
           ) : (
-            <p className="rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-3 text-xs leading-5 text-[#35506B]">
+            <p className="rounded border border-[#1C2B48]/10 bg-[#EEF1F4] p-3 text-xs leading-5 text-[#35506B]">
               Sign in to save your address and cart for next time.
             </p>
           )}
@@ -431,7 +431,7 @@ export default function CheckoutFlow() {
       <button
         type="submit"
         disabled={submitting || (hasCustomItems && !ackFinalSale) || (hasDigitalItems && !ackDigital)}
-        className="w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:opacity-60"
+        className="w-full rounded border border-[#1C2B48] bg-[#1C2B48] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white transition hover:bg-[#2A3D60] disabled:opacity-60"
       >
         {submitting ? "Submitting…" : "Continue to Review & Pay"}
       </button>
@@ -445,7 +445,7 @@ function ItemFormSection({ item, index, details, errors, onChange, savedSizing, 
   if (!product) return null;
 
   return (
-    <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-4 sm:p-5">
+    <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-4 sm:p-5">
       <div className="flex items-center gap-3">
         <img
           src={item.image}
@@ -526,12 +526,12 @@ function BirthFields({ itemId, product, details, errors, onChange, savedBirth, b
   }, [savedBirth]);
 
   return (
-    <div className="rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-3 space-y-4 sm:p-4">
+    <div className="rounded border border-[#1C2B48]/10 bg-[#EEF1F4] p-3 space-y-4 sm:p-4">
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
         Birth Information (for your BaZi chart)
       </p>
       {savedBirth?.birthDate && birth.birthDate === savedBirth.birthDate ? (
-        <p className="rounded border border-[#8EB1D1]/30 bg-white/70 px-3 py-2 text-xs text-[#35506B]">
+        <p className="rounded border border-[#1C2B48]/10 bg-white px-3 py-2 text-xs text-[#35506B]">
           Filled in with the birth details you saved last time — please check they are still correct.
         </p>
       ) : null}
@@ -553,7 +553,7 @@ function BirthFields({ itemId, product, details, errors, onChange, savedBirth, b
           <select
             value={birth.biologicalGender || ""}
             onChange={(event) => update("biologicalGender", event.target.value)}
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           >
             <option value="">Select…</option>
             <option value="Male">Male</option>
@@ -564,7 +564,7 @@ function BirthFields({ itemId, product, details, errors, onChange, savedBirth, b
           <select
             value={birth.daylightSavingTime || ""}
             onChange={(event) => update("daylightSavingTime", event.target.value)}
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           >
             <option value="">Select…</option>
             {daylightSavingOptions.map((option) => (
@@ -581,7 +581,7 @@ function BirthFields({ itemId, product, details, errors, onChange, savedBirth, b
           value={birth.birthLocation || ""}
           onChange={(event) => update("birthLocation", event.target.value)}
           placeholder="e.g. Taipei, Taiwan"
-          className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+          className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
         />
       </Field>
       {product.formType === "C" ? (
@@ -608,7 +608,7 @@ function BirthFields({ itemId, product, details, errors, onChange, savedBirth, b
         />
       )}
       {birthChoice ? (
-        <label className="flex items-start gap-2 rounded border border-[#8EB1D1]/30 bg-white/70 p-3 text-sm text-[#1C2B48]">
+        <label className="flex items-start gap-2 rounded border border-[#1C2B48]/10 bg-white p-3 text-sm text-[#1C2B48]">
           <input
             type="checkbox"
             checked={birthChoice.keep}
@@ -651,7 +651,7 @@ function NailFields({ itemId, details, errors, onChange, savedSizing, nailChoice
   }
 
   return (
-    <div className="rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-3 space-y-4 sm:p-4">
+    <div className="rounded border border-[#1C2B48]/10 bg-[#EEF1F4] p-3 space-y-4 sm:p-4">
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
         Nail Details
       </p>
@@ -666,7 +666,7 @@ function NailFields({ itemId, details, errors, onChange, savedSizing, nailChoice
         }
       />
       {nailChoice ? (
-      <label className="flex items-start gap-2 rounded border border-[#8EB1D1]/30 bg-white/70 p-3 text-sm text-[#1C2B48]">
+      <label className="flex items-start gap-2 rounded border border-[#1C2B48]/10 bg-white p-3 text-sm text-[#1C2B48]">
         <input
           type="checkbox"
           checked={nailChoice.keep}
@@ -689,7 +689,7 @@ function NailFields({ itemId, details, errors, onChange, savedSizing, nailChoice
           <select
             value={nails.nailShape || ""}
             onChange={(event) => update("nailShape", event.target.value)}
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           >
             <option value="">Select…</option>
             {nailShapes.map((shape) => (
@@ -703,7 +703,7 @@ function NailFields({ itemId, details, errors, onChange, savedSizing, nailChoice
           <select
             value={nails.nailLength || ""}
             onChange={(event) => update("nailLength", event.target.value)}
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           >
             <option value="">Select…</option>
             {nailLengths.map((option) => (
@@ -717,7 +717,7 @@ function NailFields({ itemId, details, errors, onChange, savedSizing, nailChoice
           <select
             value={nails.stylePreference || ""}
             onChange={(event) => update("stylePreference", event.target.value)}
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           >
             <option value="">Select…</option>
             {stylePreferences.map((option) => (
@@ -733,7 +733,7 @@ function NailFields({ itemId, details, errors, onChange, savedSizing, nailChoice
           value={nails.nailNotes || ""}
           onChange={(event) => update("nailNotes", event.target.value)}
           rows="2"
-          className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+          className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
         />
       </Field>
     </div>
@@ -758,8 +758,8 @@ function FortuneCheckboxGroup({ label, hint, options, selected, error, onChange 
               key={option}
               className={`flex items-center gap-3 rounded border p-3 text-sm transition ${
                 isChecked
-                  ? "border-[#8EB1D1] bg-[#C4D8E5] text-[#1C2B48]"
-                  : "border-[#8EB1D1]/25 bg-white text-[#35506B] hover:border-[#8EB1D1]"
+                  ? "border-[#8EB1D1] bg-[#EEF1F4] text-[#1C2B48]"
+                  : "border-[#1C2B48]/10 bg-white text-[#35506B] hover:border-[#8EB1D1]"
               } ${isDisabled ? "cursor-not-allowed opacity-45" : "cursor-pointer"}`}
             >
               <input
@@ -820,7 +820,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
           value={shipping.phone || ""}
           onChange={(event) => onChange("phone", event.target.value)}
           placeholder="e.g. +1 512 555 0100"
-          className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+          className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
         />
         <p className="mt-1 text-[11px] text-[#5B7893]">
           Required by the carrier and US customs to deliver your parcel.
@@ -831,7 +831,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
           <select
             value={shipping.country}
             onChange={(event) => onChange("country", event.target.value)} autoComplete="shipping country-name"
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           >
             {countries.map((country) => (
               <option key={country} value={country}>
@@ -846,7 +846,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
           type="text"
           value={shipping.addressLine1}
           onChange={(event) => onChange("addressLine1", event.target.value)} autoComplete="shipping address-line1"
-          className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+          className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
         />
       </Field>
       <Field label="Address Line 2 (optional)">
@@ -854,7 +854,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
           type="text"
           value={shipping.addressLine2}
           onChange={(event) => onChange("addressLine2", event.target.value)} autoComplete="shipping address-line2"
-          className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+          className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
         />
       </Field>
       <div className="grid gap-4 sm:grid-cols-3">
@@ -863,7 +863,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
             type="text"
             value={shipping.city}
             onChange={(event) => onChange("city", event.target.value)} autoComplete="shipping address-level2"
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           />
         </Field>
         <Field label="State / Province" error={errors.stateProvince}>
@@ -871,7 +871,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
             type="text"
             value={shipping.stateProvince}
             onChange={(event) => onChange("stateProvince", event.target.value)} autoComplete="shipping address-level1"
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           />
         </Field>
         <Field label="Postal Code" error={errors.postalCode}>
@@ -879,7 +879,7 @@ function ShippingForm({ shipping, errors, onChange, onNameChange, contactName })
             type="text"
             value={shipping.postalCode}
             onChange={(event) => onChange("postalCode", event.target.value)} autoComplete="shipping postal-code"
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           />
         </Field>
       </div>

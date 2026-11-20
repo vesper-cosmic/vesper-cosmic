@@ -9,6 +9,7 @@ import { customerStatusLabel } from "@/lib/orderStatus";
 import ReferralEarnings from "@/components/account/ReferralEarnings";
 import EmailPreferences from "@/components/account/EmailPreferences";
 import SavedBirthDetails from "@/components/account/SavedBirthDetails";
+import PageHero from "@/components/PageHero";
 
 // Member levels are stored in Chinese in Notion; show them in English.
 const MEMBER_LEVEL_EN = {
@@ -86,47 +87,52 @@ export default function AccountPage() {
 
   if (!isSignedIn) {
     return (
-      <main className="min-h-screen bg-transparent px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-8 text-center">
-          <h1 className="text-3xl font-semibold text-[#1C2B48]">
-            Your Account
-          </h1>
+      <main className="min-h-screen bg-transparent">
+        <PageHero size="sm" eyebrow="Member Center" title="Your Account" />
+        <div className="px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl rounded-sm border border-[#1C2B48]/10 bg-white p-8 text-center">
+          <h2 className="text-3xl font-semibold text-[#1C2B48]">
+            Sign in to continue
+          </h2>
           <p className="mt-3 text-sm leading-6 text-[#35506B]">
             Please sign in with Google to see your saved cart and default
             shipping address.
           </p>
           <Link
             href="/shop"
-            className="mist-button mt-6 inline-flex rounded border border-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48]"
+            className="mist-button mt-6 inline-flex rounded border border-[#1C2B48]/30 px-4 py-2 text-sm font-semibold text-[#1C2B48]"
           >
             Back to Shop
           </Link>
+        </div>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-10 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-transparent">
+      <PageHero size="sm" eyebrow="Member Center" title="My Account" />
+      <div className="px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl space-y-6">
-        <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
-          <p className="text-sm uppercase tracking-[0.24em] text-[#8EB1D1]">
+        <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-6">
+          <p className="text-sm uppercase tracking-[0.24em] text-[#5B7893]">
             Account
           </p>
-          <h1 className="mt-2 text-4xl font-semibold text-[#1C2B48]">
+          <h2 className="mt-2 text-4xl font-semibold text-[#1C2B48]">
             {member?.name || "Your Account"}
-          </h1>
+          </h2>
           <p className="mt-2 text-sm text-[#5B7893]">{userEmail}</p>
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="mt-4 rounded border border-[#8EB1D1]/40 px-3 py-1.5 text-xs font-medium text-[#5B7893] transition hover:bg-[#C4D8E5] hover:text-[#1C2B48]"
+            className="mt-4 rounded border border-[#1C2B48]/20 px-3 py-1.5 text-xs font-medium text-[#5B7893] transition hover:bg-[#EEF1F4] hover:text-[#1C2B48]"
           >
             Sign out
           </button>
         </section>
 
-        <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
+        <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-6">
           <h2 className="text-2xl font-semibold text-[#1C2B48]">
             Member Info
           </h2>
@@ -134,7 +140,7 @@ export default function AccountPage() {
             Your membership level and profile details.
           </p>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
+            <div className="rounded border border-[#1C2B48]/10 bg-white px-3 py-2.5">
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
                 Member Level
               </p>
@@ -142,7 +148,7 @@ export default function AccountPage() {
                 {MEMBER_LEVEL_EN[member?.memberLevel] || member?.memberLevel || "Bronze"}
               </p>
             </div>
-            <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
+            <div className="rounded border border-[#1C2B48]/10 bg-white px-3 py-2.5">
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
                 Total Spent
               </p>
@@ -150,7 +156,7 @@ export default function AccountPage() {
                 NT${Number(member?.totalSpending || 0).toLocaleString()}
               </p>
             </div>
-            <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
+            <div className="rounded border border-[#1C2B48]/10 bg-white px-3 py-2.5">
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
                 Orders
               </p>
@@ -158,7 +164,7 @@ export default function AccountPage() {
                 {member?.orderCount || 0}
               </p>
             </div>
-            <div className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5">
+            <div className="rounded border border-[#1C2B48]/10 bg-white px-3 py-2.5">
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#5B7893]">
                 Birthday
               </p>
@@ -174,7 +180,7 @@ export default function AccountPage() {
           </div>
         </section>
 
-        <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
+        <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-6">
           <h2 className="text-2xl font-semibold text-[#1C2B48]">
             Default Shipping Address
           </h2>
@@ -191,7 +197,7 @@ export default function AccountPage() {
                   name="addressLine1"
                   defaultValue={defaultAddress.addressLine1 || ""}
                   required
-                  className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+                  className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
                 />
               </Field>
               <Field label="Address Line 2 (optional)">
@@ -199,7 +205,7 @@ export default function AccountPage() {
                   type="text"
                   name="addressLine2"
                   defaultValue={defaultAddress.addressLine2 || ""}
-                  className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+                  className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
                 />
               </Field>
               <Field label="City">
@@ -208,7 +214,7 @@ export default function AccountPage() {
                   name="city"
                   defaultValue={defaultAddress.city || ""}
                   required
-                  className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+                  className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
                 />
               </Field>
               <Field label="Postal Code">
@@ -217,7 +223,7 @@ export default function AccountPage() {
                   name="postalCode"
                   defaultValue={defaultAddress.postalCode || ""}
                   required
-                  className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+                  className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
                 />
               </Field>
               <Field label="Phone">
@@ -227,7 +233,7 @@ export default function AccountPage() {
                   autoComplete="tel"
                   defaultValue={defaultAddress.phone || ""}
                   placeholder="e.g. +1 512 555 0100"
-                  className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+                  className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
                 />
               </Field>
               <Field label="Country">
@@ -235,7 +241,7 @@ export default function AccountPage() {
                   name="country"
                   defaultValue={defaultAddress.country || "United States"}
                   required
-                  className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+                  className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
                 >
                   {countries.map((country) => (
                     <option key={country} value={country}>
@@ -248,7 +254,7 @@ export default function AccountPage() {
             {error ? <p className="text-sm text-red-500">{error}</p> : null}
             <button
               type="submit"
-              className="rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-2.5 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+              className="rounded border border-[#1C2B48] bg-[#1C2B48] px-5 py-2.5 text-sm font-bold uppercase tracking-[0.16em] text-white transition hover:bg-[#2A3D60]"
             >
               {saved ? "✓ Saved" : "Save Address"}
             </button>
@@ -261,7 +267,7 @@ export default function AccountPage() {
 
         <SavedBirthDetails />
 
-        <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
+        <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold text-[#1C2B48]">
               Order History
@@ -286,7 +292,7 @@ export default function AccountPage() {
                 {orders.map((order) => (
                   <li
                     key={order.orderId}
-                    className="rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2.5 text-sm text-[#1C2B48]"
+                    className="rounded border border-[#1C2B48]/10 bg-white px-3 py-2.5 text-sm text-[#1C2B48]"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div>
@@ -326,7 +332,7 @@ export default function AccountPage() {
           )}
         </section>
 
-        <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6">
+        <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold text-[#1C2B48]">
               Saved Cart
@@ -343,7 +349,7 @@ export default function AccountPage() {
                 {items.map((item) => (
                   <li
                     key={item.id}
-                    className="flex items-center justify-between rounded border border-[#8EB1D1]/20 bg-white/60 px-3 py-2 text-sm text-[#1C2B48]"
+                    className="flex items-center justify-between rounded border border-[#1C2B48]/10 bg-white px-3 py-2 text-sm text-[#1C2B48]"
                   >
                     <span>
                       {item.name}{" "}
@@ -372,6 +378,7 @@ export default function AccountPage() {
             </p>
           )}
         </section>
+      </div>
       </div>
     </main>
   );

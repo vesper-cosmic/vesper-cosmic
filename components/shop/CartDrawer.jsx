@@ -47,19 +47,19 @@ export default function CartDrawer() {
 
       {/* Drawer */}
       <div
-        className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-[#E8ECEF] shadow-[0_0_60px_rgba(28,43,72,0.3)] transition-transform duration-300 ${
+        className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-[0_0_60px_rgba(28,43,72,0.3)] transition-transform duration-300 ${
           cartOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#8EB1D1]/25 px-4 py-4 sm:px-5 [padding-top:max(1rem,env(safe-area-inset-top))]">
+        <div className="flex items-center justify-between border-b border-[#1C2B48]/10 px-4 py-4 sm:px-5 [padding-top:max(1rem,env(safe-area-inset-top))]">
           <h2 className="text-xl font-semibold text-[#1C2B48]">
             Cart ({totalItems})
           </h2>
           <button
             type="button"
             onClick={closeCart}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#8EB1D1]/40 bg-white/60 text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#1C2B48]/20 bg-white text-[#1C2B48] transition hover:bg-[#EEF1F4]"
             aria-label="Close cart"
           >
             ✕
@@ -82,7 +82,7 @@ export default function CartDrawer() {
               {items.map((item) => (
                 <li
                   key={item.id}
-                  className="flex gap-3 rounded-lg border border-[#8EB1D1]/20 bg-white/60 p-3 sm:gap-4"
+                  className="flex gap-3 rounded-sm border border-[#1C2B48]/10 bg-white p-3 sm:gap-4"
                 >
                   <img
                     src={item.image}
@@ -99,13 +99,13 @@ export default function CartDrawer() {
                       </p>
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center rounded border border-[#8EB1D1]/30 bg-white">
+                      <div className="flex items-center rounded border border-[#1C2B48]/10 bg-white">
                         <button
                           type="button"
                           onClick={() =>
                             updateQuantity(item.id, item.quantity - 1)
                           }
-                          className="flex h-9 w-9 items-center justify-center text-sm text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+                          className="flex h-9 w-9 items-center justify-center text-sm text-[#1C2B48] transition hover:bg-[#EEF1F4]"
                           aria-label="Decrease quantity"
                         >
                           −
@@ -118,7 +118,7 @@ export default function CartDrawer() {
                           onClick={() =>
                             updateQuantity(item.id, item.quantity + 1)
                           }
-                          className="flex h-9 w-9 items-center justify-center text-sm text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+                          className="flex h-9 w-9 items-center justify-center text-sm text-[#1C2B48] transition hover:bg-[#EEF1F4]"
                           aria-label="Increase quantity"
                         >
                           +
@@ -141,7 +141,7 @@ export default function CartDrawer() {
 
         {/* Footer */}
         {items.length > 0 ? (
-          <div className="border-t border-[#8EB1D1]/25 px-4 py-4 sm:px-5 [padding-bottom:max(1rem,env(safe-area-inset-bottom))]">
+          <div className="border-t border-[#1C2B48]/10 px-4 py-4 sm:px-5 [padding-bottom:max(1rem,env(safe-area-inset-bottom))]">
             <div className="mb-3 flex items-center justify-between sm:mb-4">
               <span className="text-base font-semibold text-[#1C2B48]">
                 Total
@@ -152,7 +152,7 @@ export default function CartDrawer() {
             </div>
             <Link
               href="/checkout"
-              className="block w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-center text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+              className="block w-full rounded border border-[#1C2B48] bg-[#1C2B48] px-5 py-3 text-center text-sm font-bold uppercase tracking-[0.16em] text-white transition hover:bg-[#2A3D60]"
               onClick={closeCart}
             >
               Proceed to Checkout

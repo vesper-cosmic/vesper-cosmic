@@ -1,5 +1,6 @@
 import { CONTACT_EMAIL } from "@/lib/siteEmail";
 import ContactForm from "@/components/ContactForm";
+import PageHero from "@/components/PageHero";
 
 export const metadata = {
   title: "Contact Us | VESPER COSMOS",
@@ -10,25 +11,17 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <main className="min-h-screen bg-transparent">
-      <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-        {/* Header */}
-        <header className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#8EB1D1]">
-            Customer Care · We&rsquo;re Here to Help
-          </p>
-          <h1 className="mt-4 text-4xl font-semibold leading-tight text-[#1C2B48] sm:text-5xl">
-            Contact Us
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-[#35506B] sm:text-lg sm:leading-9">
-            Have a question about your birth chart report, custom nail sizing,
-            or an existing order? We are here to guide you.
-          </p>
-        </header>
+      <PageHero
+        eyebrow={<>Customer Care · We&rsquo;re Here to Help</>}
+        title={<>Contact Us</>}
+        subtitle={<>Have a question about your birth chart report, custom nail sizing, or an existing order? We are here to guide you.</>}
+      />
+      <section className="mx-auto max-w-4xl px-4 pb-16 sm:px-6 lg:px-8">
 
         {/* Contact info cards */}
         <div className="mt-12 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-lg border border-[#8EB1D1]/20 bg-white/60 p-6">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8EB1D1]">
+          <div className="rounded-sm border border-[#1C2B48]/10 bg-white p-6">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5B7893]">
               Customer Support
             </h2>
             <p className="mt-3 text-sm leading-7 text-[#35506B]">
@@ -48,8 +41,8 @@ export default function ContactPage() {
             </p>
           </div>
 
-          <div className="rounded-lg border border-[#8EB1D1]/20 bg-white/60 p-6">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8EB1D1]">
+          <div className="rounded-sm border border-[#1C2B48]/10 bg-white p-6">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5B7893]">
               Business & Press
             </h2>
             <p className="mt-3 text-sm leading-7 text-[#35506B]">

@@ -10,7 +10,7 @@ export default function AccountButton() {
 
   if (status === "loading") {
     return (
-      <span className="rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#5B7893]">
+      <span className="rounded-sm border border-[#1C2B48]/20 bg-white px-4 py-2 text-sm font-semibold text-[#5B7893]">
         ...
       </span>
     );
@@ -21,7 +21,7 @@ export default function AccountButton() {
       <div className="flex items-center gap-2">
         <Link
           href="/account"
-          className="relative flex items-center gap-2 rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+          className="relative flex items-center gap-2 rounded-sm border border-[#1C2B48]/20 bg-white px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#EEF1F4]"
         >
           <svg
             aria-hidden="true"
@@ -47,7 +47,7 @@ export default function AccountButton() {
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: "/shop" })}
-          className="rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-3 py-2 text-sm font-semibold text-[#35506B] transition hover:bg-[#C4D8E5]"
+          className="rounded-sm border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm font-semibold text-[#35506B] transition hover:bg-[#EEF1F4]"
           title="Sign out"
         >
           <svg
@@ -76,7 +76,7 @@ export default function AccountButton() {
   return (
     <Link
       href={target}
-      className="flex items-center gap-2 rounded-lg border border-[#8EB1D1]/40 bg-white/60 px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+      className="flex items-center gap-2 rounded-sm border border-[#1C2B48]/20 bg-white px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#EEF1F4]"
     >
       <svg
         aria-hidden="true"

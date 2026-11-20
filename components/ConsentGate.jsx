@@ -70,7 +70,7 @@ export default function ConsentGate() {
       aria-labelledby="consent-title"
       className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1C2B48]/60 px-4"
     >
-      <div className="w-full max-w-md rounded-lg bg-[#E8ECEF] p-6 shadow-xl">
+      <div className="w-full max-w-md rounded-sm bg-white p-6 shadow-xl">
         <h2 id="consent-title" className="text-xl font-semibold text-[#1C2B48]">
           Please review our terms
         </h2>
@@ -84,14 +84,14 @@ export default function ConsentGate() {
             type="button"
             disabled={!checked || saving}
             onClick={accept}
-            className="flex-1 rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2.5 text-sm font-bold uppercase tracking-[0.12em] text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:opacity-50"
+            className="flex-1 rounded border border-[#1C2B48] bg-[#1C2B48] px-4 py-2.5 text-sm font-bold uppercase tracking-[0.12em] text-white transition hover:bg-[#2A3D60] disabled:opacity-50"
           >
             {saving ? "Saving…" : "Accept"}
           </button>
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="rounded border border-[#8EB1D1]/50 px-4 py-2.5 text-sm font-semibold text-[#5B7893] hover:bg-[#C4D8E5]"
+            className="rounded border border-[#1C2B48]/20 px-4 py-2.5 text-sm font-semibold text-[#5B7893] hover:bg-[#EEF1F4]"
           >
             Sign out
           </button>

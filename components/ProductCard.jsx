@@ -2,11 +2,11 @@ import { productBadges } from "@/lib/productData";
 export default function ProductCard({ product, featured = false }) {
   return (
     <article
-      className={`flex h-full flex-col overflow-hidden rounded-lg border bg-[#E8ECEF] shadow-sm ${
-        featured ? "border-[#8EB1D1]" : "border-[#8EB1D1]/35"
+      className={`flex h-full flex-col overflow-hidden rounded-sm border bg-white shadow-sm ${
+        featured ? "border-[#8EB1D1]" : "border-[#1C2B48]/10"
       }`}
     >
-      <div className="relative aspect-[4/3] bg-[#E8ECEF]">
+      <div className="relative aspect-[4/3] bg-white">
         <img
           src={product.images[0]}
           alt={product.name}
@@ -38,7 +38,7 @@ export default function ProductCard({ product, featured = false }) {
           </p>
           <a
             href={`/order/${product.slug}`}
-            className="mist-button rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-medium text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+            className="mist-button rounded border border-[#1C2B48] bg-[#1C2B48] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#2A3D60]"
           >
             Order Now
           </a>

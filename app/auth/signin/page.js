@@ -6,6 +6,7 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { CONSENT_PENDING_KEY, ConsentCheckbox } from "@/components/ConsentGate";
 import { CONSENT_VERSION } from "@/lib/legal";
+import PageHero from "@/components/PageHero";
 
 const ERROR_MESSAGES = {
   OAuthSignin: "Something went wrong. Please try again.",
@@ -56,16 +57,11 @@ function SignInContent() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-md">
-        <div className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6 sm:p-8">
-          <p className="text-center text-xs uppercase tracking-[0.24em] text-[#8EB1D1]">
-            Vesper Cosmos
-          </p>
-          <h1 className="mt-2 text-center text-3xl font-semibold text-[#1C2B48]">
-            Sign In
-          </h1>
-          <p className="mt-2 text-center text-sm leading-6 text-[#5B7893]">
+    <main className="min-h-screen bg-transparent">
+      <PageHero size="sm" eyebrow="Member Center" title="Sign In" />
+      <div className="mx-auto max-w-md px-4 py-10 sm:px-6 lg:px-8">
+        <div className="rounded-sm border border-[#1C2B48]/10 bg-white p-6 sm:p-8">
+          <p className="text-center text-sm leading-6 text-[#5B7893]">
             Sign in with Google to sync your cart and default address.
           </p>
 
@@ -81,7 +77,7 @@ function SignInContent() {
             type="button"
             onClick={handleGoogle}
             disabled={!agreed}
-            className="mt-5 flex w-full items-center justify-center gap-3 rounded border border-[#8EB1D1]/40 bg-white px-4 py-2.5 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5] disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-5 flex w-full items-center justify-center gap-3 rounded border border-[#1C2B48]/20 bg-white px-4 py-2.5 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#EEF1F4] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24">
               <path

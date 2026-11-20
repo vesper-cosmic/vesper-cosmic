@@ -64,7 +64,7 @@ export default function ContactForm() {
             onChange={handleChange}
             placeholder="Your name"
             required
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           />
           {errors.name ? (
             <p className="mt-1 text-xs font-medium text-[#c05b4d]">{errors.name}</p>
@@ -86,7 +86,7 @@ export default function ContactForm() {
             onChange={handleChange}
             placeholder="you@example.com"
             required
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           />
           {errors.email ? (
             <p className="mt-1 text-xs font-medium text-[#c05b4d]">{errors.email}</p>
@@ -107,7 +107,7 @@ export default function ContactForm() {
             value={form.orderNumber}
             onChange={handleChange}
             placeholder="e.g. VC-20260801-AB12"
-            className="w-full rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           />
         </div>
 
@@ -126,7 +126,7 @@ export default function ContactForm() {
             placeholder="How can we help you?"
             rows={6}
             required
-            className="w-full resize-y rounded border border-[#8EB1D1]/40 bg-white px-3 py-2 text-sm leading-6 text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
+            className="w-full resize-y rounded border border-[#1C2B48]/20 bg-white px-3 py-2 text-sm leading-6 text-[#1C2B48] outline-none focus:border-[#8EB1D1]"
           />
           {errors.message ? (
             <p className="mt-1 text-xs font-medium text-[#c05b4d]">{errors.message}</p>
@@ -136,14 +136,14 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-2.5 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7] disabled:opacity-50"
+          className="w-full rounded border border-[#1C2B48] bg-[#1C2B48] px-5 py-2.5 text-sm font-bold uppercase tracking-[0.16em] text-white transition hover:bg-[#2A3D60] disabled:opacity-50"
         >
           {status === "loading" ? "Sending..." : "Send Message"}
         </button>
       </form>
 
       {status === "success" ? (
-        <div className="mt-4 rounded border border-[#8EB1D1]/40 bg-white/60 p-4 text-sm leading-6 text-[#1C2B48]">
+        <div className="mt-4 rounded border border-[#1C2B48]/20 bg-white p-4 text-sm leading-6 text-[#1C2B48]">
           {success}
         </div>
       ) : null}

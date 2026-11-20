@@ -47,12 +47,12 @@ export default function ProductDetailModal({ product, onClose }) {
       />
 
       {/* Modal */}
-      <div className="relative z-10 flex max-h-[100dvh] w-full max-w-4xl flex-col overflow-y-auto rounded-none border border-[#8EB1D1]/30 bg-[#E8ECEF] shadow-[0_30px_80px_rgba(28,43,72,0.4)] sm:max-h-[90vh] sm:flex-row sm:rounded-2xl">
+      <div className="relative z-10 flex max-h-[100dvh] w-full max-w-4xl flex-col overflow-y-auto rounded-none border border-[#1C2B48]/10 bg-white shadow-[0_30px_80px_rgba(28,43,72,0.4)] sm:max-h-[90vh] sm:flex-row sm:rounded-sm">
         {/* Close button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-[#8EB1D1]/40 bg-[#1C2B48]/80 text-[#E8ECEF] text-lg transition hover:bg-[#1C2B48]"
+          className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-[#1C2B48]/20 bg-[#1C2B48]/80 text-[#E8ECEF] text-lg transition hover:bg-[#1C2B48]"
           aria-label="Close"
         >
           ✕
@@ -69,7 +69,7 @@ export default function ProductDetailModal({ product, onClose }) {
             {productBadges(product).length ? (
               <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
                 {productBadges(product).map((badge) => (
-                  <span key={badge} className="rounded-full border border-[#8EB1D1] bg-[#1C2B48]/85 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#E8ECEF]">
+                  <span key={badge} className="rounded-full border border-[#1C2B48]/30 bg-[#1C2B48]/85 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#E8ECEF]">
                     {badge}
                   </span>
                 ))}
@@ -77,7 +77,7 @@ export default function ProductDetailModal({ product, onClose }) {
             ) : null}
           </div>
           {product.images.length > 1 ? (
-            <div className="flex gap-2 overflow-x-auto border-t border-[#8EB1D1]/20 bg-[#C4D8E5]/50 p-3">
+            <div className="flex gap-2 overflow-x-auto border-t border-[#1C2B48]/10 bg-[#EEF1F4] p-3">
               {product.images.map((image, index) => (
                 <button
                   key={image}
@@ -86,7 +86,7 @@ export default function ProductDetailModal({ product, onClose }) {
                   className={`h-14 w-14 flex-shrink-0 overflow-hidden rounded border ${
                     activeImageIndex === index
                       ? "border-[#8EB1D1] ring-1 ring-[#8EB1D1]"
-                      : "border-[#8EB1D1]/25 opacity-60 hover:opacity-100"
+                      : "border-[#1C2B48]/10 opacity-60 hover:opacity-100"
                   }`}
                 >
                   <img
@@ -105,10 +105,10 @@ export default function ProductDetailModal({ product, onClose }) {
           <div className="flex-1 space-y-4 p-5 pb-4 sm:p-6">
             {/* Tags */}
             <div className="flex flex-wrap gap-2">
-              <span className="rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#8EB1D1]">
+              <span className="rounded-full border border-[#1C2B48]/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#5B7893]">
                 {product.categoryLabel}
               </span>
-              <span className="rounded-full border border-[#8EB1D1]/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#35506B]">
+              <span className="rounded-full border border-[#1C2B48]/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#35506B]">
                 {product.fulfillmentMode}
               </span>
             </div>
@@ -122,7 +122,7 @@ export default function ProductDetailModal({ product, onClose }) {
             </p>
 
             {product.nailSize ? (
-              <div className="space-y-2 rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-3">
+              <div className="space-y-2 rounded border border-[#1C2B48]/10 bg-[#EEF1F4] p-3">
                 <p className="text-sm text-[#1C2B48]">
                   <span className="font-semibold">Size {product.nailSize}</span> — this set is
                   ready-made in one fixed size, so no measurements are needed. Check the chart
@@ -133,7 +133,7 @@ export default function ProductDetailModal({ product, onClose }) {
             ) : null}
 
             {product.includes ? (
-              <div className="rounded border border-[#8EB1D1]/25 bg-[#C4D8E5]/50 p-3">
+              <div className="rounded border border-[#1C2B48]/10 bg-[#EEF1F4] p-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#5B7893]">
                   Includes
                 </p>
@@ -152,7 +152,7 @@ export default function ProductDetailModal({ product, onClose }) {
                   {product.availableIntentions.map((intention) => (
                     <span
                       key={intention}
-                      className="rounded-full border border-[#8EB1D1]/30 bg-white/60 px-3 py-1 text-xs font-medium text-[#1C2B48]"
+                      className="rounded-full border border-[#1C2B48]/10 bg-white px-3 py-1 text-xs font-medium text-[#1C2B48]"
                     >
                       {intention}
                     </span>
@@ -176,7 +176,7 @@ export default function ProductDetailModal({ product, onClose }) {
               </p>
             ) : null}
 
-            <p className="rounded border border-[#8EB1D1]/25 bg-white/50 px-3 py-2 text-xs leading-5 text-[#5B7893]">
+            <p className="rounded border border-[#1C2B48]/10 bg-white/50 px-3 py-2 text-xs leading-5 text-[#5B7893]">
               <strong>Disclaimer:</strong> {PRODUCT_DISCLAIMER}
             </p>
 
@@ -185,11 +185,11 @@ export default function ProductDetailModal({ product, onClose }) {
               <span className="text-sm font-semibold text-[#1C2B48]">
                 Qty:
               </span>
-              <div className="flex items-center rounded border border-[#8EB1D1]/40 bg-white">
+              <div className="flex items-center rounded border border-[#1C2B48]/20 bg-white">
                 <button
                   type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="flex h-10 w-10 items-center justify-center text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+                  className="flex h-10 w-10 items-center justify-center text-[#1C2B48] transition hover:bg-[#EEF1F4]"
                   aria-label="Decrease quantity"
                 >
                   −
@@ -201,7 +201,7 @@ export default function ProductDetailModal({ product, onClose }) {
                   type="button"
                   onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
                   disabled={quantity >= maxQuantity}
-                  className="flex h-10 w-10 items-center justify-center text-[#1C2B48] transition hover:bg-[#C4D8E5] disabled:opacity-40"
+                  className="flex h-10 w-10 items-center justify-center text-[#1C2B48] transition hover:bg-[#EEF1F4] disabled:opacity-40"
                   aria-label="Increase quantity"
                 >
                   +
@@ -216,7 +216,7 @@ export default function ProductDetailModal({ product, onClose }) {
           </div>
 
           {/* Price & Add to Cart — compact sticky bar on phones so the CTA is always visible */}
-          <div className="sticky bottom-0 z-10 flex items-center gap-3 border-t border-[#8EB1D1]/20 bg-[#E8ECEF]/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:static sm:block sm:bg-transparent sm:p-6 sm:backdrop-blur-none">
+          <div className="sticky bottom-0 z-10 flex items-center gap-3 border-t border-[#1C2B48]/10 bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:static sm:block sm:bg-transparent sm:p-6 sm:backdrop-blur-none">
             <div className="flex shrink-0 flex-col items-start sm:mb-4 sm:flex-row sm:items-baseline sm:gap-3">
               {product.originalPrice ? (
                 <p className="text-xs text-[#5B7893] line-through sm:text-lg">
@@ -231,10 +231,10 @@ export default function ProductDetailModal({ product, onClose }) {
               type="button"
               onClick={handleAddToCart}
               disabled={soldOut}
-              className={`min-w-0 flex-1 rounded border px-4 py-3 text-sm font-bold uppercase tracking-[0.1em] transition sm:w-full sm:px-5 sm:py-3.5 sm:tracking-[0.16em] disabled:cursor-not-allowed disabled:border-[#8EB1D1]/40 disabled:bg-[#C4D8E5] disabled:text-[#5B7893] ${
+              className={`min-w-0 flex-1 rounded border px-4 py-3 text-sm font-bold uppercase tracking-[0.1em] transition sm:w-full sm:px-5 sm:py-3.5 sm:tracking-[0.16em] disabled:cursor-not-allowed disabled:border-[#1C2B48]/20 disabled:bg-[#EEF1F4] disabled:text-[#5B7893] ${
                 added
                   ? "border-green-500 bg-green-500 text-white"
-                  : "border-[#8EB1D1] bg-[#8EB1D1] text-[#1C2B48] hover:bg-[#A7C7E7]"
+                  : "border-[#1C2B48] bg-[#1C2B48] text-white hover:bg-[#2A3D60]"
               }`}
             >
               {soldOut ? "Sold Out" : added ? "✓ Added to Cart" : "Add to Cart"}

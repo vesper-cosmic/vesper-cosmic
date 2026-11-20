@@ -1,4 +1,5 @@
 import CheckoutFlow from "@/components/CheckoutFlow";
+import PageHero from "@/components/PageHero";
 
 export const metadata = {
   title: "Checkout | Vesper Cosmos",
@@ -8,9 +9,12 @@ export const metadata = {
 
 export default function CheckoutPage() {
   return (
-    <main className="min-h-screen bg-transparent px-4 py-10 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-transparent">
+      <PageHero size="sm" eyebrow="Secure Checkout" title="Checkout" />
+      <div className="px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <CheckoutFlow />
+      </div>
       </div>
     </main>
   );

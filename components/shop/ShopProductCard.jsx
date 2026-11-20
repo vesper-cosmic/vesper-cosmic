@@ -4,7 +4,7 @@ export default function ShopProductCard({ product, onClick }) {
   const soldOut = isProductSoldOut(product);
   return (
     <article
-      className="mist-card group flex h-full flex-col overflow-hidden rounded-lg border border-[#8EB1D1]/45 bg-[#E8ECEF]"
+      className="mist-card group flex h-full flex-col overflow-hidden rounded-sm border border-[#1C2B48]/20 bg-white"
       onClick={onClick}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -15,7 +15,7 @@ export default function ShopProductCard({ product, onClick }) {
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-[#E8ECEF]">
+      <div className="relative aspect-[4/3] overflow-hidden bg-white">
         <img
           src={product.images[0]}
           alt={product.name}
@@ -31,7 +31,7 @@ export default function ShopProductCard({ product, onClick }) {
         {productBadges(product).length ? (
           <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
             {productBadges(product).map((badge) => (
-              <span key={badge} className="rounded-full border border-[#8EB1D1] bg-[#1C2B48]/85 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#E8ECEF]">
+              <span key={badge} className="rounded-full border border-[#1C2B48]/30 bg-[#1C2B48]/85 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#E8ECEF]">
                 {badge}
               </span>
             ))}
@@ -66,13 +66,13 @@ export default function ShopProductCard({ product, onClick }) {
             </p>
           </div>
           {onClick ? (
-            <span className="mist-button inline-block cursor-pointer rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]">
+            <span className="mist-button inline-block cursor-pointer rounded border border-[#1C2B48] bg-[#1C2B48] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2A3D60]">
               View Details
             </span>
           ) : (
             <a
               href={`/order/${product.slug}`}
-              className="mist-button inline-block rounded border border-[#8EB1D1] bg-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48] transition hover:bg-[#C4D8E5]"
+              className="mist-button inline-block rounded border border-[#1C2B48] bg-[#1C2B48] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2A3D60]"
             >
               Order Now
             </a>

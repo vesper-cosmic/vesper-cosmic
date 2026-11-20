@@ -37,16 +37,16 @@ export default function CheckoutReview() {
 
   if (!checkout?.orderId || !checkout?.order?.items?.length) {
     return (
-      <div className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-6 text-center">
-        <h1 className="text-3xl font-semibold text-[#1C2B48]">
+      <div className="rounded-sm border border-[#1C2B48]/10 bg-white p-6 text-center">
+        <h2 className="text-3xl font-semibold text-[#1C2B48]">
           No order to review
-        </h1>
+        </h2>
         <p className="mt-3 text-sm leading-6 text-[#35506B]">
           Please add items to your cart and complete the checkout form first.
         </p>
         <Link
           href="/shop"
-          className="mt-6 inline-flex rounded border border-[#8EB1D1] px-4 py-2 text-sm font-semibold text-[#1C2B48]"
+          className="mt-6 inline-flex rounded border border-[#1C2B48]/30 px-4 py-2 text-sm font-semibold text-[#1C2B48]"
         >
           Back to Shop
         </Link>
@@ -124,23 +124,23 @@ export default function CheckoutReview() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5">
-        <p className="text-sm uppercase tracking-[0.24em] text-[#8EB1D1]">
+      <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-5">
+        <p className="text-sm uppercase tracking-[0.24em] text-[#5B7893]">
           Step 2 of 2 — Review & Pay
         </p>
-        <div className="mt-4 h-2 rounded-full bg-[#C4D8E5]">
-          <div className="h-2 w-full rounded-full bg-[#8EB1D1]" />
+        <div className="mt-4 h-2 rounded-full bg-[#EEF1F4]">
+          <div className="h-2 w-full rounded-full bg-[#BFA06A]" />
         </div>
-        <h1 className="mt-6 text-4xl font-semibold text-[#1C2B48]">
+        <h2 className="mt-6 text-4xl font-semibold text-[#1C2B48]">
           Review your order
-        </h1>
+        </h2>
       </section>
 
-      <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5">
+      <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-5">
         <h2 className="text-2xl font-semibold text-[#1C2B48]">Order Summary</h2>
         <dl className="mt-5 grid gap-4 text-sm">
           <SummaryRow label="Order ID" value={checkout.orderId} />
-          <div className="border-b border-[#8EB1D1]/15 pb-3">
+          <div className="border-b border-[#1C2B48]/10 pb-3">
             <dt className="mb-2 font-semibold text-[#8EB1D1]">Items</dt>
             <ul className="space-y-2">
               {enrichedItems.map((item, index) => (
@@ -177,7 +177,7 @@ export default function CheckoutReview() {
         </dl>
       </section>
 
-      <section className="rounded-lg border border-[#8EB1D1]/35 bg-[#E8ECEF] p-5">
+      <section className="rounded-sm border border-[#1C2B48]/10 bg-white p-5">
         <h2 className="text-2xl font-semibold text-[#1C2B48]">Your Details</h2>
         <dl className="mt-5 grid gap-4 text-sm">
           <SummaryRow label="Name" value={order.fullName} />
@@ -200,8 +200,8 @@ export default function CheckoutReview() {
         </dl>
       </section>
 
-      <section className="rounded-lg border border-[#8EB1D1]/45 bg-[#C4D8E5] p-5 text-center">
-        <p className="mb-4 rounded border border-[#8EB1D1]/35 bg-[#E8ECEF] p-3 text-sm leading-6 text-[#35506B]">
+      <section className="rounded-sm border border-[#1C2B48]/20 bg-[#EEF1F4] p-5 text-center">
+        <p className="mb-4 rounded border border-[#1C2B48]/10 bg-white p-3 text-sm leading-6 text-[#35506B]">
           Your order will only be confirmed after PayPal payment is completed.
           Unpaid submissions will not be processed.
         </p>
@@ -225,7 +225,7 @@ export default function CheckoutReview() {
             <button
               type="button"
               onClick={proceedToPayment}
-              className="mist-button w-full rounded border border-[#8EB1D1] bg-[#8EB1D1] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#1C2B48] transition hover:bg-[#A7C7E7]"
+              className="mist-button w-full rounded border border-[#1C2B48] bg-[#1C2B48] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white transition hover:bg-[#2A3D60]"
             >
               Proceed to Payment
             </button>
@@ -269,7 +269,7 @@ export default function CheckoutReview() {
 
 function SummaryRow({ label, value }) {
   return (
-    <div className="grid gap-1 border-b border-[#8EB1D1]/15 pb-3 sm:grid-cols-[180px_1fr]">
+    <div className="grid gap-1 border-b border-[#1C2B48]/10 pb-3 sm:grid-cols-[180px_1fr]">
       <dt className="font-semibold text-[#8EB1D1]">{label}</dt>
       <dd className="text-[#1C2B48]">{value || "—"}</dd>
     </div>

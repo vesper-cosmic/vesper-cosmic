@@ -56,7 +56,7 @@ export default function NailSizePicker({
                 className={`min-w-[3.5rem] rounded border px-4 py-2 text-sm font-bold transition ${
                   standardSize === size
                     ? "border-[#1C2B48] bg-[#1C2B48] text-white"
-                    : "border-[#8EB1D1]/50 bg-white text-[#1C2B48] hover:bg-[#C4D8E5]"
+                    : "border-[#1C2B48]/20 bg-white text-[#1C2B48] hover:bg-[#EEF1F4]"
                 }`}
               >
                 {size}
@@ -95,7 +95,7 @@ export default function NailSizePicker({
                       }
                       placeholder="mm"
                       className={`w-full rounded border bg-white px-2 py-2 text-sm text-[#1C2B48] outline-none focus:border-[#8EB1D1] ${
-                        errors[key] ? "border-red-400" : "border-[#8EB1D1]/40"
+                        errors[key] ? "border-red-400" : "border-[#1C2B48]/20"
                       }`}
                     />
                   </label>
@@ -121,7 +121,7 @@ function ModeOption({ active, onSelect, title, subtitle }) {
       className={`rounded border p-3 text-left transition ${
         active
           ? "border-[#1C2B48] bg-white shadow-sm"
-          : "border-[#8EB1D1]/40 bg-white/60 hover:bg-white"
+          : "border-[#1C2B48]/20 bg-white hover:bg-white"
       }`}
     >
       <span className="flex items-center gap-2 text-sm font-semibold text-[#1C2B48]">
@@ -141,9 +141,9 @@ function ModeOption({ active, onSelect, title, subtitle }) {
 /** Size chart: nail widths (mm) per standard size. */
 export function NailSizeChart({ highlight }) {
   return (
-    <div className="overflow-x-auto rounded border border-[#8EB1D1]/25 bg-white/70">
+    <div className="overflow-x-auto rounded border border-[#1C2B48]/10 bg-white">
       <table className="w-full min-w-[320px] text-center text-xs text-[#35506B]">
-        <thead className="bg-[#E8ECEF] text-[11px] uppercase tracking-[0.06em] text-[#5B7893]">
+        <thead className="bg-white text-[11px] uppercase tracking-[0.06em] text-[#5B7893]">
           <tr>
             <th className="px-2 py-1.5 text-left">Size (mm)</th>
             {nailSizeFingers.map((finger) => (

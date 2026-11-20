@@ -1,3 +1,5 @@
+import PageHero from "@/components/PageHero";
+
 export const metadata = {
   title: "Shipping & Delivery | VESPER COSMOS",
   description:
@@ -48,16 +50,11 @@ const processingTimes = [
 export default function ShippingPage() {
   return (
     <main className="min-h-screen bg-transparent">
-      <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-        {/* Header */}
-        <header className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#8EB1D1]">
-            Customer Care · Worldwide Delivery
-          </p>
-          <h1 className="mt-4 text-4xl font-semibold leading-tight text-[#1C2B48] sm:text-5xl">
-            Shipping & Delivery
-          </h1>
-        </header>
+      <PageHero
+        eyebrow={<>Customer Care · Worldwide Delivery</>}
+        title={<>Shipping & Delivery</>}
+      />
+      <section className="mx-auto max-w-4xl px-4 pb-16 sm:px-6 lg:px-8">
 
         {/* Intro */}
         <div className="mt-10 space-y-6 text-base leading-8 text-[#35506B] sm:text-lg sm:leading-9">
@@ -78,7 +75,7 @@ export default function ShippingPage() {
             {processingTimes.map((item) => (
               <li
                 key={item.product}
-                className="rounded-lg border border-[#8EB1D1]/20 bg-white/60 p-5"
+                className="rounded-sm border border-[#1C2B48]/10 bg-white p-5"
               >
                 <p className="text-base font-semibold text-[#1C2B48] sm:text-lg">
                   {item.product}
@@ -112,14 +109,14 @@ export default function ShippingPage() {
           <div className="mt-6 overflow-x-auto">
             <table className="w-full min-w-[560px] border-collapse text-left">
               <thead>
-                <tr className="border-b-2 border-[#8EB1D1]/40">
-                  <th className="py-3 pr-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#8EB1D1]">
+                <tr className="border-b-2 border-[#1C2B48]/20">
+                  <th className="py-3 pr-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#5B7893]">
                     Destination
                   </th>
-                  <th className="py-3 pr-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#8EB1D1]">
+                  <th className="py-3 pr-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#5B7893]">
                     Standard Shipping (Air Mail)
                   </th>
-                  <th className="py-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#8EB1D1]">
+                  <th className="py-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#5B7893]">
                     Express Shipping (EMS)
                   </th>
                 </tr>
@@ -128,7 +125,7 @@ export default function ShippingPage() {
                 {shippingZones.map((zone) => (
                   <tr
                     key={zone.destination}
-                    className="border-b border-[#8EB1D1]/20"
+                    className="border-b border-[#1C2B48]/10"
                   >
                     <td className="py-4 pr-4 text-base font-semibold text-[#1C2B48]">
                       {zone.destination}
@@ -168,7 +165,7 @@ export default function ShippingPage() {
           <h2 className="text-2xl font-semibold text-[#1C2B48] sm:text-3xl">
             Customs, Taxes & Import Duties
           </h2>
-          <p className="mt-4 rounded-lg border border-[#2E8B57]/30 bg-[#E9F5EE] p-4 text-sm leading-7 text-[#1F5E3B] sm:text-base">
+          <p className="mt-4 rounded-sm border border-[#2E8B57]/30 bg-[#E9F5EE] p-4 text-sm leading-7 text-[#1F5E3B] sm:text-base">
             <strong>United States customers — duties prepaid:</strong> we pay the U.S. import
             duties and customs fees for you when we ship (Delivered Duty Paid), so there is
             nothing extra to pay on delivery.
