@@ -5,6 +5,7 @@ import { getReferralCode } from "@/lib/referralClient";
 import { useCart } from "@/lib/cartContext";
 import { forgetNailSizing, getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import { applyBirthDataChoice, getSavedBirthData } from "@/lib/birthDataClient";
+import { addressFromSaved, applyContactChoice, getSavedContact } from "@/lib/contactDataClient";
 import NailSizePicker from "@/components/NailSizePicker";
 import CheckoutNotices from "@/components/CheckoutNotices";
 import NameFields, { joinName, nameErrors } from "@/components/NameFields";
@@ -60,7 +61,7 @@ const baseForm = {
 export default function OrderIntakeForm({ product }) {
   const router = useRouter();
   const { data: session } = useSession();
-  const { member, isSignedIn, saveDefaultBirthData } = useCart();
+  const { member, isSignedIn, saveDefaultBirthData, saveDefaultAddress } = useCart();
   const isCustomProduct = Boolean(product.requiresBirthData || product.requiresNailDetails);
   const isDigitalProduct = !product.requiresShipping;
   const [ackFinalSale, setAckFinalSale] = useState(false);
@@ -104,12 +105,27 @@ export default function OrderIntakeForm({ product }) {
     setForm((current) => (current.birthDate ? current : { ...current, ...saved }));
   }, [member, product.requiresBirthData]);
 
-  // Pre-fill the phone saved on the member's default address.
+  // Pre-fill name, email and shipping address from the last order (member
+  // account, or this browser for guests). Only fills what is still empty.
+  const [keepContact, setKeepContact] = useState(true);
   useEffect(() => {
-    const phone = member?.defaultAddress?.phone;
-    if (!phone) return;
-    setForm((current) => (current.address.phone ? current : { ...current, address: { ...current.address, phone } }));
-  }, [member]);
+    const saved = getSavedContact(member, session?.user?.email || "");
+    if (!saved) return;
+    setForm((current) => {
+      const next = { ...current };
+      if (!current.firstName && !current.lastName && (saved.firstName || saved.lastName)) {
+        next.firstName = saved.firstName;
+        next.lastName = saved.lastName;
+        next.fullName = joinName(saved.firstName, saved.lastName);
+      }
+      if (!current.email && saved.email) next.email = saved.email;
+      const addressEmpty = !current.address.addressLine1 && !current.address.city && !current.address.postalCode;
+      if (product.requiresShipping && saved.address && addressEmpty) {
+        next.address = { ...current.address, ...addressFromSaved(saved.address) };
+      }
+      return next;
+    });
+  }, [member, session?.user?.email, product.requiresShipping]);
 
   function updateField(event) {
     const { name, value } = event.target;
@@ -283,6 +299,17 @@ export default function OrderIntakeForm({ product }) {
         saveDefaultBirthData,
       });
     }
+    await applyContactChoice({
+      keep: keepContact,
+      contact: {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        address: product.requiresShipping ? form.address : null,
+      },
+      isSignedIn,
+      saveDefaultAddress,
+    });
     if (product.requiresNailDetails && form.sizeMode && !keepNails) {
       forgetNailSizing();
     } else if (product.requiresNailDetails && form.sizeMode) {
@@ -339,6 +366,17 @@ export default function OrderIntakeForm({ product }) {
         <Field label="Email Address" error={errors.email}>
           <input name="email" type="email" value={form.email} onChange={updateField} required className={inputClass} />
         </Field>
+        <label className="flex items-start gap-2 text-sm text-[#35506B]">
+          <input type="checkbox" checked={keepContact} onChange={(event) => setKeepContact(event.target.checked)} className="mt-1" />
+          <span>
+            Remember my name, email and shipping address for next time
+            <span className="block text-xs text-[#5B7893]">
+              {isSignedIn
+                ? "Saved to your account and filled in automatically (you can still edit it)."
+                : "Saved in this browser only and filled in automatically (you can still edit it). Untick on a shared computer."}
+            </span>
+          </span>
+        </label>
       </FormPanel>
 
       {product.intentionType === "single" ? (

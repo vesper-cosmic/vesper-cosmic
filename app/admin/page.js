@@ -546,6 +546,11 @@ function OrderCard({ order, onUpdated, selected = false, onToggle, shipmentNo = 
             </Link>
               </>
             )}
+            {items.some((it) => it?.birth?.birthDate && it?.nails) ? (
+              <Link href={`/admin/design-prompt?order=${encodeURIComponent(order.orderId)}`} className="rounded border border-[#8EB1D1]/50 bg-white px-2 py-0.5 text-[#35506B] hover:bg-[#C4D8E5]">
+                ✨ 設計指令
+              </Link>
+            ) : null}
           </div>
           <p className="mt-1 text-sm font-semibold text-[#35506B]">{order.fullName}</p>
           <p className="truncate text-xs text-[#5B7893]">{order.email}</p>

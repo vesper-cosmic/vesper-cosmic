@@ -12,6 +12,7 @@ import NameFields, { joinName, nameErrors, splitName } from "@/components/NameFi
 import { BirthDateSelect, BirthTimeSelect } from "@/components/BirthDateTimeInputs";
 import { forgetNailSizing, getSavedNailSizing, rememberNailSizing } from "@/lib/nailSizingClient";
 import { applyBirthDataChoice, getSavedBirthData } from "@/lib/birthDataClient";
+import { addressFromSaved, applyContactChoice, getSavedContact } from "@/lib/contactDataClient";
 import {
   countries,
   nailShapes,
@@ -53,7 +54,7 @@ export default function CheckoutFlow() {
       fullName: "",
       email: "",
       shipping: emptyAddress(),
-      saveAddressToMember: false,
+      saveAddressToMember: true, // "remember my details" — on by default, can be unticked
     };
   });
   const [itemDetails, setItemDetails] = useState(() => {
@@ -95,36 +96,31 @@ export default function CheckoutFlow() {
     );
   }, [form, itemDetails]);
 
-  // Prefill from member profile — only when the user has not typed anything yet
+  // Pre-fill name, email and shipping address from the last order (member
+  // account, or this browser for guests). Only fills what is still empty, so
+  // anything already typed — or restored from a draft — is never overwritten.
   useEffect(() => {
-    const hasDraft = sessionStorage.getItem("vesperCheckoutDraft");
-    if (hasDraft) return;
-    if (member?.defaultAddress) {
-      setForm((prev) => {
-        const address = member.defaultAddress;
-        const hasAddress =
-          address.addressLine1 || address.city || address.postalCode;
-        const receiver = address.fullName ? splitName(address.fullName) : null;
-        const contact = !prev.fullName && receiver ? { ...receiver, fullName: address.fullName } : {};
-        return {
-          ...prev,
-          ...contact,
-          shipping: hasAddress
-            ? {
-                ...(receiver ? { ...receiver, fullName: address.fullName } : {}),
-                phone: address.phone || "",
-                addressLine1: address.addressLine1 || "",
-                addressLine2: address.addressLine2 || "",
-                city: address.city || "",
-                stateProvince: address.stateProvince || "",
-                postalCode: address.postalCode || "",
-                country: address.country || "United States",
-              }
-            : prev.shipping,
-        };
-      });
-    }
-  }, [member]);
+    const saved = getSavedContact(member, userEmail);
+    if (!saved) return;
+    setForm((prev) => {
+      const next = { ...prev };
+      const hasName = Boolean(prev.firstName || prev.lastName);
+      if (!hasName && (saved.firstName || saved.lastName)) {
+        next.firstName = saved.firstName;
+        next.lastName = saved.lastName;
+        next.fullName = joinName(saved.firstName, saved.lastName);
+      }
+      if (!prev.email && saved.email) next.email = saved.email;
+      const addressEmpty = !prev.shipping.addressLine1 && !prev.shipping.city && !prev.shipping.postalCode;
+      if (saved.address && addressEmpty) {
+        const receiver = prev.shipping.firstName || prev.shipping.lastName
+          ? {}
+          : { firstName: saved.firstName, lastName: saved.lastName, fullName: joinName(saved.firstName, saved.lastName) };
+        next.shipping = { ...prev.shipping, ...receiver, ...addressFromSaved(saved.address) };
+      }
+      return next;
+    });
+  }, [member, userEmail]);
 
   const enrichedItems = useMemo(
     () =>
@@ -265,12 +261,17 @@ export default function CheckoutFlow() {
         JSON.stringify({ ...data, order: data.order })
       );
 
-      if (form.saveAddressToMember && isSignedIn) {
-        await saveDefaultAddress({
-          fullName: form.fullName,
-          ...form.shipping,
-        });
-      }
+      await applyContactChoice({
+        keep: form.saveAddressToMember,
+        contact: {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          address: hasShippingItems ? form.shipping : null,
+        },
+        isSignedIn,
+        saveDefaultAddress,
+      });
 
       window.location.href = `/checkout/review`;
     } catch {
@@ -390,25 +391,22 @@ export default function CheckoutFlow() {
             </>
           ) : null}
 
-          {isSignedIn ? (
-            <label className="flex items-start gap-2 text-sm text-[#35506B]">
-              <input
-                type="checkbox"
-                checked={form.saveAddressToMember}
-                onChange={(event) =>
-                  updateField("saveAddressToMember", event.target.checked)
-                }
-                className="mt-1"
-              />
-              <span>
-                Save this as my default shipping address for future orders
+          <label className="flex items-start gap-2 text-sm text-[#35506B]">
+            <input
+              type="checkbox"
+              checked={form.saveAddressToMember}
+              onChange={(event) => updateField("saveAddressToMember", event.target.checked)}
+              className="mt-1"
+            />
+            <span>
+              Remember my name, email and shipping address for next time
+              <span className="block text-xs text-[#5B7893]">
+                {isSignedIn
+                  ? "Saved to your account and filled in automatically (you can still edit it)."
+                  : "Saved in this browser only and filled in automatically (you can still edit it). Untick on a shared computer."}
               </span>
-            </label>
-          ) : (
-            <p className="rounded border border-[#1C2B48]/10 bg-[#EEF1F4] p-3 text-xs leading-5 text-[#35506B]">
-              Sign in to save your address and cart for next time.
-            </p>
-          )}
+            </span>
+          </label>
         </div>
       </section>
 
